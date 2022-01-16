@@ -6,19 +6,27 @@
 #    By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/01/13 16:35:21 by adda-sil          #+#    #+#              #
-#    Updated: 2022/01/16 11:29:19 by adda-sil         ###   ########.fr        #
+#    Updated: 2022/01/16 12:29:02 by adda-sil         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 
-SRCS_DIR			= .
+SRCS_DIR			= srcs
 SRCS_FILES			= 	\
 						main.cpp \
 
+HEAD_DIR			= includes
 HEAD_FILES			= \
 
+TEMPLATE_DIR		= templates
+TEMPLATE_FILES		= \
+						Stack.hpp \
+						Vector.hpp \
+
 SRCS				= $(addprefix $(SRCS_DIR)/, $(SRCS_FILES))
-INCLUDES			= -I .
+HEADERS				= $(addprefix $(HEAD_DIR)/, $(HEAD_FILES))
+TEMPLATES			= $(addprefix $(TEMPLATE_FILES)/, $(TEMPLATE_FILES))
+INCLUDES			= -I . -I $(HEAD_DIR) -I $(TEMPLATE_DIR)
 LIBS				= 
 CXX					= c++
 OPTS				=
