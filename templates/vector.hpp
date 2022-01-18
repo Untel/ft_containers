@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/16 12:01:27 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/01/18 16:05:48 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/01/18 16:46:11 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,9 +18,29 @@
 
 namespace ft
 {
-    template < class T, class Alloc = std::allocator<T> >
+    /**
+     * @brief Vector class
+     * @see https://en.cppreference.com/w/cpp/container/vector
+     * @see https://www.cplusplus.com/reference/vector/vector/
+     * @tparam T 
+     * @tparam Allocator 
+     */
+    template < class T, class Allocator = std::allocator<T> >
     class vector {
         public:
+            /**
+             * Member types
+             * @see 
+             */
+            typedef T                                           value_type;
+            typedef Allocator                                   allocator_type;
+            typedef std::size_t                                 size_type;
+            typedef std::ptrdiff_t                              difference_type;
+            typedef typename Allocator::reference               reference;
+            typedef typename Allocator::pointer                 pointer;
+            typedef typename Allocator::const_reference         const_reference;
+            typedef typename Allocator::const_pointer           const_pointer;
+
             explicit vector (const allocator_type& alloc = allocator_type()) {
                 VDBG("Default Constructor");
                 (void) alloc;
@@ -38,12 +58,7 @@ namespace ft
             vector (InputIterator first, InputIterator last, const allocator_type& alloc = allocator_type());
             ~vector(void) { VDBG("Destructor"); };
 
-        private:
-            typedef T                   value_type;
-            typedef value_type &        reference;
-            typedef value_type *        pointer;
-            typedef Alloc               allocator_type;
-            typedef size_t              size_type;
+
 
         protected:
             T * c;
