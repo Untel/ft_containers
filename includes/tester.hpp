@@ -1,24 +1,22 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Stack.hpp                                          :+:      :+:    :+:   */
+/*   tester.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/01/16 12:01:27 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/01/18 15:13:13 by adda-sil         ###   ########.fr       */
+/*   Created: 2022/01/18 15:09:35 by adda-sil          #+#    #+#             */
+/*   Updated: 2022/01/18 15:20:53 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef STACK_HPP
-# define STACK_HPP
+#ifndef TESTER_HPP
+# define TESTER_HPP
 
-namespace ft
-{
-    template <typename T>
-    class Stack {
-        
-    };
-}
+# include <string>
+# include <iostream>
+# include "vector.hpp"
 
-#endif // !STACK_HPP
+void        test_vector_main(void);
+
+#endif // !TESTER_HPP

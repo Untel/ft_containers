@@ -6,12 +6,16 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/16 12:00:27 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/01/16 12:01:00 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/01/18 15:12:10 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "tester.hpp"
 #include "Stack.hpp"
+#include "vector.hpp"
 
-int main(void) {
+int main(void)
+{
+    test_vector_main();
     return (0);
 }

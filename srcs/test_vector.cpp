@@ -1,24 +1,19 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Vector.hpp                                         :+:      :+:    :+:   */
+/*   test_vector.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/01/16 12:01:27 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/01/16 12:29:45 by adda-sil         ###   ########.fr       */
+/*   Created: 2022/01/18 15:09:31 by adda-sil          #+#    #+#             */
+/*   Updated: 2022/01/18 15:22:36 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef VECTOR_HPP
-# define VECTOR_HPP
+#include "tester.hpp"
 
-namespace ft
+void test_vector_main(void)
 {
-    template <typename T>
-    class Vector {
-        
-    }
+    std::cout << "TEST VECTORS" << std::endl;
+    ft::vector<int> v;
 }
-
-#endif // !VECTOR_HPP
