@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/19 16:09:22 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/01/19 21:24:18 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/01/19 22:22:11 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,15 +17,18 @@
 # include <iostream>
 # include "utils.hpp"
 
+static int inc = 0;
 class Awesome
 {
     public:
-        static int inc = 0;
+        static int _count;
         int _n;
         int *_list;
-        Awesome( void ) : _n(inc++) {
+        int is_cpy;
+        Awesome( void ) : _n(42), is_cpy(0) {
             DBG("Awesome Construct");
             _list = new int[10]();
+            _count++;
             // _list[1] = 666;
             // DBG("Awesome Construct" << *_list);
             // DBG("Awesome Construct" << _list[1]);
@@ -41,9 +44,9 @@ class Awesome
             // delete[] _list;
             return;
         }
-        Awesome( Awesome const &rhs ) : _n( 42 ) { *this = rhs; DBG("Awesome copy const"); }
+        Awesome( Awesome const &rhs ) { *this = rhs; DBG("Awesome copy const"); }
 
-		Awesome &operator=( Awesome const & rhs ) { this->_n = rhs._n; this->_list = rhs._list; return (*this); }
+		Awesome &operator=( Awesome const & rhs ) { this->_n = rhs._n; is_cpy = 1; this->_list = rhs._list; return (*this); }
 		bool operator==( Awesome const & rhs ) const { return (this->_n == rhs._n); }
 		bool operator!=( Awesome const & rhs ) const { return (this->_n != rhs._n); }
 		bool operator>( Awesome const & rhs ) const { return (this->_n > rhs._n); }
@@ -61,5 +64,6 @@ class Awesome
 //     o << std::endl;
 // 	return o;
 // }
+int Awesome::_count = 0;
 
 #endif
