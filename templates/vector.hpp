@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/16 12:01:27 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/01/18 22:09:42 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/01/19 14:00:55 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -143,8 +143,10 @@ namespace ft
                     VDBG("Reallocating " << new_cap);
                     T *tmp = this->_allocator.allocate(new_cap);
                     // Askip il faudra reconstruct + destroy pcq Maia l'a dit cf. Constructor
-                    for (size_type i = 0; i < this->_size; i++)
-                        tmp[i] = this->_c[i];
+                    for (size_type i = 0; i < this->_size; i++) {
+                        this->_allocator.construct(tmp + i, this->_c[i]);
+                        this->_allocator.destroy(this->_c + i);
+                    }
                     if (this->_capacity)
                         this->_allocator.deallocate(this->_c, this->_capacity);
                     this->_c = tmp;
