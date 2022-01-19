@@ -6,19 +6,19 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/16 12:01:27 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/01/18 15:13:13 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/01/19 18:03:58 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef STACK_HPP
-# define STACK_HPP
+// #ifndef STACK_HPP
+// # define STACK_HPP
 
-namespace ft
-{
-    template <typename T>
-    class Stack {
+// namespace ft
+// {
+//     template <typename T>
+//     class Stack {
         
-    };
-}
+//     };
+// }
 
-#endif // !STACK_HPP
+// #endif // !STACK_HPP

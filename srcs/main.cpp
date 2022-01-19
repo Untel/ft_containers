@@ -6,13 +6,11 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/16 12:00:27 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/01/18 22:00:14 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/01/19 18:04:38 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "tester.hpp"
-#include "Stack.hpp"
-#include "vector.hpp"
 
 int main(void)
 {

@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/16 12:01:27 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/01/19 14:00:55 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/01/19 18:23:34 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,12 +52,14 @@ namespace ft
                 const value_type & val = value_type(),
                 const allocator_type & alloc = allocator_type()
             ) : _size(n), _capacity(n), _allocator(alloc) {
-                VDBG("Parametric Constructor: " << val << " - N > " << n);
+                VDBG("Parametric Constructor: - N > " << n);
                 VDBG("Size: " << _size);
-                VDBG("Capacity: " << _capacity);
                 this->_c = this->_allocator.allocate(n);
-                for (size_type i = 0; i < n; i++)
-                    this->_allocator.construct(this->_c + i, val);
+                for (size_type i = 0; i < n; i++) {
+                    VDBG("Slt: " << i);
+                    this->_allocator.construct(&this->_c[i], val);
+                }
+                VDBG("End construct");
             }
             vector(const vector & x) {
                 VDBG("Copy Constructor");
@@ -67,9 +69,7 @@ namespace ft
             // vector (InputIterator first, InputIterator last, const allocator_type& alloc = allocator_type());
             ~vector(void) {
                 VDBG("Destructor");
-                for (size_type i = 0; i < this->_size; i++)
-                    this->_allocator.destroy(this->_c + i);
-                this->_allocator.deallocate(this->_c, this->_capacity);
+                this->_clearContainer();
             };
 
             // Data access
@@ -85,7 +85,6 @@ namespace ft
                     throw std::out_of_range("out of range");
                 return this->_c[position];
             }
-
             void push_back (const value_type& val) {
                 if (this->_size == this->_capacity) {
                     VDBG("Max size reached");
@@ -94,41 +93,20 @@ namespace ft
                 this->at(this->_size++) = val;
             }
 
-            reference operator[] (size_type position) {
-                return this->at(position);
-            }
-            const_reference operator[] (size_type position) const {
-                return this->at(position);
-            }
-
-            reference front() {
-                return *this->_c;
-            };
-            const_reference front() const {
-                return *this->_c;
-            }
-
-            reference back() {
-                return this->_c[this->_size];
-            }
-            const_reference back() const {
-                return this->_c[this->_size];
-            }
-
-            allocator_type get_allocator() const {
-                return this->_allocator;
-            }
-
-            // Size
-            size_type size() const {
-                return this->_size;
-            }
-            size_type max_size() const {
-                return this->_allocator.max_size();
-            }
-            size_type capacity() const {
-                return this->_capacity;
-            }
+            // getters
+            allocator_type      get_allocator() const { return this->_allocator; }
+            reference           operator[] (size_type position) { return this->at(position); }
+            const_reference     operator[] (size_type position) const { return this->at(position); }
+            T *                 data() { return this->_c; }
+            const T *           data() const { return this->_c; }
+            reference           front() { return *this->_c; }
+            const_reference     front() const { return *this->_c; }
+            reference           back() { return this->_c[this->_size]; }
+            const_reference     back() const { return this->_c[this->_size]; }
+            size_type           size() const { return this->_size; }
+            size_type           max_size() const { return this->_allocator.max_size(); }
+            size_type           capacity() const { return this->_capacity; }
+            
             /**
              * @brief 
              * Increase the capacity of the vector to a value that's greater or equal to new_cap. If new_cap is greater than the current capacity(), new storage is allocated, otherwise the function does nothing.
@@ -141,14 +119,8 @@ namespace ft
                     throw std::length_error("Length error");
                 } else if (new_cap > this->_capacity) {
                     VDBG("Reallocating " << new_cap);
-                    T *tmp = this->_allocator.allocate(new_cap);
-                    // Askip il faudra reconstruct + destroy pcq Maia l'a dit cf. Constructor
-                    for (size_type i = 0; i < this->_size; i++) {
-                        this->_allocator.construct(tmp + i, this->_c[i]);
-                        this->_allocator.destroy(this->_c + i);
-                    }
-                    if (this->_capacity)
-                        this->_allocator.deallocate(this->_c, this->_capacity);
+                    T *tmp = this->_allocateContainerType(this->_c);
+                    this->_clearContainer();
                     this->_c = tmp;
                     this->_capacity = new_cap;
                 }
@@ -160,13 +132,20 @@ namespace ft
             allocator_type              _allocator;
             T *                         _c;
 
-            void    _upCapacity(size_type count) {
-                size_type target = this->_size + count;
-                if (target > this->_capacity) {
-                    if (target > this->max_size()) {
-                        throw std::exception();
-                    }
+            void _clearContainer(void) {
+                if (this->_capacity) {
+                    VDBG("Cleaning actual container");
+                    for (size_type i = 0; i < this->_size; i++)
+                        this->_allocator.destroy(this->_c + i);
+                    this->_allocator.deallocate(this->_c, this->_capacity);
                 }
+            }
+            T * _allocateContainerType(size_type s, T *from) {
+                T *tmp = this->_allocator.allocate(s);
+                for (size_type i = 0; i < this->_size; i++) {
+                    this->_allocator.construct(tmp + i, from[i]);
+                }
+                return tmp;
             }
     };
 }

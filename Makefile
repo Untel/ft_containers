@@ -6,7 +6,7 @@
 #    By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/01/13 16:35:21 by adda-sil          #+#    #+#              #
-#    Updated: 2022/01/18 21:10:03 by adda-sil         ###   ########.fr        #
+#    Updated: 2022/01/19 16:12:12 by adda-sil         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -20,6 +20,7 @@ HEAD_DIR			= includes
 HEAD_FILES			= \
 						tester.hpp \
 						utils.hpp \
+						awesome.hpp \
 
 TEMPLATE_DIR		= templates
 TEMPLATE_FILES		= \
