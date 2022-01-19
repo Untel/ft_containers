@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/16 12:01:27 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/01/19 18:23:34 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/01/19 20:38:59 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,21 +55,20 @@ namespace ft
                 VDBG("Parametric Constructor: - N > " << n);
                 VDBG("Size: " << _size);
                 this->_c = this->_allocator.allocate(n);
-                for (size_type i = 0; i < n; i++) {
-                    VDBG("Slt: " << i);
+                for (size_type i = 0; i < n; i++)
                     this->_allocator.construct(&this->_c[i], val);
-                }
                 VDBG("End construct");
             }
             vector(const vector & x) {
                 VDBG("Copy Constructor");
+                this->clear();
                 *this = x;
             };
             // template <class InputIterator>
             // vector (InputIterator first, InputIterator last, const allocator_type& alloc = allocator_type());
             ~vector(void) {
                 VDBG("Destructor");
-                this->_clearContainer();
+                this->_clean();
             };
 
             // Data access
@@ -120,10 +119,20 @@ namespace ft
                 } else if (new_cap > this->_capacity) {
                     VDBG("Reallocating " << new_cap);
                     T *tmp = this->_allocateContainerType(this->_c);
-                    this->_clearContainer();
+                    this->_clean();
                     this->_c = tmp;
                     this->_capacity = new_cap;
                 }
+            }
+
+            void clear(void) {
+                if (this->_size) {
+                    VDBG("Cleaning actual container");
+                    for (size_type i = 0; i < this->_size; i++) {
+                        this->_allocator.destroy(this->_c + i);
+                    }
+                }
+                this->_size = 0;
             }
 
         private:
@@ -132,20 +141,19 @@ namespace ft
             allocator_type              _allocator;
             T *                         _c;
 
-            void _clearContainer(void) {
-                if (this->_capacity) {
-                    VDBG("Cleaning actual container");
-                    for (size_type i = 0; i < this->_size; i++)
-                        this->_allocator.destroy(this->_c + i);
-                    this->_allocator.deallocate(this->_c, this->_capacity);
-                }
-            }
             T * _allocateContainerType(size_type s, T *from) {
                 T *tmp = this->_allocator.allocate(s);
                 for (size_type i = 0; i < this->_size; i++) {
                     this->_allocator.construct(tmp + i, from[i]);
                 }
                 return tmp;
+            }
+
+            void _clean(void) {
+                this->clear();
+                if (this->_capacity)
+                    this->_allocator.deallocate(this->_c, this->_capacity);
+                this->_capacity = 0;
             }
     };
 }
