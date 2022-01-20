@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/19 16:09:22 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/01/20 20:15:18 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/01/20 21:38:27 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,9 +21,10 @@ class Awesome
 {
     public:
         int _n;
+        std::string const str;
         int *_list;
         int is_cpy;
-        explicit Awesome( void ) : _n(42), is_cpy(0) {
+        Awesome( void ) : _n(42), str("None tmtc"), is_cpy(0) {
             DBG("Awesome Construct");
             // _list = new int[10]();
             // _list[1] = 666;
@@ -33,7 +34,7 @@ class Awesome
 
             return;
         }
-        explicit Awesome( int n ) : _n(n), is_cpy(0) {
+        Awesome( int n ) : _n(n), str(std::string("N=").append(toString(n))), is_cpy(0) {
             DBG("Awesome Construct By ints: " << n);
             // _list = new int[10]();
             // _list[1] = 666;
@@ -51,9 +52,17 @@ class Awesome
             // delete[] _list;
             return;
         }
-        Awesome( Awesome const &rhs ) { *this = rhs; DBG("Awesome copy const"); }
+        Awesome( Awesome const &rhs ) : str(rhs.str) {
+            *this = rhs; DBG("Awesome copy const " << rhs.str);
+        }
 
-		Awesome &operator=( Awesome const & rhs ) { this->_n = rhs._n; is_cpy = 1; this->_list = rhs._list; return (*this); }
+		Awesome &operator=( Awesome const & rhs ) {
+            this->_n = rhs._n;
+            is_cpy = 1;
+            this->_list = rhs._list;
+            DBG("Test = str " << this->str << " vs " << rhs.str << " from " << this->_n);
+            return (*this);
+        }
 		bool operator==( Awesome const & rhs ) const { return (this->_n == rhs._n); }
 		bool operator!=( Awesome const & rhs ) const { return (this->_n != rhs._n); }
 		bool operator>( Awesome const & rhs ) const { return (this->_n > rhs._n); }

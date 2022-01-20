@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/16 12:01:27 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/01/20 20:29:59 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/01/20 20:50:28 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,7 +100,14 @@ namespace ft
             iterator insert (iterator position, const value_type& val) {
                 difference_type idx = (position - this->begin()); //maybe fail if not ref
                 
-                return iterator(this->_c[idx]);
+                if (this->_size == this->_capacity) {
+                    this->reserve(this->_capacity * 2);
+                }
+                for (size_t i = idx; i < idx + _size; i++)
+                    this->_c[i + _size] = this->_c[i];
+
+
+                return iterator(this->_c + idx);
             }
             void insert (iterator position, size_type n, const value_type& val);
             template <class InputIterator>

@@ -6,41 +6,58 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/18 15:09:31 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/01/20 20:14:32 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/01/20 21:50:36 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "tester.hpp"
 
-void test_vector_main(void)
-{
-    std::cout << "TEST VECTORS" << std::endl;
+void thetest(void) {
+	    std::cout << "TEST VECTORS" << std::endl;
     ft::vector<Awesome> v;
-	v.reserve(1);
+	v.reserve(30);
 	for (int i = 0; i < 10; i++)
-		v.push_back(Awesome(i));
+		v.push_back(i);
 
 	ft::vector<Awesome>::iterator it = v.begin();
 	ft::vector<Awesome>::iterator ite = v.end();
 
+	std::cout << ">>>>>>>>>>>> Inserting " << std::endl;
+	ft::vector<Awesome>::iterator lit = v.insert(it + 4, Awesome(666));
+	std::cout << ">>>>>>>>>>>> Inserted " << (*lit).get() << std::endl;
+	(void)lit;
+	(void)it;
+
+	ft::vector<Awesome>::iterator nit = v.begin();
+	ite = v.end();
+
 	// it =;
-	for (; it != ite; it++) {
-		std::cout << "Iter " << (*it).get() << std::endl;
+	for (; nit != ite; nit++) {
+		std::cout << "Iter " << (*nit).str << std::endl;
 	}
-	// v.push_back(666);
-	// std::cout << "First " << v[0] << std::endl;
+}
 
+void test_vector_main(void) {
+	std::cout << "TEST VECTORS" << std::endl;
+    ft::vector<Awesome> v;
+	v.reserve(30);
+	for (int i = 0; i < 10; i++)
+		v.push_back(i);
 
-    // ft::vector<int> v(10, 9);
-	// for (int i = 0;i < 10; i++)
-	// 	std::cout << "Iter " << i << " = " << v[i] << std::endl;
-	// v.reserve(30);
-	// for (int i = 0;i < 10; i++)
-	// 	std::cout << "Iter2 " << i << " = " << v[i] << std::endl;
-	// v.reserve(31);
-	// for (int i = 0;i < 10; i++)
-	// 	std::cout << "Iter3 " << i << " = " << v[i] << std::endl;
+	ft::vector<Awesome>::iterator it = v.begin();
+	ft::vector<Awesome>::iterator ite = v.end();
 
-    // std::cout << "At 2" << v[2] << std::endl;
+	std::cout << ">>>>>>>>>>>> Inserting " << std::endl;
+	v.insert(it + 2, 4, Awesome(666));
+	std::cout << ">>>>>>>>>>>> Inserted " << std::endl;
+	// (void)lit;
+	(void)it;
 
+	ft::vector<Awesome>::iterator nit = v.begin();
+	ite = v.end();
+
+	std::cout << "Size " << v.size() << std::endl;
+	for (; nit != ite; nit++) {
+		std::cout << "Iter " << (*nit).str << " From " << (*nit)._n << std::endl;
+	}
 }
