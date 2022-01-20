@@ -6,52 +6,56 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/19 20:05:28 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/01/19 22:24:01 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/01/20 18:39:21 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef ITERATOR_HPP
 # define ITERATOR_HPP
 # include <iterator>
+# include <cstddef>
 
 namespace ft {
 
-	template < class Iterator >
+	template <class Iterator>
 	class iterator_trait {
-		typedef Iterator::difference_type                   difference_type;
-		typedef Iterator::value_type                        value_type;
-		typedef Iterator::pointer                           pointer;
-		typedef Iterator::reference                         reference;
-		typedef Iterator::iterator_category                 iterator_category;
+		public:
+			typedef typename Iterator::difference_type                   difference_type;
+			typedef typename Iterator::value_type                        value_type;
+			typedef typename Iterator::pointer                           pointer;
+			typedef typename Iterator::reference                         reference;
+			typedef typename Iterator::iterator_category                 iterator_category;
 	};
 
 	template <class T>
 	class iterator_trait<T *> {
-			typedef ptrdiff_t                               difference_type;
-			typedef T                                       value_type;
-			typedef T *                                     pointer;
-			typedef T &                                     reference;
-			typedef std::random_access_iterator_tag         iterator_category;
+		public:
+			typedef ptrdiff_t                               	difference_type;
+			typedef T                                       	value_type;
+			typedef T *                                     	pointer;
+			typedef T &                                     	reference;
+			typedef std::random_access_iterator_tag         	iterator_category;
 	};
 
 	template <class T>
 	class iterator_trait<const T *> {
-			typedef ptrdiff_t                               difference_type;
-			typedef T                                       value_type;
-			typedef const T *                               pointer;
-			typedef const T &                               reference;
-			typedef std::random_access_iterator_tag         iterator_category;
+		public:
+			typedef ptrdiff_t                           	difference_type;
+			typedef T                                   	value_type;
+			typedef const T *                           	pointer;
+			typedef const T &                           	reference;
+			typedef std::random_access_iterator_tag     	iterator_category;
 	};
 
 	template <class Iterator>
 	class reverse_iterator {
 		public: 
-			typedef	Iterator														iterator_type
-			typedef ft::iterator_trait<Iterator>::difference_type                   difference_type;
-			typedef ft::iterator_trait<Iterator>::value_type                        value_type;
-			typedef ft::iterator_trait<Iterator>::pointer                           pointer;
-			typedef ft::iterator_trait<Iterator>::reference                         reference;
-			typedef ft::iterator_trait<Iterator>::iterator_category                 iterator_category;
+			typedef	Iterator														iterator_type;
+			typedef typename ft::iterator_trait<Iterator>::difference_type          difference_type;
+			typedef typename ft::iterator_trait<Iterator>::value_type               value_type;
+			typedef typename ft::iterator_trait<Iterator>::pointer                  pointer;
+			typedef typename ft::iterator_trait<Iterator>::reference                reference;
+			typedef typename ft::iterator_trait<Iterator>::iterator_category        iterator_category;
 
 			// default (1)	
 			reverse_iterator() : _base(iterator_type()) {}
@@ -59,16 +63,20 @@ namespace ft {
 			explicit reverse_iterator (iterator_type it) : _base(it) {}
 			// copy (3)	
 			template <class Iter>
-			reverse_iterator (const reverse_iterator<Iter> v & rev_it) { *this = rev_it; }
+			reverse_iterator (const reverse_iterator<Iter> & rev_it) { *this = rev_it; }
 
 			reverse_iterator & operator ++ (void) { --this->_base; return *this; }
 			reverse_iterator operator ++ (int) { reverse_iterator tmp(*this); operator++(); return tmp; }
 			reverse_iterator & operator -- (void) { ++this->_base; return *this; }	
 			reverse_iterator operator -- (int) { reverse_iterator tmp(*this); operator--(); return tmp; }
 			
+			/**
+			 * @brief cppreference.com ask tparams U
+			 * cplusplus.com say to dont implement this operator
+			 * @todo check if possible in cpp98
+			 */
 			template< class U >
-			reverse_iterator & operator = ( const reverse_iterator<U> &other) { this->_base = other._base }
-
+			reverse_iterator & operator = ( const reverse_iterator<U> &other) { this->_base = other._base; }
 			iterator_type base() const {
 				return this->_base;
 			}
@@ -103,6 +111,12 @@ namespace ft {
 		private:
 			iterator_type	_base;
 	};
+
+	/**
+	 * @brief cppreference.com ask for 2 tparams
+	 * cplusplus.com ask for one
+	 * @todo check if comparison between 2 differents iterators is possible. It could be problematic if it is
+	 */
 	template <class Iterator, class Iterator2>
 	bool operator == (const reverse_iterator<Iterator> & lhs, const reverse_iterator<Iterator2> & rhs) {
 		return lhs.base() == rhs.base();
@@ -128,6 +142,5 @@ namespace ft {
 		return lhs.base() <= rhs.base();
 	}
 }
-
 
 #endif

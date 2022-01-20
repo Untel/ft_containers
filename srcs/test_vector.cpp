@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/18 15:09:31 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/01/19 17:50:08 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/01/20 20:14:32 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,18 @@
 void test_vector_main(void)
 {
     std::cout << "TEST VECTORS" << std::endl;
-    ft::vector<Awesome> v(10);
+    ft::vector<Awesome> v;
+	v.reserve(1);
+	for (int i = 0; i < 10; i++)
+		v.push_back(Awesome(i));
+
+	ft::vector<Awesome>::iterator it = v.begin();
+	ft::vector<Awesome>::iterator ite = v.end();
+
+	// it =;
+	for (; it != ite; it++) {
+		std::cout << "Iter " << (*it).get() << std::endl;
+	}
 	// v.push_back(666);
 	// std::cout << "First " << v[0] << std::endl;
 

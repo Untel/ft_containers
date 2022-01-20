@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/16 12:01:27 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/01/19 20:38:59 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/01/20 20:29:59 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,8 @@
 # include <iostream>
 # include <stdexcept>
 # include "utils.hpp"
+# include "array_iterator.hpp"
+# include "iterator.hpp"
 
 namespace ft
 {
@@ -31,14 +33,16 @@ namespace ft
     class vector {
         public:
             // Member types
-            typedef T                                           value_type;
-            typedef Allocator                                   allocator_type;
-            typedef std::size_t                                 size_type;
-            typedef std::ptrdiff_t                              difference_type;
-            typedef typename Allocator::reference               reference;
-            typedef typename Allocator::pointer                 pointer;
-            typedef typename Allocator::const_reference         const_reference;
-            typedef typename Allocator::const_pointer           const_pointer;
+            typedef T                                               value_type;
+            typedef Allocator                                       allocator_type;
+            typedef std::size_t                                     size_type;
+            typedef std::ptrdiff_t                                  difference_type;
+            typedef typename Allocator::reference                   reference;
+            typedef typename Allocator::pointer                     pointer;
+            typedef typename Allocator::const_reference             const_reference;
+            typedef typename Allocator::const_pointer               const_pointer;
+            typedef typename ft::array_iterator<const value_type>   const_iterator;
+            typedef typename ft::array_iterator<value_type>         iterator;
 
             // Member functions
             explicit vector (const allocator_type& alloc = allocator_type()) :
@@ -51,12 +55,13 @@ namespace ft
                 size_type n,
                 const value_type & val = value_type(),
                 const allocator_type & alloc = allocator_type()
-            ) : _size(n), _capacity(n), _allocator(alloc) {
+            ) : _size(0), _capacity(0), _allocator(alloc) {
                 VDBG("Parametric Constructor: - N > " << n);
                 VDBG("Size: " << _size);
-                this->_c = this->_allocator.allocate(n);
+                this->reserve(n);
                 for (size_type i = 0; i < n; i++)
                     this->_allocator.construct(&this->_c[i], val);
+                this->_size = n;
                 VDBG("End construct");
             }
             vector(const vector & x) {
@@ -87,10 +92,19 @@ namespace ft
             void push_back (const value_type& val) {
                 if (this->_size == this->_capacity) {
                     VDBG("Max size reached");
-                    this->reserve(this->_capacity * 2 || 1);
+                    this->reserve(this->_capacity * 2);
                 }
                 this->at(this->_size++) = val;
             }
+
+            iterator insert (iterator position, const value_type& val) {
+                difference_type idx = (position - this->begin()); //maybe fail if not ref
+                
+                return iterator(this->_c[idx]);
+            }
+            void insert (iterator position, size_type n, const value_type& val);
+            template <class InputIterator>
+            void insert (iterator position, InputIterator first, InputIterator last);
 
             // getters
             allocator_type      get_allocator() const { return this->_allocator; }
@@ -117,22 +131,41 @@ namespace ft
                 if (new_cap > this->max_size()) {
                     throw std::length_error("Length error");
                 } else if (new_cap > this->_capacity) {
+                    size_type s = this->_size;
                     VDBG("Reallocating " << new_cap);
-                    T *tmp = this->_allocateContainerType(this->_c);
+                    pointer tmp = this->_allocator.allocate(new_cap + 1);
+                    for (size_type i = 0; i < this->_size; i++)
+                        this->_allocator.construct(tmp + i, this->_c[i]);
                     this->_clean();
                     this->_c = tmp;
+                    this->_size = s;
                     this->_capacity = new_cap;
                 }
             }
 
             void clear(void) {
                 if (this->_size) {
-                    VDBG("Cleaning actual container");
+                    VDBG("Clearing actual container");
                     for (size_type i = 0; i < this->_size; i++) {
                         this->_allocator.destroy(this->_c + i);
                     }
                 }
                 this->_size = 0;
+            }
+
+            iterator begin() {
+                VDBG("Begin iterator" << this->_c[0].get() );
+                return iterator(this->_c);
+            }
+            const_iterator begin() const {
+                return iterator(this->_c);
+            }
+            iterator end() {
+                VDBG("End iterator");
+                return iterator(this->_c + this->_size);
+            }
+            const_iterator end() const {
+                return iterator(this->_c + this->_size);
             }
 
         private:
@@ -141,18 +174,10 @@ namespace ft
             allocator_type              _allocator;
             T *                         _c;
 
-            T * _allocateContainerType(size_type s, T *from) {
-                T *tmp = this->_allocator.allocate(s);
-                for (size_type i = 0; i < this->_size; i++) {
-                    this->_allocator.construct(tmp + i, from[i]);
-                }
-                return tmp;
-            }
-
             void _clean(void) {
                 this->clear();
                 if (this->_capacity)
-                    this->_allocator.deallocate(this->_c, this->_capacity);
+                    this->_allocator.deallocate(this->_c, this->_capacity + 1);
                 this->_capacity = 0;
             }
     };
