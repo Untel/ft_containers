@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/16 12:01:27 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/01/21 14:54:54 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/01/21 20:45:37 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@
 # include "utils.hpp"
 # include "array_iterator.hpp"
 # include "iterator.hpp"
+# include "iVector.hpp"
 
 namespace ft
 {
@@ -51,7 +52,7 @@ namespace ft
                 _size(0), _capacity(0), _allocator(alloc)
             {
                 VDBG("Default Constructor");
-                (void) alloc;
+                this->_c = this->_allocator.allocate(1);
             };
             explicit vector (
                 size_type n,
@@ -62,7 +63,7 @@ namespace ft
                 VDBG("Size: " << _size);
                 this->reserve(n);
                 for (size_type i = 0; i < n; i++)
-                    this->_allocator.construct(&this->_c[i], val);
+                    this->_allocator.construct(this->_c + i, val);
                 this->_size = n;
                 VDBG("End construct");
             }
@@ -91,16 +92,18 @@ namespace ft
                     throw std::out_of_range("out of range");
                 return this->_c[position];
             }
-            void push_back (const value_type& val) {
+            void push_back (const value_type & val) {
                 if (this->_size == this->_capacity) {
                     VDBG("Max size reached");
                     this->reserve(this->_capacity * 2);
                 }
-                this->at(this->_size++) = val;
+                // this->c + this->_size++ = value_type(val);
+                this->_allocator.construct(this->_c + this->_size++, val);
             }
 
             void pop_back() {
                 VDBG("Poping back");
+                this->erase(this->end() - 1);
             }
 
             // iterator insert (iterator position, const value_type& val) {
@@ -116,8 +119,47 @@ namespace ft
             //     return iterator(this->_c + idx);
             // }
             void insert (iterator position, size_type n, const value_type& val);
+
             template <class InputIterator>
-            void insert (iterator position, InputIterator first, InputIterator last);
+            void insert (iterator position, InputIterator first, InputIterator last) {
+                difference_type dist = std::distance(first, last);
+                difference_type at = std::distance(this->begin(), position);
+                // difference_type fe = this->end() - at;
+                // (void)fe;
+                difference_type still_constructed = this->end() - position;
+                difference_type to_construct = dist - still_constructed;
+                if (this->_size + dist > this->_capacity) {
+                    VDBG("Should upgrade container size");
+                } else {
+                    VDBG("Have enough container size");
+                    for (difference_type i = 0; i < to_construct; i++) {
+                        difference_type fromIdx = at + still_constructed + i;
+                        difference_type targetIdx = still_constructed + i;
+                        VDBG("To construct: " << (*(first + targetIdx)).str << " at idx " << fromIdx);
+                        this->_allocator.construct(this->_c + fromIdx, *(first + targetIdx));
+                    }
+                    for (difference_type i = 0; i < still_constructed; i++) {
+                        difference_type idx = at + i + dist;
+                        VDBG("Still constructed copy: " << (*(position + i)).str << " at idx " << idx);
+                        this->_allocator.construct(this->_c + idx, *(position + i));
+                    }
+                    for (difference_type i = 0; i < still_constructed; i++) {
+                        VDBG("Still constructed assignation: " << (*(position + i)).str << " at idx " << at + i);
+                        *(this->_c + at + i) = *(first + i);
+                    }
+                }
+
+                this->_size += dist;
+            }
+
+            // void _buildHole(iterator position, difference_type width) {
+            //     iterator b = this->begin();
+            //     iterator e = this->end();
+
+            //     for (size_type s = this->_size; s < this->_size + width; s++) {
+                    
+            //     }
+            // }
 
             iterator erase (iterator position) {
                 if (position < this->end())
@@ -129,11 +171,11 @@ namespace ft
                 size_type n         = last - first;
                 VDBG("Erasing " << n << " elements");
 
-                // Iterer qu'il y a entre iterator last a detruire et iterator end()
+                // Iterer entre iterator last et iterator end(), car on déplace ce qu'il y a après last a l'endroit mémoire qu'on erase
                 // Cf. problème de memset dans libft (gauche a droite et pas droite a gauche)
-                iterator it = last;
-                for (; it != e; it++) {
-                    VDBG("Erasing " << (it - n)->get() << " with " << it->get() );
+                iterator it = first;
+                for (; it != e - n; it++) {
+                    // VDBG("Erasing " << (it - n)->get() << " with " << it->get() );
                     *(it - n) = *(it); // assigner de n elements vers la gauche
                 }
                 it = e - n;
@@ -149,7 +191,7 @@ namespace ft
             void resize (size_type n, value_type val = value_type()) {
                 if (n < this->_size) {
                     VDBG("Resizing: deletion");
-                    // do erase
+                    this->erase(this->begin() + n, this->end());
                 } else if (n > this->_size) {
                     VDBG("Resizing: addition");
                     // do insert
@@ -236,8 +278,7 @@ namespace ft
 
             void _clean(void) {
                 this->clear();
-                if (this->_capacity)
-                    this->_allocator.deallocate(this->_c, this->_capacity + 1);
+                this->_allocator.deallocate(this->_c, this->_capacity + 1);
                 this->_capacity = 0;
             }
     };

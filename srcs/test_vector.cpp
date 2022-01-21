@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/18 15:09:31 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/01/21 00:04:55 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/01/21 20:32:41 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,11 +72,14 @@ void test_vector_main(void) {
 
 	ft::vector<Awesome>::iterator it = v.begin();
 	ft::vector<Awesome>::iterator ite = v.end();
-
+	std::cout << ">>>>>>>>>>>> Prepare range ite " << std::endl;
+    ft::vector<Awesome> x;
+	x.reserve(30);
+	for (int i = 70; i < 75; i++)
+		x.push_back(i);
 	std::cout << ">>>>>>>>>>>> Inserting " << std::endl;
-	ft::vector<Awesome>::iterator four = v.erase(it + 2, it + 4);
+	v.insert(ite - 2, x.begin(), x.end());
 	std::cout << ">>>>>>>>>>>> Inserted " << std::endl;
-	std::cout << ">>>>>>>>>>>> Should be it + 4 " << (*four).get() << std::endl;
 	// (void)lit;
 	(void)it;
 
