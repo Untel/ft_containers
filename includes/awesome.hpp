@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/19 16:09:22 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/01/20 21:38:27 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/01/21 00:17:10 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,13 +53,14 @@ class Awesome
             return;
         }
         Awesome( Awesome const &rhs ) : str(rhs.str) {
-            *this = rhs; DBG("Awesome copy const " << rhs.str);
+            DBG("Awesome copy const " << rhs.str);
+            *this = rhs;
         }
 
 		Awesome &operator=( Awesome const & rhs ) {
             this->_n = rhs._n;
             is_cpy = 1;
-            this->_list = rhs._list;
+            // this->_list = rhs._list;
             DBG("Test = str " << this->str << " vs " << rhs.str << " from " << this->_n);
             return (*this);
         }

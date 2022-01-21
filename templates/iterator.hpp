@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/19 20:05:28 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/01/20 18:39:21 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/01/20 22:12:21 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@
 namespace ft {
 
 	template <class Iterator>
-	class iterator_trait {
+	class iterator_traits {
 		public:
 			typedef typename Iterator::difference_type                   difference_type;
 			typedef typename Iterator::value_type                        value_type;
@@ -28,7 +28,7 @@ namespace ft {
 	};
 
 	template <class T>
-	class iterator_trait<T *> {
+	class iterator_traits<T *> {
 		public:
 			typedef ptrdiff_t                               	difference_type;
 			typedef T                                       	value_type;
@@ -38,7 +38,7 @@ namespace ft {
 	};
 
 	template <class T>
-	class iterator_trait<const T *> {
+	class iterator_traits<const T *> {
 		public:
 			typedef ptrdiff_t                           	difference_type;
 			typedef T                                   	value_type;
@@ -51,11 +51,11 @@ namespace ft {
 	class reverse_iterator {
 		public: 
 			typedef	Iterator														iterator_type;
-			typedef typename ft::iterator_trait<Iterator>::difference_type          difference_type;
-			typedef typename ft::iterator_trait<Iterator>::value_type               value_type;
-			typedef typename ft::iterator_trait<Iterator>::pointer                  pointer;
-			typedef typename ft::iterator_trait<Iterator>::reference                reference;
-			typedef typename ft::iterator_trait<Iterator>::iterator_category        iterator_category;
+			typedef typename ft::iterator_traits<Iterator>::difference_type          difference_type;
+			typedef typename ft::iterator_traits<Iterator>::value_type               value_type;
+			typedef typename ft::iterator_traits<Iterator>::pointer                  pointer;
+			typedef typename ft::iterator_traits<Iterator>::reference                reference;
+			typedef typename ft::iterator_traits<Iterator>::iterator_category        iterator_category;
 
 			// default (1)	
 			reverse_iterator() : _base(iterator_type()) {}

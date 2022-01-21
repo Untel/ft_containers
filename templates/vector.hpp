@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/16 12:01:27 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/01/20 20:50:28 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/01/21 14:54:54 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,16 +33,18 @@ namespace ft
     class vector {
         public:
             // Member types
-            typedef T                                               value_type;
-            typedef Allocator                                       allocator_type;
-            typedef std::size_t                                     size_type;
-            typedef std::ptrdiff_t                                  difference_type;
-            typedef typename Allocator::reference                   reference;
-            typedef typename Allocator::pointer                     pointer;
-            typedef typename Allocator::const_reference             const_reference;
-            typedef typename Allocator::const_pointer               const_pointer;
-            typedef typename ft::array_iterator<const value_type>   const_iterator;
-            typedef typename ft::array_iterator<value_type>         iterator;
+            typedef T                                                           value_type;
+            typedef Allocator                                                   allocator_type;
+            typedef typename Allocator::reference                               reference;
+            typedef typename Allocator::pointer                                 pointer;
+            typedef typename Allocator::const_reference                         const_reference;
+            typedef typename Allocator::const_pointer                           const_pointer;
+            typedef typename ft::array_iterator<const value_type>               const_iterator;
+            typedef typename ft::array_iterator<value_type>                     iterator;
+            typedef typename ft::reverse_iterator< const_iterator >             const_reverse_iterator;
+            typedef typename ft::reverse_iterator< iterator >                   reverse_iterator;
+            typedef typename ft::iterator_traits<iterator>::difference_type     difference_type;
+            typedef std::size_t                                                 size_type;
 
             // Member functions
             explicit vector (const allocator_type& alloc = allocator_type()) :
@@ -97,21 +99,62 @@ namespace ft
                 this->at(this->_size++) = val;
             }
 
-            iterator insert (iterator position, const value_type& val) {
-                difference_type idx = (position - this->begin()); //maybe fail if not ref
-                
-                if (this->_size == this->_capacity) {
-                    this->reserve(this->_capacity * 2);
-                }
-                for (size_t i = idx; i < idx + _size; i++)
-                    this->_c[i + _size] = this->_c[i];
-
-
-                return iterator(this->_c + idx);
+            void pop_back() {
+                VDBG("Poping back");
             }
+
+            // iterator insert (iterator position, const value_type& val) {
+            //     size_type idx = (position - this->begin()); //maybe fail if not ref
+                
+            //     if (this->_size == this->_capacity) {
+            //         this->reserve(this->_capacity * 2);
+            //     }
+            //     for (size_t i = idx; i < idx + _size; i++)
+            //         this->_c[i + _size] = this->_c[i];
+
+
+            //     return iterator(this->_c + idx);
+            // }
             void insert (iterator position, size_type n, const value_type& val);
             template <class InputIterator>
             void insert (iterator position, InputIterator first, InputIterator last);
+
+            iterator erase (iterator position) {
+                if (position < this->end())
+                    this->erase(position, position + 1);
+            }
+            iterator erase (iterator first, iterator last) {
+                iterator e          = this->end();
+                // Nombre d'el a remove
+                size_type n         = last - first;
+                VDBG("Erasing " << n << " elements");
+
+                // Iterer qu'il y a entre iterator last a detruire et iterator end()
+                // Cf. problème de memset dans libft (gauche a droite et pas droite a gauche)
+                iterator it = last;
+                for (; it != e; it++) {
+                    VDBG("Erasing " << (it - n)->get() << " with " << it->get() );
+                    *(it - n) = *(it); // assigner de n elements vers la gauche
+                }
+                it = e - n;
+                // détruire les n éléments en partant du iterator end()
+                // on ne détruit pas les éléments qu'on a érase, mais ceux a la fin du ctn, qui on été réassigné a la boucle précédente
+                for (; it != e; it++)
+                    this->_allocator.destroy(&(*it));
+                this->_size -= n;
+                return first;
+            }
+
+            // will probably just call insert ??
+            void resize (size_type n, value_type val = value_type()) {
+                if (n < this->_size) {
+                    VDBG("Resizing: deletion");
+                    // do erase
+                } else if (n > this->_size) {
+                    VDBG("Resizing: addition");
+                    // do insert
+                }
+            }
 
             // getters
             allocator_type      get_allocator() const { return this->_allocator; }
@@ -124,6 +167,7 @@ namespace ft
             reference           back() { return this->_c[this->_size]; }
             const_reference     back() const { return this->_c[this->_size]; }
             size_type           size() const { return this->_size; }
+            bool                empty() const { return this->_size == 0; }
             size_type           max_size() const { return this->_allocator.max_size(); }
             size_type           capacity() const { return this->_capacity; }
             
@@ -151,13 +195,22 @@ namespace ft
             }
 
             void clear(void) {
-                if (this->_size) {
-                    VDBG("Clearing actual container");
-                    for (size_type i = 0; i < this->_size; i++) {
-                        this->_allocator.destroy(this->_c + i);
-                    }
-                }
-                this->_size = 0;
+                VDBG("Clearing actual container");
+                this->erase(this->begin(), this->end());
+            }
+
+            void swap (vector & x) {
+                size_type   tmp_s   = this->_size;
+                size_type   tmp_c   = this->_capacity;
+                pointer     tmp_p   = this->_c;
+
+                this->_size         = x._size;
+                this->_capacity     = x._capacity;
+                this->_c            = x._c;
+
+                x._size             = tmp_s;
+                x._capacity         = tmp_c;
+                x._c                = tmp_p;
             }
 
             iterator begin() {
@@ -179,7 +232,7 @@ namespace ft
             size_type                   _size;
             size_type                   _capacity;
             allocator_type              _allocator;
-            T *                         _c;
+            pointer                     _c;
 
             void _clean(void) {
                 this->clear();
@@ -188,6 +241,10 @@ namespace ft
                 this->_capacity = 0;
             }
     };
-}
 
+    template <class T, class Alloc>
+    void swap (vector<T, Alloc> & x, vector<T, Alloc> & y) {
+        x.swap(y);
+    }
+}
 #endif // !VECTOR_HPP
