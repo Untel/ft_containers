@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/16 12:01:27 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/01/21 20:45:37 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/01/21 23:57:20 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -120,6 +120,11 @@ namespace ft
             // }
             void insert (iterator position, size_type n, const value_type& val);
 
+            /**
+             * @brief The STL in c++98 is doing so much weirds things
+             * @todo make a readme to explain this
+             * @see http://www.lirmm.fr/~ducour/Doc-objets/ISO+IEC+14882-1998.pdf
+             */
             template <class InputIterator>
             void insert (iterator position, InputIterator first, InputIterator last) {
                 difference_type dist = std::distance(first, last);
@@ -131,7 +136,9 @@ namespace ft
                 if (this->_size + dist > this->_capacity) {
                     VDBG("Should upgrade container size");
                 } else {
-                    VDBG("Have enough container size");
+                    VDBG("Have enough container size StillConstructed("
+                        << still_constructed << ") toConstruct(" << to_construct << ")" 
+                    );
                     for (difference_type i = 0; i < to_construct; i++) {
                         difference_type fromIdx = at + still_constructed + i;
                         difference_type targetIdx = still_constructed + i;
