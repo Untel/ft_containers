@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/19 16:09:22 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/01/21 19:45:42 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/01/22 17:56:32 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,12 +73,6 @@ class Awesome
         int get(void) const { return this->_n; }
         void set(int v) { this->_n = v; }
 };
-// std::ostream & operator << (std::ostream & o, Awesome const & a){
-//     o << "Awesome" << " N: " << a.get() << std::endl; 
-//     for (int i = 0; i < 10; i++)
-//         o << i << ": " << a._list[i] << ", ";
-//     o << std::endl;
-// 	return o;
-// }
+extern std::ostream & operator << (std::ostream & o, Awesome const & a);
 
 #endif

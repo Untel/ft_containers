@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/16 12:01:27 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/01/21 23:57:20 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/01/23 14:27:19 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -127,33 +127,79 @@ namespace ft
              */
             template <class InputIterator>
             void insert (iterator position, InputIterator first, InputIterator last) {
-                difference_type dist = std::distance(first, last);
-                difference_type at = std::distance(this->begin(), position);
+                size_type dist = std::distance(first, last);
+                difference_type at = std::distance(begin(), position);
+                iterator it_end = this->end();
+                bool is_collapsing = (position + dist) > it_end;
+                difference_type collapse_at = is_collapsing ? (it_end - position) : -1;
                 // difference_type fe = this->end() - at;
                 // (void)fe;
-                difference_type still_constructed = this->end() - position;
-                difference_type to_construct = dist - still_constructed;
+                difference_type still_constructed = is_collapsing ? it_end - position : dist;
+                difference_type to_construct = is_collapsing ? dist - still_constructed : 0;
                 if (this->_size + dist > this->_capacity) {
                     VDBG("Should upgrade container size");
                 } else {
-                    VDBG("Have enough container size StillConstructed("
-                        << still_constructed << ") toConstruct(" << to_construct << ")" 
+                    VDBG(
+                        "Have enough container size StillConstructed("
+                        << still_constructed << ") toConstruct(" << to_construct << ") isCollapsing("
+                        << is_collapsing << ") collapaseAt(" << collapse_at << ")"
                     );
-                    for (difference_type i = 0; i < to_construct; i++) {
-                        difference_type fromIdx = at + still_constructed + i;
-                        difference_type targetIdx = still_constructed + i;
-                        VDBG("To construct: " << (*(first + targetIdx)).str << " at idx " << fromIdx);
-                        this->_allocator.construct(this->_c + fromIdx, *(first + targetIdx));
+
+                    /**
+                     * std::vector insert, construit et assigne ces éléments dans un ordre bien précis
+                     * Pour le voir, il faut créer un classe custom qui va logguer tous les constructeurs, destructeur et assignation operator,
+                     * Suivant la 
+                     */
+
+                    /**
+                     * On construits n nouveaux éléments à partir des derniers de la liste actuelle ou de la nouvelle liste si on collapse
+                     * COLLAPSE: si on insert 3 elements à partir de à la postion (end() - 1)
+                     * alors un élément sera créé a partir de l'ancienne liste, et 2 à partir de la nouvelle range
+                     */
+                    difference_type construct_from_end = dist < _size ? dist : _size;
+                    for (difference_type i = 0; i < dist; i++) {
+                        this->_allocator.construct(_c + _size + i, *(
+                            (is_collapsing && i < collapse_at) // 
+                                ? last - collapse_at + i
+                                : it_end - construct_from_end + i
+                        ));
                     }
-                    for (difference_type i = 0; i < still_constructed; i++) {
-                        difference_type idx = at + i + dist;
-                        VDBG("Still constructed copy: " << (*(position + i)).str << " at idx " << idx);
-                        this->_allocator.construct(this->_c + idx, *(position + i));
+                    // On déplace tous les éléments après position de n position
+                    if (!is_collapsing) {
+                        difference_type to_move = it_end - position - construct_from_end;
+                        VDBG("NEED TO MOVE " << to_move << " elements");
+                        for (difference_type i = 0; i < to_move; i++) {
+                            VDBG("Moving " << _size - i << " in " << _size - (i + dist));
+                            *(this->_c + _size - (i + 1)) = *(this->_c + _size - (i + dist + 1));
+                        }
                     }
-                    for (difference_type i = 0; i < still_constructed; i++) {
-                        VDBG("Still constructed assignation: " << (*(position + i)).str << " at idx " << at + i);
+                    // On assign les éléments restant qui n'ont pas été construit dans la première loop
+                    difference_type remaining_to_insert = is_collapsing ? dist - collapse_at : dist;
+                    VDBG("NEED TO INSERT LEFT " << remaining_to_insert << " elements");
+                    for (difference_type i = 0; i < remaining_to_insert; i++) {
                         *(this->_c + at + i) = *(first + i);
                     }
+                    // // 72 73
+                    // Nodes a construire a partir de la nouvelle list
+                    // for (difference_type i = 0; i < to_construct; i++) {
+                    //     difference_type toIdx = this->_size + i;
+                    //     difference_type targetIdx = still_constructed + i;
+                    //     VDBG("To construct: " << (*(first + targetIdx)).str << " at idx " << fromIdx);
+                    //     this->_allocator.construct(this->_c + fromIdx, *(first + targetIdx));
+                    // }
+                    // // 8 9>
+                    // // Nodes a construire a partir de l'ancienne liste
+                    // for (difference_type i = 0; i < still_constructed; i++) {
+                    //     difference_type idx = this->_size + to_construct + i;
+                    //     VDBG("Still constructed copy: " << (*(position + i)).str << " at idx " << idx);
+                    //     this->_allocator.construct(this->_c + idx, *(position + i));
+                    // }
+                    // // 70 71
+                    // // Nodes a assigner sur l'ancienne liste a partir de la nouvelle
+                    // for (difference_type i = 0; i < still_constructed; i++) {
+                    //     VDBG("Still constructed assignation: " << (*(position + i)).str << " at idx " << at + i);
+                    //     *(this->_c + at + i) = *(first + i);
+                    // }
                 }
 
                 this->_size += dist;
@@ -207,10 +253,10 @@ namespace ft
 
             // getters
             allocator_type      get_allocator() const { return this->_allocator; }
-            reference           operator[] (size_type position) { return this->at(position); }
-            const_reference     operator[] (size_type position) const { return this->at(position); }
-            T *                 data() { return this->_c; }
-            const T *           data() const { return this->_c; }
+            reference           operator[] (size_type position) { return this->_c[position]; }
+            const_reference     operator[] (size_type position) const { return this->_c[position]; }
+            pointer             data() { return this->_c; }
+            const pointer       data() const { return this->_c; }
             reference           front() { return *this->_c; }
             const_reference     front() const { return *this->_c; }
             reference           back() { return this->_c[this->_size]; }
