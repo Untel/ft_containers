@@ -6,13 +6,13 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/21 15:57:08 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/01/21 16:12:54 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/01/23 15:26:57 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <memory>
 #ifndef IVECTOR_HPP
-#define IVECTOR_HPP
+# define IVECTOR_HPP 1
 namespace ft {
     template <class T, class Allocator = std::allocator<T> >
     class iVector {

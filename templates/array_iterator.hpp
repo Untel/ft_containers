@@ -6,12 +6,15 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/19 19:48:57 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/01/21 00:18:45 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/01/23 15:26:48 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <iostream>     // std::cout
-#include "iterator.hpp"     // std::iterator, std::random_access_iterator_tag
+#ifndef ARRAYITERATOR_HPP
+# define ARRAYITERATOR_HPP 1
+# include <iostream>     // std::cout
+# include "iterator.hpp"     // std::iterator, std::random_access_iterator_tag
+
 namespace ft
 {
     /**
@@ -67,3 +70,5 @@ namespace ft
             pointer     _p;
     };
 }
+
+#endif

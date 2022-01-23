@@ -6,12 +6,12 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/16 12:01:27 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/01/23 14:42:19 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/01/23 15:25:52 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef VECTOR_HPP
-# define VECTOR_HPP
+# define VECTOR_HPP 1
 
 # include <iostream>
 # include <stdexcept>
@@ -128,10 +128,10 @@ namespace ft
             template <class InputIterator>
             void insert (iterator position, InputIterator first, InputIterator last) {
                 size_type n_to_insert = std::distance(first, last);
-                difference_type at = std::distance(begin(), position);
+                size_type at = std::distance(begin(), position);
                 iterator it_end = this->end();
                 bool is_collapsing = (position + n_to_insert) > it_end;
-                difference_type collapse_at = is_collapsing ? (it_end - position) : -1;
+                size_type collapse_at = is_collapsing ? (it_end - position) : -1;
                 if (this->_size + n_to_insert > this->_capacity) {
                     VDBG("Should upgrade container size");
                 } else {
@@ -154,8 +154,8 @@ namespace ft
                      * J'insère 97 98 99 à partir l'index 4
                      * Alors Je construit d'abord deux éléments 98 et 99, puis un élément 5
                      */
-                    difference_type construct_from_end = n_to_insert < _size ? n_to_insert : _size;
-                    for (difference_type i = 0; i < n_to_insert; i++) {
+                    size_type construct_from_end = n_to_insert < _size ? n_to_insert : _size;
+                    for (size_type i = 0; i < n_to_insert; i++) {
                         this->_allocator.construct(_c + _size + i, *(
                             (is_collapsing && i < collapse_at)
                                 ? last - collapse_at + i
@@ -164,32 +164,23 @@ namespace ft
                     }
                     // On déplace tous les éléments après position de 
                     if (!is_collapsing) {
-                        difference_type to_move = it_end - position - construct_from_end;
+                        size_type to_move = it_end - position - construct_from_end;
                         VDBG("NEED TO MOVE " << to_move << " elements");
-                        for (difference_type i = 0; i < to_move; i++) {
+                        for (size_type i = 0; i < to_move; i++) {
                             VDBG("Moving " << _size - i + 1 << " in " << _size - (i + n_to_insert + 1));
                             *(this->_c + _size - (i + 1)) = *(this->_c + _size - (i + n_to_insert + 1));
                         }
                     }
                     // On assign les éléments restant qui n'ont pas été construit dans la première loop
-                    difference_type remaining_to_insert = is_collapsing ? n_to_insert - collapse_at : n_to_insert;
+                    size_type remaining_to_insert = is_collapsing ? n_to_insert - collapse_at : n_to_insert;
                     VDBG("NEED TO INSERT LEFT " << remaining_to_insert << " elements");
-                    for (difference_type i = 0; i < remaining_to_insert; i++) {
+                    for (size_type i = 0; i < remaining_to_insert; i++) {
                         *(this->_c + at + i) = *(first + i);
                     }
                 }
 
                 this->_size += n_to_insert;
             }
-
-            // void _buildHole(iterator position, difference_type width) {
-            //     iterator b = this->begin();
-            //     iterator e = this->end();
-
-            //     for (size_type s = this->_size; s < this->_size + width; s++) {
-                    
-            //     }
-            // }
 
             iterator erase (iterator position) {
                 if (position < this->end())
