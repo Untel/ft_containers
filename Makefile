@@ -6,7 +6,7 @@
 #    By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/01/13 16:35:21 by adda-sil          #+#    #+#              #
-#    Updated: 2022/01/23 13:13:16 by adda-sil         ###   ########.fr        #
+#    Updated: 2022/01/24 17:23:42 by adda-sil         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -58,6 +58,26 @@ clean:
 
 fclean:				clean
 					$(RM) $(NAME)
+
+compare:
+					$(MAKE) OPTS="-D STL" re && ./$(NAME) > stl.output
+					$(MAKE) OPTS="" re && ./$(NAME) > ft.output
+					git diff --no-index ft.output stl.output
+
+debug:
+					$(MAKE) OPTS="-D STL" re && ./$(NAME) > stl.output
+					$(MAKE) OPTS="-D DEBUG" re && ./$(NAME) > ft.output
+					git diff --no-index ft.output stl.output
+
+
+stl:
+					$(MAKE) OPTS="-D STL" re && ./$(NAME)
+
+ft:
+					$(MAKE) OPTS="" re && ./$(NAME)
+
+dbg:
+					$(MAKE) OPTS="-D DEBUG" re && ./$(NAME)
 
 re:					clean all
 

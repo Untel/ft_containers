@@ -3,3 +3,4 @@
 containers
 .vscode
 containers.dSYM
+**/*.output

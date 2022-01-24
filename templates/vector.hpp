@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/16 12:01:27 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/01/23 15:25:52 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/01/24 18:08:44 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,62 @@
 # include "array_iterator.hpp"
 # include "iterator.hpp"
 # include "iVector.hpp"
+
+#define __VECTOR_INSERT(__RESOLVER, __RESOLVER2) \
+    size_type required_cap = _size + n_to_insert; \
+    size_type at = std::distance(begin(), position); \
+    iterator it_end = end(); \
+    bool is_collapsing = (position + n_to_insert) > it_end; \
+    size_type collapse_at = is_collapsing ? (it_end - position) : 0; \
+    size_type remaining_to_insert = is_collapsing ? n_to_insert - collapse_at : n_to_insert; \
+    VDBG("INSERTING at: " << at << " length: " << n_to_insert << " actual_size: " << _size); \
+    if (required_cap > _capacity) { \
+        VDBG("NOT ENOUGH CAP"); \
+        size_type s = _size; \
+        size_type next_capacity = (required_cap > (_capacity * 2) \
+            ? required_cap \
+            : _capacity * 2 \
+        ); \
+        pointer tmp = _allocator.allocate(next_capacity + 1); \
+        VDBG("Copying length" << at); \
+        for (size_type i = 0; i < at; i++) {\
+            VDBG("Copying " << _c[i]); \
+            _allocator.construct(tmp + i, _c[i]); \
+        } \
+        VDBG("Constructing length" << n_to_insert); \
+        for (size_type i = 0; i < n_to_insert; i++) { \
+            VDBG("Constructing " << __RESOLVER); \
+            _allocator.construct(tmp + at + i, __RESOLVER); \
+        } \
+        VDBG("Collapsing length" << remaining_to_insert); \
+        if (is_collapsing) \
+            for (size_type i = 0; i < remaining_to_insert; i++) { \
+                VDBG("Collapsing " << *(_c + s - remaining_to_insert + i)); \
+                _allocator.construct(tmp + at + n_to_insert + i, *(_c + s - remaining_to_insert + i)); \
+            } \
+        _clean(); \
+        _c = tmp; \
+        _size = required_cap; \
+        _capacity = next_capacity; \
+        return ; \
+    } \
+    size_type construct_from_end = n_to_insert; \
+    VDBG("ENOUGH CAP: " << _capacity); \
+    VDBG("Construct from end: " << construct_from_end); \
+    for (size_type i = 0; i < n_to_insert; i++) { \
+        _allocator.construct(_c + _size + i, __RESOLVER2); \
+    } \
+    if (!is_collapsing) { \
+        size_type to_move = it_end - position - construct_from_end; \
+        VDBG("Collapse is(" << is_collapsing << ") N=" << to_move); \
+        for (size_type i = 0; i < to_move; i++) { \
+            *(_c + _size - (i + 1)) = *(_c + _size - (i + n_to_insert + 1)); \
+        } \
+        VDBG("Remaining is(" << remaining_to_insert); \
+        for (size_type i = 0; i < remaining_to_insert; i++) \
+            *(_c + at + i) = __RESOLVER; \
+    } \
+    _size += n_to_insert;
 
 namespace ft
 {
@@ -52,7 +108,7 @@ namespace ft
                 _size(0), _capacity(0), _allocator(alloc)
             {
                 VDBG("Default Constructor");
-                this->_c = this->_allocator.allocate(1);
+                _c = _allocator.allocate(1);
             };
             explicit vector (
                 size_type n,
@@ -61,133 +117,62 @@ namespace ft
             ) : _size(0), _capacity(0), _allocator(alloc) {
                 VDBG("Parametric Constructor: - N > " << n);
                 VDBG("Size: " << _size);
-                this->reserve(n);
+                reserve(n);
                 for (size_type i = 0; i < n; i++)
-                    this->_allocator.construct(this->_c + i, val);
-                this->_size = n;
+                    _allocator.construct(_c + i, val);
+                _size = n;
                 VDBG("End construct");
             }
             vector(const vector & x) {
                 VDBG("Copy Constructor");
-                this->clear();
+                clear();
                 *this = x;
             };
             // template <class InputIterator>
             // vector (InputIterator first, InputIterator last, const allocator_type& alloc = allocator_type());
             ~vector(void) {
                 VDBG("Destructor");
-                this->_clean();
+                _clean();
             };
-
             // Data access
             reference at(size_type position) {
                 VDBG("At position " << position);
-                if (!(position < this->size()))
+                if (!(position < size()))
                     throw std::out_of_range("out of range");
-                return this->_c[position];
+                return _c[position];
             }
             const_reference at(size_type position) const {
                 VDBG("const At position " << position);
-                if (!(position < this->size()))
+                if (!(position < size()))
                     throw std::out_of_range("out of range");
-                return this->_c[position];
+                return _c[position];
             }
             void push_back (const value_type & val) {
-                if (this->_size == this->_capacity) {
-                    VDBG("Max size reached");
-                    this->reserve(this->_capacity * 2);
-                }
-                // this->c + this->_size++ = value_type(val);
-                this->_allocator.construct(this->_c + this->_size++, val);
+                insert(end(), val);
             }
-
             void pop_back() {
                 VDBG("Poping back");
-                this->erase(this->end() - 1);
+                erase(end() - 1);
             }
-
-            // iterator insert (iterator position, const value_type& val) {
-            //     size_type idx = (position - this->begin()); //maybe fail if not ref
-                
-            //     if (this->_size == this->_capacity) {
-            //         this->reserve(this->_capacity * 2);
-            //     }
-            //     for (size_t i = idx; i < idx + _size; i++)
-            //         this->_c[i + _size] = this->_c[i];
-
-
-            //     return iterator(this->_c + idx);
-            // }
-            void insert (iterator position, size_type n, const value_type& val);
-
-            /**
-             * @brief The STL in c++98 is doing so much weirds things
-             * @todo make a readme to explain this
-             * @see http://www.lirmm.fr/~ducour/Doc-objets/ISO+IEC+14882-1998.pdf
-             */
+            iterator insert (iterator position, const value_type & val) {
+                difference_type at = position - begin();
+                insert(position, 1, val);
+                return (begin() + at + 1);
+            }
+            void insert (iterator position, size_type n_to_insert, const value_type& val) {
+                __VECTOR_INSERT(val, val);
+            }
             template <class InputIterator>
             void insert (iterator position, InputIterator first, InputIterator last) {
                 size_type n_to_insert = std::distance(first, last);
-                size_type at = std::distance(begin(), position);
-                iterator it_end = this->end();
-                bool is_collapsing = (position + n_to_insert) > it_end;
-                size_type collapse_at = is_collapsing ? (it_end - position) : -1;
-                if (this->_size + n_to_insert > this->_capacity) {
-                    VDBG("Should upgrade container size");
-                } else {
-                    VDBG(
-                        "Have enough container size isCollapsing("
-                        << is_collapsing << ") collapaseAt(" << collapse_at << ")"
-                    );
-
-                    /**
-                     * std::vector en c++98 (différent en c11+) insert, construit et assigne ces éléments dans un ordre bien précis
-                     * Pour le voir, il faut créer un classe custom qui va logguer tous les constructeurs, destructeur et assignation operator,
-                     * La spec ISO mentionne qu'il ne faut pas faire plus de n_to_insert construction.
-                     */
-
-                    /**
-                     * On construits n nouveaux éléments à partir des derniers de la liste actuelle ou de la nouvelle liste si on collapse
-                     * COLLAPSE: si on insert 3 elements à partir de à la postion (end() - 1)
-                     * alors un élément sera créé a partir de l'ancienne liste, et 2 à partir de la liste a inséré
-                     * Ex: J'ai une list 0 1 2 3 4 5
-                     * J'insère 97 98 99 à partir l'index 4
-                     * Alors Je construit d'abord deux éléments 98 et 99, puis un élément 5
-                     */
-                    size_type construct_from_end = n_to_insert < _size ? n_to_insert : _size;
-                    for (size_type i = 0; i < n_to_insert; i++) {
-                        this->_allocator.construct(_c + _size + i, *(
-                            (is_collapsing && i < collapse_at)
-                                ? last - collapse_at + i
-                                : it_end - construct_from_end + i
-                        ));
-                    }
-                    // On déplace tous les éléments après position de 
-                    if (!is_collapsing) {
-                        size_type to_move = it_end - position - construct_from_end;
-                        VDBG("NEED TO MOVE " << to_move << " elements");
-                        for (size_type i = 0; i < to_move; i++) {
-                            VDBG("Moving " << _size - i + 1 << " in " << _size - (i + n_to_insert + 1));
-                            *(this->_c + _size - (i + 1)) = *(this->_c + _size - (i + n_to_insert + 1));
-                        }
-                    }
-                    // On assign les éléments restant qui n'ont pas été construit dans la première loop
-                    size_type remaining_to_insert = is_collapsing ? n_to_insert - collapse_at : n_to_insert;
-                    VDBG("NEED TO INSERT LEFT " << remaining_to_insert << " elements");
-                    for (size_type i = 0; i < remaining_to_insert; i++) {
-                        *(this->_c + at + i) = *(first + i);
-                    }
-                }
-
-                this->_size += n_to_insert;
+                __VECTOR_INSERT(*(first + i), *((is_collapsing && i < collapse_at) ? last - collapse_at + i : it_end - construct_from_end + i));
             }
-
             iterator erase (iterator position) {
-                if (position < this->end())
-                    this->erase(position, position + 1);
+                if (position < end())
+                    erase(position, position + 1);
             }
             iterator erase (iterator first, iterator last) {
-                iterator e          = this->end();
+                iterator e          = end();
                 // Nombre d'el a remove
                 size_type n         = last - first;
                 VDBG("Erasing " << n << " elements");
@@ -203,36 +188,36 @@ namespace ft
                 // détruire les n éléments en partant du iterator end()
                 // on ne détruit pas les éléments qu'on a érase, mais ceux a la fin du ctn, qui on été réassigné a la boucle précédente
                 for (; it != e; it++)
-                    this->_allocator.destroy(&(*it));
-                this->_size -= n;
+                    _allocator.destroy(&(*it));
+                _size -= n;
                 return first;
             }
 
             // will probably just call insert ??
             void resize (size_type n, value_type val = value_type()) {
-                if (n < this->_size) {
+                if (n < _size) {
                     VDBG("Resizing: deletion");
-                    this->erase(this->begin() + n, this->end());
-                } else if (n > this->_size) {
+                    erase(begin() + n, end());
+                } else if (n > _size) {
                     VDBG("Resizing: addition");
                     // do insert
                 }
             }
 
             // getters
-            allocator_type      get_allocator() const { return this->_allocator; }
-            reference           operator[] (size_type position) { return this->_c[position]; }
-            const_reference     operator[] (size_type position) const { return this->_c[position]; }
-            pointer             data() { return this->_c; }
-            const pointer       data() const { return this->_c; }
-            reference           front() { return *this->_c; }
-            const_reference     front() const { return *this->_c; }
-            reference           back() { return this->_c[this->_size]; }
-            const_reference     back() const { return this->_c[this->_size]; }
-            size_type           size() const { return this->_size; }
-            bool                empty() const { return this->_size == 0; }
-            size_type           max_size() const { return this->_allocator.max_size(); }
-            size_type           capacity() const { return this->_capacity; }
+            allocator_type      get_allocator() const { return _allocator; }
+            reference           operator[] (size_type position) { return _c[position]; }
+            const_reference     operator[] (size_type position) const { return _c[position]; }
+            pointer             data() { return _c; }
+            const pointer       data() const { return _c; }
+            reference           front() { return *_c; }
+            const_reference     front() const { return *_c; }
+            reference           back() { return _c[_size]; }
+            const_reference     back() const { return _c[_size]; }
+            size_type           size() const { return _size; }
+            bool                empty() const { return _size == 0; }
+            size_type           max_size() const { return _allocator.max_size(); }
+            size_type           capacity() const { return _capacity; }
             
             /**
              * @brief 
@@ -242,34 +227,34 @@ namespace ft
              * @param new_cap 
              */
             void reserve(size_type new_cap) {
-                if (new_cap > this->max_size()) {
+                if (new_cap > max_size()) {
                     throw std::length_error("Length error");
-                } else if (new_cap > this->_capacity) {
-                    size_type s = this->_size;
+                } else if (new_cap > _capacity) {
+                    size_type s = _size;
                     VDBG("Reallocating " << new_cap);
-                    pointer tmp = this->_allocator.allocate(new_cap + 1);
-                    for (size_type i = 0; i < this->_size; i++)
-                        this->_allocator.construct(tmp + i, this->_c[i]);
-                    this->_clean();
-                    this->_c = tmp;
-                    this->_size = s;
-                    this->_capacity = new_cap;
+                    pointer tmp = _allocator.allocate(new_cap + 1);
+                    for (size_type i = 0; i < _size; i++)
+                        _allocator.construct(tmp + i, _c[i]);
+                    _clean();
+                    _c = tmp;
+                    _size = s;
+                    _capacity = new_cap;
                 }
             }
 
             void clear(void) {
                 VDBG("Clearing actual container");
-                this->erase(this->begin(), this->end());
+                erase(begin(), end());
             }
 
             void swap (vector & x) {
-                size_type   tmp_s   = this->_size;
-                size_type   tmp_c   = this->_capacity;
-                pointer     tmp_p   = this->_c;
+                size_type   tmp_s   = _size;
+                size_type   tmp_c   = _capacity;
+                pointer     tmp_p   = _c;
 
-                this->_size         = x._size;
-                this->_capacity     = x._capacity;
-                this->_c            = x._c;
+                _size               = x._size;
+                _capacity           = x._capacity;
+                _c                  = x._c;
 
                 x._size             = tmp_s;
                 x._capacity         = tmp_c;
@@ -277,18 +262,18 @@ namespace ft
             }
 
             iterator begin() {
-                VDBG("Begin iterator" << this->_c[0].get() );
-                return iterator(this->_c);
+                VDBG("Begin iterator");
+                return iterator(_c);
             }
             const_iterator begin() const {
-                return iterator(this->_c);
+                return iterator(_c);
             }
             iterator end() {
                 VDBG("End iterator");
-                return iterator(this->_c + this->_size);
+                return iterator(_c + _size);
             }
             const_iterator end() const {
-                return iterator(this->_c + this->_size);
+                return iterator(_c + _size);
             }
 
         private:
@@ -298,9 +283,9 @@ namespace ft
             pointer                     _c;
 
             void _clean(void) {
-                this->clear();
-                this->_allocator.deallocate(this->_c, this->_capacity + 1);
-                this->_capacity = 0;
+                clear();
+                _allocator.deallocate(_c, _capacity + 1);
+                _capacity = 0;
             }
     };
 
@@ -309,4 +294,5 @@ namespace ft
         x.swap(y);
     }
 }
+
 #endif // !VECTOR_HPP
