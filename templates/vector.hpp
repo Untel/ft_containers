@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/16 12:01:27 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/01/24 18:08:44 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/01/25 17:15:46 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,17 +26,18 @@
     iterator it_end = end(); \
     bool is_collapsing = (position + n_to_insert) > it_end; \
     size_type collapse_at = is_collapsing ? (it_end - position) : 0; \
-    size_type remaining_to_insert = is_collapsing ? n_to_insert - collapse_at : n_to_insert; \
+    size_type remaining_to_insert = is_collapsing ? n_to_insert - collapse_at : 0; \
     VDBG("INSERTING at: " << at << " length: " << n_to_insert << " actual_size: " << _size); \
     if (required_cap > _capacity) { \
-        VDBG("NOT ENOUGH CAP"); \
         size_type s = _size; \
         size_type next_capacity = (required_cap > (_capacity * 2) \
             ? required_cap \
             : _capacity * 2 \
         ); \
+        VDBG("NOT ENOUGH CAP cap" << _capacity << " required" << required_cap  << " next" << next_capacity); \
         pointer tmp = _allocator.allocate(next_capacity + 1); \
-        VDBG("Copying length" << at); \
+        VDBG("Copying length " << at); \
+        VDBG("Next capacity " << next_capacity); \
         for (size_type i = 0; i < at; i++) {\
             VDBG("Copying " << _c[i]); \
             _allocator.construct(tmp + i, _c[i]); \
@@ -47,11 +48,10 @@
             _allocator.construct(tmp + at + i, __RESOLVER); \
         } \
         VDBG("Collapsing length" << remaining_to_insert); \
-        if (is_collapsing) \
-            for (size_type i = 0; i < remaining_to_insert; i++) { \
-                VDBG("Collapsing " << *(_c + s - remaining_to_insert + i)); \
-                _allocator.construct(tmp + at + n_to_insert + i, *(_c + s - remaining_to_insert + i)); \
-            } \
+        for (size_type i = 0; i < remaining_to_insert; i++) { \
+            VDBG("Collapsing " << *(_c + s - remaining_to_insert + i)); \
+            _allocator.construct(tmp + at + n_to_insert + i, *(_c + s - remaining_to_insert + i)); \
+        } \
         _clean(); \
         _c = tmp; \
         _size = required_cap; \
@@ -64,14 +64,16 @@
     for (size_type i = 0; i < n_to_insert; i++) { \
         _allocator.construct(_c + _size + i, __RESOLVER2); \
     } \
-    if (!is_collapsing) { \
+    if (!is_collapsing && it_end != position) { \
         size_type to_move = it_end - position - construct_from_end; \
         VDBG("Collapse is(" << is_collapsing << ") N=" << to_move); \
         for (size_type i = 0; i < to_move; i++) { \
             *(_c + _size - (i + 1)) = *(_c + _size - (i + n_to_insert + 1)); \
         } \
+    } \
+    if (it_end != position) { \
         VDBG("Remaining is(" << remaining_to_insert); \
-        for (size_type i = 0; i < remaining_to_insert; i++) \
+        for (size_type i = 0; i < n_to_insert - remaining_to_insert; i++) \
             *(_c + at + i) = __RESOLVER; \
     } \
     _size += n_to_insert;
@@ -148,7 +150,7 @@ namespace ft
                 return _c[position];
             }
             void push_back (const value_type & val) {
-                insert(end(), val);
+                // insert(end(), val);
             }
             void pop_back() {
                 VDBG("Poping back");
@@ -159,7 +161,7 @@ namespace ft
                 insert(position, 1, val);
                 return (begin() + at + 1);
             }
-            void insert (iterator position, size_type n_to_insert, const value_type& val) {
+            void insert (iterator position, size_type n_to_insert, const value_type & val) {
                 __VECTOR_INSERT(val, val);
             }
             template <class InputIterator>
