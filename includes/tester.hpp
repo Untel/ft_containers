@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/18 15:09:35 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/01/19 16:44:19 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/02/02 16:23:44 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 # include <string>
 # include <iostream>
 # include "awesome.hpp"
+# include "term.hpp"
 
 # ifdef STL
     #  include <map>

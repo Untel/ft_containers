@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/16 12:01:27 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/01/24 18:08:44 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/02/02 18:56:52 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,12 +24,16 @@
     size_type required_cap = _size + n_to_insert; \
     size_type at = std::distance(begin(), position); \
     iterator it_end = end(); \
-    bool is_collapsing = (position + n_to_insert) > it_end; \
+    bool is_collapsing = (it_end != position && ((position + n_to_insert) > it_end)); \
     size_type collapse_at = is_collapsing ? (it_end - position) : 0; \
     size_type remaining_to_insert = is_collapsing ? n_to_insert - collapse_at : n_to_insert; \
     VDBG("INSERTING at: " << at << " length: " << n_to_insert << " actual_size: " << _size); \
     if (required_cap > _capacity) { \
-        VDBG("NOT ENOUGH CAP"); \
+        VDBG("NOT ENOUGH CAP "); \
+        VDBG(CYAN << "remaining_to_insert " << remaining_to_insert << std::endl); \
+        VDBG(RED << "collpase " << is_collapsing << std::endl); \
+        VDBG(MAGENTA << "collapse_at " << collapse_at << std::endl); \
+        VDBG(YELLOW << "at " << at << std::endl << RESET); \
         size_type s = _size; \
         size_type next_capacity = (required_cap > (_capacity * 2) \
             ? required_cap \
@@ -58,22 +62,30 @@
         _capacity = next_capacity; \
         return ; \
     } \
-    size_type construct_from_end = n_to_insert; \
+    size_type construct_from_end = n_to_insert - collapse_at; \
     VDBG("ENOUGH CAP: " << _capacity); \
     VDBG("Construct from end: " << construct_from_end); \
-    for (size_type i = 0; i < n_to_insert; i++) { \
+    for (size_type i = 0; i < construct_from_end; i++) { \
         _allocator.construct(_c + _size + i, __RESOLVER2); \
     } \
-    if (!is_collapsing) { \
+    for (size_type i = 0; i < n_to_insert - construct_from_end; i++) { \
+        _allocator.construct(_c + _size + i + construct_from_end, *(_c + _size - construct_from_end + i)); \
+    } \
+    if (is_collapsing && it_end > position) { \
         size_type to_move = it_end - position - construct_from_end; \
         VDBG("Collapse is(" << is_collapsing << ") N=" << to_move); \
         for (size_type i = 0; i < to_move; i++) { \
             *(_c + _size - (i + 1)) = *(_c + _size - (i + n_to_insert + 1)); \
         } \
-        VDBG("Remaining is(" << remaining_to_insert); \
-        for (size_type i = 0; i < remaining_to_insert; i++) \
-            *(_c + at + i) = __RESOLVER; \
+    } else if (!is_collapsing) { \
+        size_type to_move = _size - (n_to_insert); \
+        for (size_type i = _size; i > to_move; i--) { \
+            *(_c + i - 1) = *(_c + i - at - 1 - to_move); \
+        } \
     } \
+    VDBG("Remaining is(" << remaining_to_insert); \
+    for (size_type i = 0; i < remaining_to_insert; i++) \
+        *(_c + at + i) = __RESOLVER; \
     _size += n_to_insert;
 
 namespace ft
@@ -148,7 +160,7 @@ namespace ft
                 return _c[position];
             }
             void push_back (const value_type & val) {
-                insert(end(), val);
+                insert(end(), 1, val);
             }
             void pop_back() {
                 VDBG("Poping back");
@@ -160,10 +172,12 @@ namespace ft
                 return (begin() + at + 1);
             }
             void insert (iterator position, size_type n_to_insert, const value_type& val) {
+                VDBG(GREEN << "Insert by val n(" << n_to_insert << ") val(" << val << ")" << RESET);
                 __VECTOR_INSERT(val, val);
             }
             template <class InputIterator>
             void insert (iterator position, InputIterator first, InputIterator last) {
+                VDBG(BLUE << "Insert by range" << RESET);
                 size_type n_to_insert = std::distance(first, last);
                 __VECTOR_INSERT(*(first + i), *((is_collapsing && i < collapse_at) ? last - collapse_at + i : it_end - construct_from_end + i));
             }
@@ -200,7 +214,7 @@ namespace ft
                     erase(begin() + n, end());
                 } else if (n > _size) {
                     VDBG("Resizing: addition");
-                    // do insert
+                    insert(end(), n, val);
                 }
             }
 

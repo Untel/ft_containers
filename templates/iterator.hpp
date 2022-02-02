@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/19 20:05:28 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/01/23 15:25:42 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/02/02 16:20:46 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,7 +82,7 @@ namespace ft {
 			}
 
 			reference operator * () const {
-				reference b = base;
+				reference b = _base;
 				return *(--b);
 			}
 			// PEUT ETRE PAS BON CA

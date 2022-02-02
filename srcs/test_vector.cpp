@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/18 15:09:31 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/01/24 17:46:51 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/02/02 18:09:55 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -155,7 +155,7 @@ void add_more_than_size(void) {
 	std::cout << "TEST NOT ENOUGH CAPACITY VECTORS" << std::endl;
     ft::vector<Awesome> v;
 	v.reserve(5);
-	for (int i = 0; i < 10; i++)
+	for (int i = 0; i < 5; i++)
 		v.push_back(i);
 
 	ft::vector<Awesome>::iterator it = v.begin();
@@ -239,7 +239,7 @@ void test_vector_main(void) {
 		std::cout << "IS FT" << std::endl;
 	#endif
 	insert_inside_range();
-	// std::cout << std::endl << std::endl << std::endl;
+	std::cout << std::endl << std::endl << std::endl;
 	// insert_outside_range();
 	// std::cout << std::endl << std::endl << std::endl;
 	// add_more_than_size();
@@ -247,5 +247,4 @@ void test_vector_main(void) {
 	// add_big_size();
 	// std::cout << std::endl << std::endl << std::endl;
 	// add_n_elems();
-	// push_back();
 }
