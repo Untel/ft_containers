@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/16 12:01:27 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/02/04 07:50:19 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/02/04 08:48:40 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -181,8 +181,8 @@ namespace ft
                 VDBG(GREEN << "Insert by val n(" << n_to_insert << ") val(" << val << ")" << RESET);
                 __VECTOR_INSERT(val, val);
             }
-            template <class InputIterator>
-            void insert (iterator position, InputIterator first, InputIterator last) {
+            template <class NonInputIterator>
+            void insert (iterator position, NonInputIterator first, NonInputIterator last) {
                 VDBG(BLUE << "Insert by range" << RESET);
                 size_type n_to_insert = std::distance(first, last);
                 __VECTOR_INSERT(*(first + i), *((is_collapsing && i < collapse_at) ? last - collapse_at + i : it_end - construct_from_end + i));
