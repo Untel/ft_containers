@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/18 15:09:31 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/02/02 18:09:55 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/02/04 03:45:57 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -240,11 +240,11 @@ void test_vector_main(void) {
 	#endif
 	insert_inside_range();
 	std::cout << std::endl << std::endl << std::endl;
-	// insert_outside_range();
-	// std::cout << std::endl << std::endl << std::endl;
-	// add_more_than_size();
-	// std::cout << std::endl << std::endl << std::endl;
-	// add_big_size();
-	// std::cout << std::endl << std::endl << std::endl;
-	// add_n_elems();
+	insert_outside_range();
+	std::cout << std::endl << std::endl << std::endl;
+	add_more_than_size();
+	std::cout << std::endl << std::endl << std::endl;
+	add_big_size();
+	std::cout << std::endl << std::endl << std::endl;
+	add_n_elems();
 }

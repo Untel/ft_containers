@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/16 12:01:27 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/02/02 18:56:52 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/02/04 03:45:20 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,24 +68,28 @@
     for (size_type i = 0; i < construct_from_end; i++) { \
         _allocator.construct(_c + _size + i, __RESOLVER2); \
     } \
+    VDBG(YELLOW << "Construct from actual list: " << RESET << n_to_insert - construct_from_end); \
     for (size_type i = 0; i < n_to_insert - construct_from_end; i++) { \
         _allocator.construct(_c + _size + i + construct_from_end, *(_c + _size - construct_from_end + i)); \
     } \
     if (is_collapsing && it_end > position) { \
         size_type to_move = it_end - position - construct_from_end; \
+        VDBG(CYAN << "Moving if collapsing: " << RESET << to_move); \
         VDBG("Collapse is(" << is_collapsing << ") N=" << to_move); \
         for (size_type i = 0; i < to_move; i++) { \
             *(_c + _size - (i + 1)) = *(_c + _size - (i + n_to_insert + 1)); \
         } \
-    } else if (!is_collapsing) { \
-        size_type to_move = _size - (n_to_insert); \
-        for (size_type i = _size; i > to_move; i--) { \
-            *(_c + i - 1) = *(_c + i - at - 1 - to_move); \
+    } else if (!is_collapsing && it_end != position) { \
+        size_type to_move = n_to_insert; \
+        VDBG(MAGENTA << "Moving if not collapsing: " << RESET << to_move << " at " << at << " size: " << _size << " n " << n_to_insert); \
+        for (size_type i = 0; i < to_move; i++) { \
+            *(_c + at + n_to_insert + to_move - (i + 1)) = *(_c + to_move + at - (i + 1)); \
         } \
     } \
-    VDBG("Remaining is(" << remaining_to_insert); \
-    for (size_type i = 0; i < remaining_to_insert; i++) \
-        *(_c + at + i) = __RESOLVER; \
+    VDBG(BLUE << "Remaining is " << RESET << remaining_to_insert); \
+    if (position != it_end) \
+        for (size_type i = 0; i < remaining_to_insert; i++) \
+            *(_c + at + i) = __RESOLVER; \
     _size += n_to_insert;
 
 namespace ft
