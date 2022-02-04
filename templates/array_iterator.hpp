@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/19 19:48:57 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/01/23 15:27:40 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/02/04 07:43:42 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,10 +31,16 @@ namespace ft
             typedef T                                   	value_type;
             typedef value_type *                           	pointer;
             typedef value_type &                           	reference;
+            typedef const value_type *                      const_pointer;
+            typedef const value_type &                      const_reference;
             typedef std::random_access_iterator_tag     	iterator_category;
+            // typedef array_iterator<value_type>     	        iterator;
+            // typedef array_iterator<const value_type>     	const_iterator;
             // Member types
             array_iterator(void) : _p(value_type()) {}
             array_iterator(pointer x) : _p(x) {}
+            // array_iterator(const_pointer x) : _p(x) {}
+            // array_iterator(const_iterator & cpy) : _p(cpy._p) {}
             array_iterator(const array_iterator & cpy) : _p(cpy._p) {}
             array_iterator & operator = (const array_iterator & rhs) {
                 if (this != &rhs) {

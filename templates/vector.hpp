@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/16 12:01:27 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/02/04 03:45:20 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/02/04 07:50:19 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -106,18 +106,20 @@ namespace ft
     class vector {
         public:
             // Member types
-            typedef T                                                           value_type;
-            typedef Allocator                                                   allocator_type;
-            typedef typename Allocator::reference                               reference;
-            typedef typename Allocator::pointer                                 pointer;
-            typedef typename Allocator::const_reference                         const_reference;
-            typedef typename Allocator::const_pointer                           const_pointer;
-            typedef typename ft::array_iterator<const value_type>               const_iterator;
-            typedef typename ft::array_iterator<value_type>                     iterator;
-            typedef typename ft::reverse_iterator< const_iterator >             const_reverse_iterator;
-            typedef typename ft::reverse_iterator< iterator >                   reverse_iterator;
-            typedef typename ft::iterator_traits<iterator>::difference_type     difference_type;
-            typedef std::size_t                                                 size_type;
+            typedef T                                                               value_type;
+            typedef Allocator                                                       allocator_type;
+            typedef typename Allocator::reference                                   reference;
+            typedef typename Allocator::pointer                                     pointer;
+            typedef typename Allocator::const_reference                             const_reference;
+            typedef typename Allocator::const_pointer                               const_pointer;
+            // typedef typename ft::array_iterator< value_type >::iterator             iterator;
+            // typedef typename ft::array_iterator< value_type >::const_iterator       const_iterator;
+            typedef typename ft::array_iterator< value_type >                       iterator;
+            typedef typename ft::array_iterator< const value_type >                 const_iterator;
+            typedef typename ft::reverse_iterator< iterator >                       reverse_iterator;
+            typedef typename ft::reverse_iterator< const_iterator >                 const_reverse_iterator;
+            typedef typename ft::iterator_traits<iterator>::difference_type         difference_type;
+            typedef std::size_t                                                     size_type;
 
             // Member functions
             explicit vector (const allocator_type& alloc = allocator_type()) :
@@ -284,14 +286,14 @@ namespace ft
                 return iterator(_c);
             }
             const_iterator begin() const {
-                return iterator(_c);
+                return const_iterator(_c);
             }
             iterator end() {
                 VDBG("End iterator");
                 return iterator(_c + _size);
             }
             const_iterator end() const {
-                return iterator(_c + _size);
+                return const_iterator(_c + _size);
             }
 
         private:
