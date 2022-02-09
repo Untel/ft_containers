@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/16 12:01:27 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/02/09 17:32:32 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/02/09 21:11:39 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -219,8 +219,12 @@ namespace ft
                 typename ft::enable_if <!ft::is_integral <InputIterator>::value, InputIterator >::type = NULL
             ) {
                 VDBG(BLUE << "Insert by range" << RESET);
+                size_type at = std::distance(begin(), position);
                 size_type n_to_insert = std::distance(first, last);
-                __VECTOR_INSERT(*(first + i), *((is_collapsing && i < collapse_at) ? last - collapse_at + i : it_end - construct_from_end + i));
+                _fitCapacity(n_to_insert, position);
+                for (size_type i = 0; i < n_to_insert; i++)
+                    _allocator.construct(_c + at + i, *(first + i));
+                // __VECTOR_INSERT(*(first + i), *((is_collapsing && i < collapse_at) ? last - collapse_at + i : it_end - construct_from_end + i));
             }
             iterator erase (iterator position) {
                 if (position < end())
@@ -348,6 +352,7 @@ namespace ft
                 pointer ref = _c;
                 size_type to_move = end() - position;
                 size_type at = position - begin();
+                at = at > 0 ? at : 0;
                 if (_capacity < required_cap) {
                     size_type next_capacity = (required_cap > (_capacity * 2)
                         ? required_cap
@@ -356,12 +361,10 @@ namespace ft
                     ref = _allocator.allocate(next_capacity + 1);
                     _capacity = next_capacity;
                     for (size_type i = 0; i < at; i++) {
-                        VDBG("COPY" << _c[i]);
                         _allocator.construct(ref + i, _c[i]);
                     }
                 }
-                for (size_type i = to_move; i >= 0; i--) {
-                    VDBG("oTHER COPY" << _c[at + i]);
+                for (int i = to_move; i >= 0; i--) {
                     _allocator.construct(ref + at + i + additional, _c[at + i]);
                 }
                 _c = ref;
