@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/18 15:09:31 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/02/04 03:45:57 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/02/08 14:50:01 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -228,8 +228,41 @@ void add_n_elems(void) {
 	}
 }
 
+void test_enable_if_insert() {
+	std::cout << "ENABLE IF" << std::endl;
+
+	ft::vector<int> v;
+	v.push_back(1);
+	v.push_back(2);
+	v.push_back(3);
+	ft::vector<int> vinsert;
+	vinsert.push_back(4);
+	vinsert.push_back(5);
+	vinsert.push_back(6);
+	v.insert(v.begin() + 1, vinsert.begin(), vinsert.end());
+
+	ft::vector<int>::iterator it = v.begin();
+	ft::vector<int>::iterator ite = v.end();
+		for (; it != ite; it++) {
+		std::cout << "Iter " << *it << std::endl;
+	}
+}
+
 void test_push_back() {
-	
+	std::cout << "ENABLE IF" << std::endl;
+
+	ft::vector<int> v;
+	v.push_back(1);
+	v.push_back(2);
+	v.push_back(3);
+
+	v.insert(v.begin() + 1, 3, 10);
+
+	ft::vector<int>::iterator it = v.begin();
+	ft::vector<int>::iterator ite = v.end();
+		for (; it != ite; it++) {
+		std::cout << "Iter " << *it << std::endl;
+	}
 }
 
 void test_vector_main(void) {
@@ -238,13 +271,16 @@ void test_vector_main(void) {
 	#else
 		std::cout << "IS FT" << std::endl;
 	#endif
-	insert_inside_range();
-	std::cout << std::endl << std::endl << std::endl;
-	insert_outside_range();
-	std::cout << std::endl << std::endl << std::endl;
-	add_more_than_size();
-	std::cout << std::endl << std::endl << std::endl;
-	add_big_size();
-	std::cout << std::endl << std::endl << std::endl;
-	add_n_elems();
+	// insert_inside_range();
+	// std::cout << std::endl << std::endl << std::endl;
+	// insert_outside_range();
+	// std::cout << std::endl << std::endl << std::endl;
+	// add_more_than_size();
+	// std::cout << std::endl << std::endl << std::endl;
+	// add_big_size();
+	// std::cout << std::endl << std::endl << std::endl;
+	// add_n_elems();
+	// std::cout << std::endl << std::endl << std::endl;
+	// test_enable_if_insert();
+	test_push_back();
 }

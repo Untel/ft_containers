@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/16 12:01:27 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/02/04 08:48:40 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/02/08 15:03:39 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,8 +25,9 @@
     size_type at = std::distance(begin(), position); \
     iterator it_end = end(); \
     bool is_collapsing = (it_end != position && ((position + n_to_insert) > it_end)); \
-    size_type collapse_at = is_collapsing ? (it_end - position) : 0; \
-    size_type remaining_to_insert = is_collapsing ? n_to_insert - collapse_at : n_to_insert; \
+    size_type collapse_at = is_collapsing ? (it_end - position) : at; \
+    size_type remaining_to_insert = is_collapsing ? n_to_insert - (collapse_at - at) : n_to_insert; \
+    (void)collapse_at; \
     VDBG("INSERTING at: " << at << " length: " << n_to_insert << " actual_size: " << _size); \
     if (required_cap > _capacity) { \
         VDBG("NOT ENOUGH CAP "); \
@@ -39,21 +40,21 @@
             ? required_cap \
             : _capacity * 2 \
         ); \
+        VDBG("Alloc = " << next_capacity); \
         pointer tmp = _allocator.allocate(next_capacity + 1); \
         VDBG("Copying length" << at); \
         for (size_type i = 0; i < at; i++) {\
-            VDBG("Copying " << _c[i]); \
+            VDBG("Copying " << _c[i] << " at " << i); \
             _allocator.construct(tmp + i, _c[i]); \
         } \
         VDBG("Constructing length" << n_to_insert); \
         for (size_type i = 0; i < n_to_insert; i++) { \
-            VDBG("Constructing " << __RESOLVER); \
+            VDBG("Constructing " << __RESOLVER << " at " << at + i); \
             _allocator.construct(tmp + at + i, __RESOLVER); \
         } \
         VDBG("Collapsing length" << remaining_to_insert); \
-        if (is_collapsing) \
             for (size_type i = 0; i < remaining_to_insert; i++) { \
-                VDBG("Collapsing " << *(_c + s - remaining_to_insert + i)); \
+                VDBG("Collapsing " << *(_c + s - remaining_to_insert + i) << " at " <<  at + n_to_insert + i); \
                 _allocator.construct(tmp + at + n_to_insert + i, *(_c + s - remaining_to_insert + i)); \
             } \
         _clean(); \
@@ -94,6 +95,29 @@
 
 namespace ft
 {
+
+    struct false_type { static const bool value = false; };
+    struct true_type { static const bool value = true; };
+
+    template <class T> struct is_integral : public false_type {};
+    template <> struct is_integral<int> : public true_type {};
+    template <> struct is_integral<unsigned int> : public true_type {};
+    template <> struct is_integral<bool> : public true_type {};
+    template <> struct is_integral<char> : public true_type {};
+    template <> struct is_integral<unsigned char> : public true_type {};
+    template <> struct is_integral<signed char> : public true_type {};
+    template <> struct is_integral<short> : public true_type {};
+    template <> struct is_integral<unsigned short> : public true_type {};
+    template <> struct is_integral<long> : public true_type {};
+    template <> struct is_integral<unsigned long> : public true_type {};
+    template <> struct is_integral<long long> : public true_type {};
+    template <> struct is_integral<unsigned long long> : public true_type {};
+
+    template<bool B, typename T = void>
+        struct enable_if {};
+
+    template<typename T>
+    struct enable_if<true, T> { typedef T type; };
     /**
      * @brief Vector class
      * @see https://en.cppreference.com/w/cpp/container/vector
@@ -177,12 +201,23 @@ namespace ft
                 insert(position, 1, val);
                 return (begin() + at + 1);
             }
+
             void insert (iterator position, size_type n_to_insert, const value_type& val) {
                 VDBG(GREEN << "Insert by val n(" << n_to_insert << ") val(" << val << ")" << RESET);
-                __VECTOR_INSERT(val, val);
+                size_type at = std::distance(begin(), position);
+                _fitCapacity(n_to_insert, position);
+                for (size_type i = 0; i < n_to_insert; i++)
+                    _allocator.construct(_c + at + i, val);
+                // __VECTOR_INSERT(val, val);
             }
-            template <class NonInputIterator>
-            void insert (iterator position, NonInputIterator first, NonInputIterator last) {
+            
+            template <class InputIterator>
+            void insert (
+                iterator position,
+                InputIterator first,
+                InputIterator last,
+                typename ft::enable_if <!ft::is_integral <InputIterator>::value, InputIterator >::type = NULL
+            ) {
                 VDBG(BLUE << "Insert by range" << RESET);
                 size_type n_to_insert = std::distance(first, last);
                 __VECTOR_INSERT(*(first + i), *((is_collapsing && i < collapse_at) ? last - collapse_at + i : it_end - construct_from_end + i));
@@ -306,6 +341,36 @@ namespace ft
                 clear();
                 _allocator.deallocate(_c, _capacity + 1);
                 _capacity = 0;
+            }
+
+            void _fitCapacity(size_type additional, iterator position) {
+                size_type required_cap = _size + additional;
+                pointer ref = _c;
+                if (_capacity < required_cap) {
+                    size_type next_capacity = (required_cap > (_capacity * 2)
+                        ? required_cap
+                        : _capacity * 2
+                    );
+                    ref = _allocator.allocate(next_capacity + 1);
+                    _capacity = next_capacity;
+                    int i = 0;
+                    for (iterator it = begin(); it != position; it++, i++)
+                        *(ref + i) = *it;
+                }
+                int oversize = position - end() + additional;
+                /**
+                 * oversize > 0 = collapse the end of list, need to construct from the old list
+                 * oversize < 0 = not collapsing
+                 */
+                VDBG("Oversize " << oversize);
+                if (oversize > 0) {
+                    size_type rest = end() - position;
+                    VDBG("Rest " << rest);
+                    for (size_type i = 0; i < static_cast<size_type>(oversize); i++)
+                        _allocator.construct(ref + _size + rest + i, *(position + i));
+                }
+                _c = ref;
+                _size += additional;
             }
     };
 

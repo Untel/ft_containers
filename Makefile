@@ -6,7 +6,7 @@
 #    By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/01/13 16:35:21 by adda-sil          #+#    #+#              #
-#    Updated: 2022/02/04 07:04:38 by adda-sil         ###   ########.fr        #
+#    Updated: 2022/02/08 14:04:20 by adda-sil         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -34,7 +34,7 @@ INCLUDES			= -I . -I $(HEAD_DIR) -I $(TEMPLATE_DIR)
 LIBS				= 
 CXX					= c++
 OPTS				=
-CXXFLAGS			= -std=c++98 -Wall -Wextra -Werror -Wno-unused-variable ${OPTS} $(INCLUDES) -MMD
+CXXFLAGS			= -std=c++98 -Wall -Wextra -Werror ${OPTS} $(INCLUDES) -MMD
 OBJS				= $(SRCS:.cpp=.o)
 NAME				= containers
 ARGS				= 
