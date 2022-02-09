@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/16 12:01:27 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/02/08 15:03:39 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/02/09 17:32:32 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -346,6 +346,8 @@ namespace ft
             void _fitCapacity(size_type additional, iterator position) {
                 size_type required_cap = _size + additional;
                 pointer ref = _c;
+                size_type to_move = end() - position;
+                size_type at = position - begin();
                 if (_capacity < required_cap) {
                     size_type next_capacity = (required_cap > (_capacity * 2)
                         ? required_cap
@@ -353,21 +355,14 @@ namespace ft
                     );
                     ref = _allocator.allocate(next_capacity + 1);
                     _capacity = next_capacity;
-                    int i = 0;
-                    for (iterator it = begin(); it != position; it++, i++)
-                        *(ref + i) = *it;
+                    for (size_type i = 0; i < at; i++) {
+                        VDBG("COPY" << _c[i]);
+                        _allocator.construct(ref + i, _c[i]);
+                    }
                 }
-                int oversize = position - end() + additional;
-                /**
-                 * oversize > 0 = collapse the end of list, need to construct from the old list
-                 * oversize < 0 = not collapsing
-                 */
-                VDBG("Oversize " << oversize);
-                if (oversize > 0) {
-                    size_type rest = end() - position;
-                    VDBG("Rest " << rest);
-                    for (size_type i = 0; i < static_cast<size_type>(oversize); i++)
-                        _allocator.construct(ref + _size + rest + i, *(position + i));
+                for (size_type i = to_move; i >= 0; i--) {
+                    VDBG("oTHER COPY" << _c[at + i]);
+                    _allocator.construct(ref + at + i + additional, _c[at + i]);
                 }
                 _c = ref;
                 _size += additional;
