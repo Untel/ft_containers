@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/16 12:01:27 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/02/09 21:11:39 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/02/18 19:38:56 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -147,31 +147,35 @@ namespace ft
 
             // Member functions
             explicit vector (const allocator_type& alloc = allocator_type()) :
-                _size(0), _capacity(0), _allocator(alloc)
+                _size(0), _capacity(0), _allocator(alloc), _c(_allocator.allocate(1))
             {
                 VDBG("Default Constructor");
-                _c = _allocator.allocate(1);
             };
             explicit vector (
                 size_type n,
                 const value_type & val = value_type(),
                 const allocator_type & alloc = allocator_type()
-            ) : _size(0), _capacity(0), _allocator(alloc) {
-                VDBG("Parametric Constructor: - N > " << n);
-                VDBG("Size: " << _size);
-                reserve(n);
-                for (size_type i = 0; i < n; i++)
-                    _allocator.construct(_c + i, val);
-                _size = n;
-                VDBG("End construct");
+            ) : _size(0), _capacity(0), _allocator(alloc), _c(_allocator.allocate(1)) {
+                insert(begin(), n, val);
             }
-            vector(const vector & x) {
-                VDBG("Copy Constructor");
-                clear();
-                *this = x;
-            };
-            // template <class InputIterator>
-            // vector (InputIterator first, InputIterator last, const allocator_type& alloc = allocator_type());
+            vector(const vector & cpy) :
+                _size(cpy._size),
+                _capacity(cpy._capacity),
+                _allocator(cpy._allocator),
+                _c(_allocator.allocate(_capacity + 1))
+            {
+                for (size_type i = 0; i < _size; i++)
+                    _allocator.construct(_c + i, cpy._c[i]);
+		    }
+            template <class InputIterator>
+            vector (
+                InputIterator first,
+                InputIterator last,
+                const allocator_type& alloc = allocator_type(),
+                typename ft::enable_if <!ft::is_integral <InputIterator>::value, InputIterator >::type = NULL
+            ) : _size(0), _capacity(0), _allocator(alloc), _c(_allocator.allocate(1)) {
+                insert(begin(), first, last);
+            }
             ~vector(void) {
                 VDBG("Destructor");
                 _clean();
@@ -205,7 +209,7 @@ namespace ft
             void insert (iterator position, size_type n_to_insert, const value_type& val) {
                 VDBG(GREEN << "Insert by val n(" << n_to_insert << ") val(" << val << ")" << RESET);
                 size_type at = std::distance(begin(), position);
-                _fitCapacity(n_to_insert, position);
+                _buildMemoryHole(n_to_insert, position);
                 for (size_type i = 0; i < n_to_insert; i++)
                     _allocator.construct(_c + at + i, val);
                 // __VECTOR_INSERT(val, val);
@@ -221,7 +225,7 @@ namespace ft
                 VDBG(BLUE << "Insert by range" << RESET);
                 size_type at = std::distance(begin(), position);
                 size_type n_to_insert = std::distance(first, last);
-                _fitCapacity(n_to_insert, position);
+                _buildMemoryHole(n_to_insert, position);
                 for (size_type i = 0; i < n_to_insert; i++)
                     _allocator.construct(_c + at + i, *(first + i));
                 // __VECTOR_INSERT(*(first + i), *((is_collapsing && i < collapse_at) ? last - collapse_at + i : it_end - construct_from_end + i));
@@ -271,8 +275,8 @@ namespace ft
             const pointer       data() const { return _c; }
             reference           front() { return *_c; }
             const_reference     front() const { return *_c; }
-            reference           back() { return _c[_size]; }
-            const_reference     back() const { return _c[_size]; }
+            reference           back() { return _c[_size - 1]; }
+            const_reference     back() const { return _c[_size - 1]; }
             size_type           size() const { return _size; }
             bool                empty() const { return _size == 0; }
             size_type           max_size() const { return _allocator.max_size(); }
@@ -342,18 +346,22 @@ namespace ft
             pointer                     _c;
 
             void _clean(void) {
-                clear();
-                _allocator.deallocate(_c, _capacity + 1);
-                _capacity = 0;
+                if (_capacity) {
+                    clear();
+                    _allocator.deallocate(_c, _capacity + 1);
+                    _capacity = 0;
+                }
             }
 
-            void _fitCapacity(size_type additional, iterator position) {
+            void _buildMemoryHole(size_type additional, iterator position) {
                 size_type required_cap = _size + additional;
                 pointer ref = _c;
                 size_type to_move = end() - position;
                 size_type at = position - begin();
+                size_type old_capacity = _capacity;
+                bool is_capacity_changing = _capacity < required_cap;
                 at = at > 0 ? at : 0;
-                if (_capacity < required_cap) {
+                if (is_capacity_changing) {
                     size_type next_capacity = (required_cap > (_capacity * 2)
                         ? required_cap
                         : _capacity * 2
@@ -362,11 +370,14 @@ namespace ft
                     _capacity = next_capacity;
                     for (size_type i = 0; i < at; i++) {
                         _allocator.construct(ref + i, _c[i]);
+                        _allocator.destroy(_c + i);
                     }
                 }
                 for (int i = to_move; i >= 0; i--) {
                     _allocator.construct(ref + at + i + additional, _c[at + i]);
                 }
+                if (is_capacity_changing)
+                    _allocator.deallocate(_c, old_capacity + 1);
                 _c = ref;
                 _size += additional;
             }
