@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/16 12:01:27 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/02/21 10:06:30 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/02/21 10:50:04 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -136,14 +136,14 @@ namespace ft
             typedef typename Allocator::pointer                                     pointer;
             typedef typename Allocator::const_reference                             const_reference;
             typedef typename Allocator::const_pointer                               const_pointer;
-            // typedef typename ft::array_iterator< value_type >::iterator             iterator;
-            // typedef typename ft::array_iterator< value_type >::const_iterator       const_iterator;
-            typedef typename ft::array_iterator< value_type >                       iterator;
-            typedef typename ft::array_iterator< const value_type >                 const_iterator;
+            typedef typename Allocator::size_type                                   size_type;
+            typedef typename ft::array_iterator< value_type >::iterator             iterator;
+            typedef typename ft::array_iterator<const value_type >::const_iterator  const_iterator;
+            // typedef typename ft::array_iterator< value_type >                       iterator;
+            // typedef typename ft::array_iterator< const value_type >                 const_iterator;
             typedef typename ft::reverse_iterator< iterator >                       reverse_iterator;
             typedef typename ft::reverse_iterator< const_iterator >                 const_reverse_iterator;
             typedef typename ft::iterator_traits<iterator>::difference_type         difference_type;
-            typedef std::size_t                                                     size_type;
 
             // Member functions
             vector (const allocator_type& alloc = allocator_type()) :
@@ -233,7 +233,7 @@ namespace ft
             }
             iterator erase (iterator first, iterator last) {
                 iterator e          = end();
-                size_type at        = std::distance(begin(), first());
+                // size_type at        = std::distance(begin(), first);
                 // Nombre d'el a remove
                 size_type n         = last - first;
                 VDBG("Erasing " << n << " elements");
@@ -270,11 +270,11 @@ namespace ft
                 InputIterator first,
                 typename enable_if <!is_integral <InputIterator>::value, InputIterator >::type last
             ) {
-                erase(begin(), end());
+                clear();
                 insert(begin(), first, last);
             }
             void assign (size_type n, const value_type& val) {
-                erase(begin(), end());
+                clear();
                 insert(begin(), n, val);
             }
             // getters
@@ -346,6 +346,7 @@ namespace ft
                 return iterator(_c + _size);
             }
             const_iterator end() const {
+                VDBG("Const End iterator");
                 return const_iterator(_c + _size);
             }
 
