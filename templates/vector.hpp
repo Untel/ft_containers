@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/16 12:01:27 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/02/18 19:38:56 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/02/21 10:06:30 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -146,12 +146,12 @@ namespace ft
             typedef std::size_t                                                     size_type;
 
             // Member functions
-            explicit vector (const allocator_type& alloc = allocator_type()) :
+            vector (const allocator_type& alloc = allocator_type()) :
                 _size(0), _capacity(0), _allocator(alloc), _c(_allocator.allocate(1))
             {
                 VDBG("Default Constructor");
             };
-            explicit vector (
+            vector (
                 size_type n,
                 const value_type & val = value_type(),
                 const allocator_type & alloc = allocator_type()
@@ -170,9 +170,8 @@ namespace ft
             template <class InputIterator>
             vector (
                 InputIterator first,
-                InputIterator last,
-                const allocator_type& alloc = allocator_type(),
-                typename ft::enable_if <!ft::is_integral <InputIterator>::value, InputIterator >::type = NULL
+                typename enable_if <!is_integral <InputIterator>::value, InputIterator >::type last,
+                const allocator_type& alloc = allocator_type()
             ) : _size(0), _capacity(0), _allocator(alloc), _c(_allocator.allocate(1)) {
                 insert(begin(), first, last);
             }
@@ -219,23 +218,22 @@ namespace ft
             void insert (
                 iterator position,
                 InputIterator first,
-                InputIterator last,
-                typename ft::enable_if <!ft::is_integral <InputIterator>::value, InputIterator >::type = NULL
+                typename enable_if <!is_integral <InputIterator>::value, InputIterator >::type last
             ) {
                 VDBG(BLUE << "Insert by range" << RESET);
                 size_type at = std::distance(begin(), position);
                 size_type n_to_insert = std::distance(first, last);
                 _buildMemoryHole(n_to_insert, position);
                 for (size_type i = 0; i < n_to_insert; i++)
-                    _allocator.construct(_c + at + i, *(first + i));
+                    _allocator.construct(_c + at + i, *(first++));
                 // __VECTOR_INSERT(*(first + i), *((is_collapsing && i < collapse_at) ? last - collapse_at + i : it_end - construct_from_end + i));
             }
             iterator erase (iterator position) {
-                if (position < end())
-                    erase(position, position + 1);
+                return erase(position, position + 1);
             }
             iterator erase (iterator first, iterator last) {
                 iterator e          = end();
+                size_type at        = std::distance(begin(), first());
                 // Nombre d'el a remove
                 size_type n         = last - first;
                 VDBG("Erasing " << n << " elements");
@@ -267,6 +265,18 @@ namespace ft
                 }
             }
 
+            template <class InputIterator>
+            void assign (
+                InputIterator first,
+                typename enable_if <!is_integral <InputIterator>::value, InputIterator >::type last
+            ) {
+                erase(begin(), end());
+                insert(begin(), first, last);
+            }
+            void assign (size_type n, const value_type& val) {
+                erase(begin(), end());
+                insert(begin(), n, val);
+            }
             // getters
             allocator_type      get_allocator() const { return _allocator; }
             reference           operator[] (size_type position) { return _c[position]; }
