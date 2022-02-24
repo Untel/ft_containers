@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/18 15:18:01 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/02/07 17:27:10 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/02/21 10:58:01 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 
 # include <sstream>
 # ifdef DEBUG
-    #define VDBG(...) std::cerr << "<Vector> " << __VA_ARGS__ << std::endl
+    #define VDBG(...) std::cerr << "<Vector " << this << " > " << __VA_ARGS__ << std::endl
 # else
     #define VDBG(...)
     // #define DBG(...)

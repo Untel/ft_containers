@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/16 12:01:27 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/02/21 10:50:04 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/02/21 14:22:15 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@
 # include "array_iterator.hpp"
 # include "iterator.hpp"
 # include "iVector.hpp"
+# include "tester.hpp"
 
 #define __VECTOR_INSERT(__RESOLVER, __RESOLVER2) \
     size_type required_cap = _size + n_to_insert; \
@@ -158,15 +159,22 @@ namespace ft
             ) : _size(0), _capacity(0), _allocator(alloc), _c(_allocator.allocate(1)) {
                 insert(begin(), n, val);
             }
-            vector(const vector & cpy) :
-                _size(cpy._size),
-                _capacity(cpy._capacity),
-                _allocator(cpy._allocator),
-                _c(_allocator.allocate(_capacity + 1))
-            {
+
+            vector(const vector & cpy) {
+                VDBG(RED << "COPY CONST OLD REF:" << cpy._c << BLUE << " NEW REF " << _c << RESET);
+                *this = cpy;
+            }
+            vector & operator = ( const vector &cpy) {
+                VDBG(RED << "ASSIGNING OLD REF:" << cpy._c << BLUE << " NEW REF " << _c << RESET);
+                _size = cpy._size;
+                _capacity = cpy._capacity;
+                _allocator = cpy._allocator;
+                _c = _allocator.allocate(_capacity + 1);
                 for (size_type i = 0; i < _size; i++)
                     _allocator.construct(_c + i, cpy._c[i]);
-		    }
+                return *this;
+            }
+
             template <class InputIterator>
             vector (
                 InputIterator first,
@@ -176,7 +184,7 @@ namespace ft
                 insert(begin(), first, last);
             }
             ~vector(void) {
-                VDBG("Destructor");
+                VDBG("Destructor _c ref " << _c);
                 _clean();
             };
             // Data access
@@ -202,7 +210,7 @@ namespace ft
             iterator insert (iterator position, const value_type & val) {
                 difference_type at = position - begin();
                 insert(position, 1, val);
-                return (begin() + at + 1);
+                return (begin() + at);
             }
 
             void insert (iterator position, size_type n_to_insert, const value_type& val) {
@@ -233,25 +241,27 @@ namespace ft
             }
             iterator erase (iterator first, iterator last) {
                 iterator e          = end();
-                // size_type at        = std::distance(begin(), first);
+                size_type at        = std::distance(begin(), first);
                 // Nombre d'el a remove
-                size_type n         = last - first;
+                size_type n         = std::distance(first, last);
                 VDBG("Erasing " << n << " elements");
 
                 // Iterer entre iterator last et iterator end(), car on déplace ce qu'il y a après last a l'endroit mémoire qu'on erase
                 // Cf. problème de memset dans libft (gauche a droite et pas droite a gauche)
-                iterator it = first;
-                for (; it != e - n; it++) {
-                    // VDBG("Erasing " << (it - n)->get() << " with " << it->get() );
+                iterator it = first + n;
+                for (; it != e; it++) {
+                    VDBG("Erasing " << *it << " with " << *(it - n) );
                     *(it - n) = *(it); // assigner de n elements vers la gauche
                 }
-                it = e - n;
+                it = end();
                 // détruire les n éléments en partant du iterator end()
                 // on ne détruit pas les éléments qu'on a érase, mais ceux a la fin du ctn, qui on été réassigné a la boucle précédente
-                for (; it != e; it++)
+                for (; it != end(); it++) {
+                    VDBG("Destroying " << *it);
                     _allocator.destroy(&(*it));
+                }
                 _size -= n;
-                return first;
+                return iterator(_c + at);
             }
 
             // will probably just call insert ??
@@ -259,9 +269,9 @@ namespace ft
                 if (n < _size) {
                     VDBG("Resizing: deletion");
                     erase(begin() + n, end());
-                } else if (n > _size) {
+                } else {
                     VDBG("Resizing: addition");
-                    insert(end(), n, val);
+                    insert(end(), n - _size, val);
                 }
             }
 
@@ -357,11 +367,10 @@ namespace ft
             pointer                     _c;
 
             void _clean(void) {
-                if (_capacity) {
-                    clear();
-                    _allocator.deallocate(_c, _capacity + 1);
-                    _capacity = 0;
-                }
+                VDBG(MAGENTA << "CLEARING " << _c << RESET);
+                clear();
+                _allocator.deallocate(_c, _capacity + 1);
+                _capacity = 0;
             }
 
             void _buildMemoryHole(size_type additional, iterator position) {

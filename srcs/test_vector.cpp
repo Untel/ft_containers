@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/18 15:09:31 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/02/18 18:03:03 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/02/21 14:09:07 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,6 +71,34 @@ void test_constructor() {
 	}
 }
 
+void test_erase() {
+	std::cout << "ERASE" << std::endl;
+
+	ft::vector<int> vct(10);
+
+	for (unsigned long int i = 0; i < vct.size(); ++i)
+		vct[i] = i;
+
+
+	std::cout << "Size " << vct.size() << std::endl;
+	ft::vector<int>::iterator it = vct.begin();
+	ft::vector<int>::iterator ite = vct.end();
+	for (; it != ite; it++) {
+		std::cout << "Pre " << *it << std::endl;
+	}
+
+	std::cout << "Iter " << *(vct.erase(vct.begin())) << std::endl;
+
+	it = vct.begin();
+	ite = vct.end();
+	std::cout << "Size " << vct.size() << std::endl;
+	for (; it != ite; it++) {
+		std::cout << "Post " << *it << std::endl;
+	}
+
+
+}
+
 
 void test_vector_main(void) {
 	#ifdef STL
@@ -78,6 +106,7 @@ void test_vector_main(void) {
 	#else
 		std::cout << "IS FT" << std::endl;
 	#endif
-	test_push_back();
-	test_push_list();
+	// test_push_back();
+	// test_push_list();
+	test_erase();
 }
