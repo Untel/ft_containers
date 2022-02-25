@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/16 12:01:27 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/02/21 14:22:15 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/02/25 07:55:52 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -402,6 +402,39 @@ namespace ft
                 _size += additional;
             }
     };
+
+    template <class T, class Alloc>
+    bool operator == (const vector<T,Alloc> & lhs, const vector<T,Alloc> & rhs) {
+        VDBG("lhs == rhs");
+        if (lhs.size() != rhs.size())
+            return false;
+        
+        for (typename vector<T,Alloc>::size_type i = 0; i < lhs.size(); i++)
+            if (!(lhs.at(i) == rhs.at(i)))
+                return false;
+        return true;
+    }
+    template <class T, class Alloc>
+    bool operator != (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs) {
+        VDBG("lhs != rhs");
+        return (!(lhs == rhs));
+    }
+    template <class T, class Alloc>
+    bool operator < (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs) {
+        return ft::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
+    }
+    template <class T, class Alloc>
+    bool operator > (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs) {
+        return (rhs < lhs);
+    }
+    template <class T, class Alloc>
+    bool operator <= (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs) {
+        return !(rhs < lhs);
+    }
+    template <class T, class Alloc>
+    bool operator >= (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs) {
+        return !(lhs < rhs);
+    }
 
     template <class T, class Alloc>
     void swap (vector<T, Alloc> & x, vector<T, Alloc> & y) {

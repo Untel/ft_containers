@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/19 19:48:57 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/02/24 15:01:08 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/02/25 07:10:04 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,7 +72,7 @@ namespace ft
             reference operator * () { return *(this->_p); }
             pointer operator -> () { return this->_p; }
 		    reference operator[](difference_type at) const { return (_p[at]); }
-			array_iterator operator + (difference_type n) const { return this->_p + n; }
+			array_iterator operator + (difference_type n) const { IDBG("this + n"); return this->_p + n; }
 			array_iterator operator - (difference_type n) const { return this->_p - n; }
 			difference_type operator - (array_iterator rhs) const { return this->_p - rhs._p; }
 
@@ -85,41 +85,35 @@ namespace ft
     template<typename T>
     ft::array_iterator<T> operator + (
         typename ft::array_iterator<T>::difference_type lhs,
-        typename ft::array_iterator<T>::const_reference rhs
+        typename ft::array_iterator<T> & rhs
     ) {
+        IDBG("T + n");
         return (&(*rhs) + lhs);
-    }
-
-    template<typename T>
-    ft::array_iterator<T> operator + (
-        typename ft::array_iterator<T>::const_reference lhs,
-        typename ft::array_iterator<T>::difference_type rhs
-    ) {
-        return (&(*lhs) + rhs);
     }
 
     template<typename T>
     ft::array_iterator<T> operator - (
         typename ft::array_iterator<T>::difference_type lhs,
-        typename ft::array_iterator<T>::const_reference rhs
+        typename ft::array_iterator<T> & rhs
     ) {
         return (&(*rhs) - lhs);
     }
 
     template <typename T>
     bool operator == (
-        const ft::array_iterator<T> lhs,
-        const ft::array_iterator<T> rhs
+        const ft::array_iterator<T> & lhs,
+        const ft::array_iterator<T> & rhs
     ) {
+        IDBG("T == T");
         return (lhs.base() == rhs.base());
     }
 
-    /* For iterator == const_iterator */
-    template<typename T_L, typename T_R>
+    template<typename T, typename U>
     bool operator == (
-        const ft::array_iterator<T_L> lhs,
-        const ft::array_iterator<T_R> rhs
+        const ft::array_iterator<T> & lhs,
+        const ft::array_iterator<U> & rhs
     ) {
+        IDBG("T == U");
         return (lhs.base() == rhs.base());
     }
 	// template <typename T, typename U>
@@ -129,8 +123,8 @@ namespace ft
 
 	template <typename T, typename U>
 	bool operator != (
-        const array_iterator<T> & lhs,
-        const array_iterator<U> & rhs
+        const ft::array_iterator<T> & lhs,
+        const ft::array_iterator<U> & rhs
     ) {
 		return !(lhs == rhs);
 	}
