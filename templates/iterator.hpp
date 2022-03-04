@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/19 20:05:28 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/03/04 07:50:14 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/03/04 08:09:56 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,13 +75,11 @@ namespace ft {
 			 * cplusplus.com say to dont implement this operator
 			 * @todo check if possible in cpp98
 			 */
-			template< class U >
-			reverse_iterator<U> & operator = ( const reverse_iterator<U> &rhs) {
-                if (this != &rhs) {
-                    _base = rhs._base;
-                }
-                return *this;
-			}
+			// template< class U >
+			// reverse_iterator<U> & operator = ( const reverse_iterator<U> &rhs) {
+			// 	_base = rhs.base();
+            //     return (*this);
+			// }
 			// operator reverse_iterator<const value_type>() const {
             //     return (reverse_iterator<const value_type>(base()));
             // }
@@ -142,7 +140,7 @@ namespace ft {
         const ft::reverse_iterator<T> & rhs
     ) {
         IDBG("Rev T - T");
-        return (lhs.base() - rhs.base());
+        return (rhs.base() - lhs.base());
     }
 
     template<typename T, typename U>
@@ -151,7 +149,7 @@ namespace ft {
         const ft::reverse_iterator<U> & rhs
     ) {
         IDBG("Rev T - U ");
-        return (lhs.base() - rhs.base());
+        return (rhs.base() - lhs.base());
     }
 
 

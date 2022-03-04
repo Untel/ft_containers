@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/19 19:48:57 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/03/04 07:38:54 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/03/04 08:08:34 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,9 +43,7 @@ namespace ft
             // array_iterator(const_iterator & cpy) : _p(cpy._p) {}
             array_iterator(const array_iterator & cpy) : _p(cpy._p) {}
             array_iterator & operator = (const array_iterator & rhs) {
-                if (this != &rhs) {
-                    _p = rhs._p;
-                }
+                _p = rhs._p;
                 return *this;
             }
             operator array_iterator<const value_type>() const {
@@ -102,20 +100,22 @@ namespace ft
         return (&(*rhs) - lhs);
     }
 
-    template<typename T>
-    typename ft::array_iterator<T>::difference_type operator - (
-        typename ft::array_iterator<T> & lhs,
-        typename ft::array_iterator<T> & rhs
-    ) {
-        return (lhs.base() - rhs.base());
-    }
+    // template<typename T>
+    // typename ft::array_iterator<T>::difference_type operator - (
+    //     typename ft::array_iterator<T> & lhs,
+    //     typename ft::array_iterator<T> & rhs
+    // ) {
+    //     IDBG("T - T");
+    //     return (lhs.base() - rhs.base());
+    // }
 
     template<typename T, typename U>
     typename ft::array_iterator<T>::difference_type operator - (
-        typename ft::array_iterator<T> & lhs,
-        typename ft::array_iterator<U> & rhs
+        const ft::array_iterator<T> & lhs,
+        const ft::array_iterator<U> & rhs
     ) {
-        return (lhs.base() - rhs.base());
+        IDBG("T - U");
+        return (&(lhs[0]) - &(rhs[0]));
     }
 
     template <typename T>
