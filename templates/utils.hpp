@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/18 15:18:01 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/02/25 07:47:48 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/03/04 07:23:12 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 # include <sstream>
 # ifdef DEBUG
     #define VDBG(...) std::cerr << "<Vector> " << YELLOW << __VA_ARGS__ << RESET << std::endl
-    #define IDBG(...) std::cerr << "<Iterator> " << YELLOW << __VA_ARGS__ << RESET << std::endl
+    #define IDBG(...) std::cerr << "<Iterator> " << CYAN << __VA_ARGS__ << RESET << std::endl
 
 # else
     #define VDBG(...)
@@ -33,7 +33,6 @@ std::string toString(T el) {
 }
 
 namespace ft {
-
     template <class InputIterator1, class InputIterator2>
     bool lexicographical_compare (
         InputIterator1 first1, InputIterator1 last1,

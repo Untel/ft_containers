@@ -6,14 +6,14 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/19 19:48:57 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/02/25 07:10:04 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/03/04 07:38:54 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef ARRAYITERATOR_HPP
 # define ARRAYITERATOR_HPP 1
-# include <iostream>     // std::cout
-# include "iterator.hpp"     // std::iterator, std::random_access_iterator_tag
+# include <iostream>
+# include "iterator.hpp"
 
 namespace ft
 {
@@ -71,7 +71,10 @@ namespace ft
             // contains: *a++ *a-- *a = T
             reference operator * () { return *(this->_p); }
             pointer operator -> () { return this->_p; }
-		    reference operator[](difference_type at) const { return (_p[at]); }
+		    reference operator [] (difference_type at) const {
+				IDBG("op[" << at << "] = " << _p[at]);
+                return (_p[at]); 
+            }
 			array_iterator operator + (difference_type n) const { IDBG("this + n"); return this->_p + n; }
 			array_iterator operator - (difference_type n) const { return this->_p - n; }
 			difference_type operator - (array_iterator rhs) const { return this->_p - rhs._p; }
@@ -97,6 +100,22 @@ namespace ft
         typename ft::array_iterator<T> & rhs
     ) {
         return (&(*rhs) - lhs);
+    }
+
+    template<typename T>
+    typename ft::array_iterator<T>::difference_type operator - (
+        typename ft::array_iterator<T> & lhs,
+        typename ft::array_iterator<T> & rhs
+    ) {
+        return (lhs.base() - rhs.base());
+    }
+
+    template<typename T, typename U>
+    typename ft::array_iterator<T>::difference_type operator - (
+        typename ft::array_iterator<T> & lhs,
+        typename ft::array_iterator<U> & rhs
+    ) {
+        return (lhs.base() - rhs.base());
     }
 
     template <typename T>

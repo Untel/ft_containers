@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/16 12:01:27 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/02/25 07:55:52 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/03/04 07:43:27 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -358,6 +358,22 @@ namespace ft
             const_iterator end() const {
                 VDBG("Const End iterator");
                 return const_iterator(_c + _size);
+            }
+
+            reverse_iterator rbegin() {
+                VDBG("Begin reverse_iterator");
+                return reverse_iterator(end());
+            }
+            const_reverse_iterator rbegin() const {
+                return const_reverse_iterator(end());
+            }
+            reverse_iterator rend() {
+                VDBG("End reverse_iterator");
+                return reverse_iterator(begin());
+            }
+            const_reverse_iterator rend() const {
+                VDBG("Const End reverse_iterator");
+                return const_reverse_iterator(begin());
             }
 
         private:

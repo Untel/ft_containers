@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/18 15:09:31 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/02/25 07:31:48 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/03/04 07:12:01 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -128,6 +128,41 @@ void comp() {
 //   if (foo>=bar) std::cout << "foo is greater than or equal to bar\n";
 }
 
+void revite() {
+	const int size = 5;
+	ft::vector<int> vct(size);
+	ft::vector<int>::reverse_iterator it = vct.rbegin();
+	ft::vector<int>::const_reverse_iterator ite = vct.rbegin();
+
+
+	for (int i = 0; i < size; ++i) {
+		it[i] = (size - i) * 5;
+		std::cout << "Insert at " << i << " value "
+			<< it[i] << " should be " << (size - i) * 5 << std::endl;
+	}
+
+	ft::vector<int>::iterator nit = vct.begin();
+	ft::vector<int>::iterator nite = vct.end();
+	for (; nit != nite; nit++)
+		std::cout << "By normal iterator is " << *nit << " " << std::endl;
+	for (int i = 0; i < size; ++i) {
+		std::cout << "Index " << vct[i] << " " << std::endl;
+	}
+	it = it + 5;
+	it = 1 + it;
+	it = it - 4;
+	std::cout << *(it += 2) << std::endl;
+	std::cout << *(it -= 1) << std::endl;
+
+	*(it -= 2) = 42;
+	*(it += 2) = 21;
+
+	std::cout << "const_ite +=/-=: " << *(ite += 2) << " | " << *(ite -= 2) << std::endl;
+
+	std::cout << "(it == const_it): " << (ite == it) << std::endl;
+	std::cout << "(const_ite - it): " << (ite - it) << std::endl;
+}
+
 void test_vector_main(void) {
 	#ifdef STL
 		std::cout << "IS STL" << std::endl;
@@ -138,5 +173,6 @@ void test_vector_main(void) {
 	// test_push_list();
 	// test_erase();
 	// plus_iterator();
-	comp();
+	// comp();
+	revite();
 }

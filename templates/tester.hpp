@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/18 15:09:35 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/02/02 16:23:44 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/03/04 07:14:56 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,7 @@
     namespace ft = std;
 # else
     #  include "vector.hpp"
+    #  include "utils.hpp"
 # endif
 
 void        test_vector_main(void);
