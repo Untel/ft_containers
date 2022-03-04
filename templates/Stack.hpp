@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/16 12:01:27 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/03/04 08:25:07 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/03/04 08:28:37 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,39 +45,33 @@ namespace ft {
         friend bool operator>= (const ft::stack<_T, _Container> &lhs, const ft::stack<_T, _Container> &rhs);
 
 	protected:
-		Container	c;
+		Container   c;
 	};
 
     template <class T, class Container>
-	bool operator== (const stack<T,Container>& lhs, const stack<T,Container>& rhs) {
+	bool operator== (const stack<T,Container> &lhs, const stack<T,Container> &rhs) {
 		return (lhs.c == rhs.c);
 	}
-
 	template <class T, class Container>
-	bool operator!= (const stack<T,Container>& lhs, const stack<T,Container>& rhs) {
+	bool operator!= (const stack<T, Container> &lhs, const stack<T, Container> &rhs) {
 		return (!(lhs == rhs));
 	}
-
 	template <class T, class Container>
-	bool operator< (const stack<T,Container>& lhs, const stack<T,Container>& rhs) {
+	bool operator< (const stack<T, Container> &lhs, const stack<T, Container> &rhs) {
 		return (lhs.c < rhs.c);
 	}
-
 	template <class T, class Container>
-	bool operator> (const stack<T,Container>& lhs, const stack<T,Container>& rhs) {
+	bool operator> (const stack<T, Container> &lhs, const stack<T, Container> &rhs) {
 		return (rhs < lhs);
 	}
-
 	template <class T, class Container>
-	bool operator<= (const stack<T,Container>& lhs, const stack<T,Container>& rhs) {
+	bool operator<= (const stack<T, Container> &lhs, const stack<T, Container> &rhs) {
 		return (!(rhs < lhs));
 	}
-
 	template <class T, class Container>
-	bool operator>= (const stack<T,Container>& lhs, const stack<T,Container>& rhs) {
+	bool operator>= (const stack<T, Container> &lhs, const stack<T, Container> &rhs) {
 		return (!(lhs < rhs));
 	}
-
 }
 
 #endif // !STACK_HPP
