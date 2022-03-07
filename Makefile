@@ -6,7 +6,7 @@
 #    By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/01/13 16:35:21 by adda-sil          #+#    #+#              #
-#    Updated: 2022/03/04 09:12:10 by adda-sil         ###   ########.fr        #
+#    Updated: 2022/03/07 16:39:22 by adda-sil         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -26,6 +26,8 @@ TEMPLATE_DIR		= templates
 TEMPLATE_FILES		= \
 						vector.hpp \
 						stack.hpp \
+						map.hpp \
+						pair.hpp \
 
 SRCS				= $(addprefix $(SRCS_DIR)/, $(SRCS_FILES))
 HEADERS				= $(addprefix $(HEAD_DIR)/, $(HEAD_FILES))

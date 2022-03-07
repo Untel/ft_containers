@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/16 12:01:27 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/03/04 07:43:27 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/03/07 17:39:48 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -133,11 +133,11 @@ namespace ft
             // Member types
             typedef T                                                               value_type;
             typedef Allocator                                                       allocator_type;
-            typedef typename Allocator::reference                                   reference;
-            typedef typename Allocator::pointer                                     pointer;
-            typedef typename Allocator::const_reference                             const_reference;
-            typedef typename Allocator::const_pointer                               const_pointer;
-            typedef typename Allocator::size_type                                   size_type;
+            typedef typename allocator_type::reference                              reference;
+            typedef typename allocator_type::pointer                                pointer;
+            typedef typename allocator_type::const_reference                        const_reference;
+            typedef typename allocator_type::const_pointer                          const_pointer;
+            typedef typename allocator_type::size_type                              size_type;
             typedef typename ft::array_iterator< value_type >::iterator             iterator;
             typedef typename ft::array_iterator<const value_type >::const_iterator  const_iterator;
             // typedef typename ft::array_iterator< value_type >                       iterator;
