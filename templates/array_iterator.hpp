@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/19 19:48:57 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/03/04 08:08:34 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/03/07 18:20:31 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,8 +77,6 @@ namespace ft
 			array_iterator operator - (difference_type n) const { return this->_p - n; }
 			difference_type operator - (array_iterator rhs) const { return this->_p - rhs._p; }
 
-            pointer base(void) const { return _p; }
-
         private:
             pointer     _p;
     };
@@ -124,7 +122,7 @@ namespace ft
         const ft::array_iterator<T> & rhs
     ) {
         IDBG("T == T");
-        return (lhs.base() == rhs.base());
+        return (&(lhs[0]) == &(rhs[0]));
     }
 
     template<typename T, typename U>
@@ -133,11 +131,11 @@ namespace ft
         const ft::array_iterator<U> & rhs
     ) {
         IDBG("T == U");
-        return (lhs.base() == rhs.base());
+        return (&(lhs[0]) == &(rhs[0]));
     }
 	// template <typename T, typename U>
 	// bool operator == (const ft::array_iterator<T> & lhs, const ft::array_iterator<U> & rhs) {
-	// 	return lhs.base() == rhs.base();
+	// 	return &(lhs[0]) == &(rhs[0]);
 	// }
 
 	template <typename T, typename U>
@@ -157,11 +155,11 @@ namespace ft
 	}
 	template <typename T, typename U>
 	bool operator <= (const ft::array_iterator<T> & lhs, const ft::array_iterator<U> & rhs) {
-		return lhs.base() <= rhs.base();
+		return &(lhs[0]) <= &(rhs[0]);
 	}
 	template <typename T, typename U>
 	bool operator >= (const ft::array_iterator<T> & lhs, const ft::array_iterator<U> & rhs) {
-		return lhs.base() >= rhs.base();
+		return &(lhs[0]) >= &(rhs[0]);
 	}
 
 }

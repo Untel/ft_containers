@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/19 19:48:57 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/03/07 18:03:30 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/03/07 18:08:57 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -124,7 +124,7 @@ namespace ft
         const ft::binary_tree_iterator<T> & rhs
     ) {
         IDBG("T == T");
-        return (lhs.base() == rhs.base());
+        return (&(lhs[0]) == &(rhs[0]));
     }
 
     template<typename T, typename U>
@@ -133,11 +133,11 @@ namespace ft
         const ft::binary_tree_iterator<U> & rhs
     ) {
         IDBG("T == U");
-        return (lhs.base() == rhs.base());
+        return (&(lhs[0]) == &(rhs[0]));
     }
 	// template <typename T, typename U>
 	// bool operator == (const ft::binary_tree_iterator<T> & lhs, const ft::binary_tree_iterator<U> & rhs) {
-	// 	return lhs.base() == rhs.base();
+	// 	return &(lhs[0]) == &(rhs[0]);
 	// }
 
 	template <typename T, typename U>
@@ -157,11 +157,11 @@ namespace ft
 	}
 	template <typename T, typename U>
 	bool operator <= (const ft::binary_tree_iterator<T> & lhs, const ft::binary_tree_iterator<U> & rhs) {
-		return lhs.base() <= rhs.base();
+		return &(lhs[0]) <= &(rhs[0]);
 	}
 	template <typename T, typename U>
 	bool operator >= (const ft::binary_tree_iterator<T> & lhs, const ft::binary_tree_iterator<U> & rhs) {
-		return lhs.base() >= rhs.base();
+		return &(lhs[0]) >= &(rhs[0]);
 	}
 
 }
