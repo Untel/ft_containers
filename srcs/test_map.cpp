@@ -1,25 +1,30 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.cpp                                           :+:      :+:    :+:   */
+/*   test_map.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/01/16 12:00:27 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/03/08 15:46:46 by adda-sil         ###   ########.fr       */
+/*   Created: 2022/03/08 14:23:38 by adda-sil          #+#    #+#             */
+/*   Updated: 2022/03/08 15:50:19 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "tester.hpp"
 
-std::ostream & operator << (std::ostream & o, Awesome const & a){
-    o << "Awesome" << " N: " << a.get() << std::endl; 
-	return o;
+void test_init_map() {
+	std::cout << "INIT MAP" << std::endl;
+
+	ft::map<int, std::string> m;
+    m.insert(ft::make_pair(1, "lol"));
 }
 
-int main(void)
-{
-    // test_vector_main();
-    test_map_main();
-    return (0);
+void test_map_main(void) {
+	#ifdef STL
+		std::cout << "IS STL" << std::endl;
+	#else
+		std::cout << "IS FT" << std::endl;
+	#endif
+
+	test_init_map();
 }

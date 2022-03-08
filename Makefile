@@ -6,7 +6,7 @@
 #    By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/01/13 16:35:21 by adda-sil          #+#    #+#              #
-#    Updated: 2022/03/07 16:39:22 by adda-sil         ###   ########.fr        #
+#    Updated: 2022/03/08 15:45:02 by adda-sil         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -15,6 +15,7 @@ SRCS_DIR			= srcs
 SRCS_FILES			= 	\
 						main.cpp \
 						test_vector.cpp \
+						test_map.cpp \
 
 HEAD_DIR			= includes
 HEAD_FILES			= \

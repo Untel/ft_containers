@@ -6,12 +6,12 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/19 19:48:57 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/03/07 18:08:57 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/03/08 14:58:57 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef ARRAYITERATOR_HPP
-# define ARRAYITERATOR_HPP 1
+#ifndef BINARYTREEITERATOR_HPP
+# define BINARYTREEITERATOR_HPP 1
 # include <iostream>
 # include "iterator.hpp"
 

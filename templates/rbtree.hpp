@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/07 16:46:43 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/03/07 17:19:55 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/03/08 16:03:30 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,47 +16,51 @@
 
 namespace ft {
 
-    enum Color { RED, BLACK };
+    enum Color { _RED, _BLACK };
     
     template <class T>
     struct Node
     {
         typedef T           value_type;
+        typedef T *         pointer;
+        typedef T &         reference;
 
-        value_type data;
+        pointer data;
+        Node * left;
+        Node * right;
+        Node * parent;
         bool color;
-        Node *left, *right, *parent;
     
         // Constructor
-        Node(value_type el)
-            : data(el), left(NULL), parent(NULL), color(RED)
+        Node(pointer el)
+            : data(el), left(NULL), parent(NULL), color(_RED)
         {};
     };
     
-    // Class to represent Red-Black Tree
+    // Class to represent _RED-_BLACK Tree
     template <class T>
-    class RBTree
-    {
-        typedef typename Node<T>           value_type;
+    class RBTree {
+        typedef ft::Node<T>                     value_type;
+        typedef typename ft::Node<T> *          pointer;
 
         public:
             // Constructor
             RBTree() { root = NULL; }
-            void insert(const value_type *pt) {            
+            void insert(pointer pt) {            
                 // Do a normal BST insert
                 root = BSTInsert(root, pt);
-                // fix Red Black Tree violations
+                // fix _RED _BLACK Tree violations
                 fixViolation(root, pt);
             }
             void inorder() { inorderHelper(root); }
             void levelOrder() { {  levelOrderHelper(root); } }
 
         private:
-            value_type *root;
+            pointer root;
 
         protected:
-            void rotateLeft(value_type *&root, value_type *&pt) {
-                value_type *pt_right = pt->right;
+            void rotateLeft(pointer &root, pointer &pt) {
+                pointer pt_right = pt->right;
             
                 pt->right = pt_right->left;
             
@@ -77,8 +81,8 @@ namespace ft {
                 pt_right->left = pt;
                 pt->parent = pt_right;
             }
-            void rotateRight(value_type *&root, value_type *&pt) {
-                value_type *pt_left = pt->left;
+            void rotateRight(pointer &root, pointer &pt) {
+                pointer pt_left = pt->left;
             
                 pt->left = pt_left->right;
             
@@ -99,12 +103,12 @@ namespace ft {
                 pt_left->right = pt;
                 pt->parent = pt_left;
             }
-            void fixViolation(value_type *&root, value_type *&pt) {
-                value_type *parent_pt = NULL;
-                value_type *grand_parent_pt = NULL;
+            void fixViolation(pointer &root, pointer &pt) {
+                pointer parent_pt = NULL;
+                pointer grand_parent_pt = NULL;
             
-                while ((pt != root) && (pt->color != BLACK) &&
-                    (pt->parent->color == RED))
+                while ((pt != root) && (pt->color != _BLACK) &&
+                    (pt->parent->color == _RED))
                 {
             
                     parent_pt = pt->parent;
@@ -116,16 +120,16 @@ namespace ft {
                     if (parent_pt == grand_parent_pt->left)
                     {
             
-                        value_type *uncle_pt = grand_parent_pt->right;
+                        pointer uncle_pt = grand_parent_pt->right;
             
                         /* Case : 1
-                        The uncle of pt is also red
-                        Only Recoloring required */
-                        if (uncle_pt != NULL && uncle_pt->color == RED)
+                        The uncle of pt is also _RED
+                        Only Recoloring requi_RED */
+                        if (uncle_pt != NULL && uncle_pt->color == _RED)
                         {
-                            grand_parent_pt->color = RED;
-                            parent_pt->color = BLACK;
-                            uncle_pt->color = BLACK;
+                            grand_parent_pt->color = _RED;
+                            parent_pt->color = _BLACK;
+                            uncle_pt->color = _BLACK;
                             pt = grand_parent_pt;
                         }
             
@@ -133,7 +137,7 @@ namespace ft {
                         {
                             /* Case : 2
                             pt is right child of its parent
-                            Left-rotation required */
+                            Left-rotation requi_RED */
                             if (pt == parent_pt->right)
                             {
                                 rotateLeft(root, parent_pt);
@@ -143,7 +147,7 @@ namespace ft {
             
                             /* Case : 3
                             pt is left child of its parent
-                            Right-rotation required */
+                            Right-rotation requi_RED */
                             rotateRight(root, grand_parent_pt);
                             swap(parent_pt->color,
                                     grand_parent_pt->color);
@@ -156,24 +160,24 @@ namespace ft {
                     of Grand-parent of pt */
                     else
                     {
-                        value_type *uncle_pt = grand_parent_pt->left;
+                        pointer uncle_pt = grand_parent_pt->left;
             
                         /*  Case : 1
-                            The uncle of pt is also red
-                            Only Recoloring required */
+                            The uncle of pt is also _RED
+                            Only Recoloring requi_RED */
                         if ((uncle_pt != NULL) && (uncle_pt->color ==
-                                                                RED))
+                                                                _RED))
                         {
-                            grand_parent_pt->color = RED;
-                            parent_pt->color = BLACK;
-                            uncle_pt->color = BLACK;
+                            grand_parent_pt->color = _RED;
+                            parent_pt->color = _BLACK;
+                            uncle_pt->color = _BLACK;
                             pt = grand_parent_pt;
                         }
                         else
                         {
                             /* Case : 2
                             pt is left child of its parent
-                            Right-rotation required */
+                            Right-rotation requi_RED */
                             if (pt == parent_pt->left)
                             {
                                 rotateRight(root, parent_pt);
@@ -183,7 +187,7 @@ namespace ft {
             
                             /* Case : 3
                             pt is right child of its parent
-                            Left-rotation required */
+                            Left-rotation requi_RED */
                             rotateLeft(root, grand_parent_pt);
                             swap(parent_pt->color,
                                     grand_parent_pt->color);
@@ -192,13 +196,13 @@ namespace ft {
                     }
                 }
             
-                root->color = BLACK;
+                root->color = _BLACK;
             }
     };
     
     // A recursive function to do inorder traversal
     template <class T>
-    void inorderHelper(Node<T> *root)
+    void inorderHelper(ft::Node<T> *root)
     {
         if (root == NULL)
             return;
@@ -212,7 +216,7 @@ namespace ft {
         a new node with given key
     in BST */
     template <class T>
-    Node<T>* BSTInsert(Node<T>* root, Node<T> *pt)
+    ft::Node<T>* BSTInsert(ft::Node<T>* root, ft::Node<T> *pt)
     {
         /* If the tree is empty, return a new node */
         if (root == NULL)
@@ -236,17 +240,17 @@ namespace ft {
     
     // Utility function to do level order traversal
     template <class T>
-    void levelOrderHelper(Node<T> *root)
+    void levelOrderHelper(ft::Node<T> *root)
     {
         if (root == NULL)
             return;
     
-        std::queue<Node<T> *> q;
+        std::queue<ft::Node<T> *> q;
         q.push(root);
     
         while (!q.empty())
         {
-            Node *temp = q.front();
+            ft::Node<T> *temp = q.front();
             std::cout << temp->data << "  ";
             q.pop();
     
