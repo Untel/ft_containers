@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/07 16:46:43 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/03/08 16:03:30 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/03/14 16:21:33 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ namespace ft {
         bool color;
     
         // Constructor
-        Node(pointer el)
+        Node(pointer el = NULL)
             : data(el), left(NULL), parent(NULL), color(_RED)
         {};
     };
@@ -40,10 +40,9 @@ namespace ft {
     // Class to represent _RED-_BLACK Tree
     template <class T>
     class RBTree {
-        typedef ft::Node<T>                     value_type;
-        typedef typename ft::Node<T> *          pointer;
-
         public:
+            typedef ft::Node<T>                     value_type;
+            typedef typename ft::Node<T> *          pointer;
             // Constructor
             RBTree() { root = NULL; }
             void insert(pointer pt) {            
@@ -71,10 +70,8 @@ namespace ft {
             
                 if (pt->parent == NULL)
                     root = pt_right;
-            
                 else if (pt == pt->parent->left)
                     pt->parent->left = pt_right;
-            
                 else
                     pt->parent->right = pt_right;
             
@@ -93,10 +90,8 @@ namespace ft {
             
                 if (pt->parent == NULL)
                     root = pt_left;
-            
                 else if (pt == pt->parent->left)
                     pt->parent->left = pt_left;
-            
                 else
                     pt->parent->right = pt_left;
             
@@ -149,7 +144,7 @@ namespace ft {
                             pt is left child of its parent
                             Right-rotation requi_RED */
                             rotateRight(root, grand_parent_pt);
-                            swap(parent_pt->color,
+                            std::swap(parent_pt->color,
                                     grand_parent_pt->color);
                             pt = parent_pt;
                         }
@@ -189,7 +184,7 @@ namespace ft {
                             pt is right child of its parent
                             Left-rotation requi_RED */
                             rotateLeft(root, grand_parent_pt);
-                            swap(parent_pt->color,
+                            std::swap(parent_pt->color,
                                     grand_parent_pt->color);
                             pt = parent_pt;
                         }
@@ -208,7 +203,7 @@ namespace ft {
             return;
     
         inorderHelper(root->left);
-        std::cout << root->data << "  ";
+        std::cout << *(root->data) << "  ";
         inorderHelper(root->right);
     }
     
@@ -251,7 +246,7 @@ namespace ft {
         while (!q.empty())
         {
             ft::Node<T> *temp = q.front();
-            std::cout << temp->data << "  ";
+            std::cout << *(temp->data) << "  ";
             q.pop();
     
             if (temp->left != NULL)

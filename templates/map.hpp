@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/16 12:01:27 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/03/08 16:06:01 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/03/14 16:27:26 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,6 +45,10 @@ namespace ft {
 			typedef typename ft::reverse_iterator< const_iterator >     						const_reverse_iterator;
 			typedef typename ft::iterator_traits<iterator>::difference_type     				difference_type;
 
+			typedef typename ft::RBTree<value_type>												tree_type;
+			typedef typename ft::RBTree<value_type>::value_type									node_type;
+			typedef typename ft::RBTree<value_type>::pointer									node_ptr;
+
 			class value_compare : public std::binary_function<value_type, value_type, bool> {   // in C++98, it is required to inherit binary_function<value_type,value_type,bool>
 				friend class map<key_type, mapped_type, key_compare, allocator_type>;
 				protected:
@@ -67,15 +71,20 @@ namespace ft {
 
 			// ft::pair<iterator, bool> insert (const value_type &val) {
 			void insert (const value_type &val) {
-				pointer allocated = _allocator.allocate(1);
-				_allocator.construct(allocated, val);
-				_rbt.insert(ft::Node<value_type>(allocated));
+				node_ptr node = new node_type();
+				node->data = _allocator.allocate(1);
+				_allocator.construct(node->data, val);
+				_rbt.insert(node);
 			}
+
+			// wrap into debug delete before prod
+            void inorder() { _rbt.inorder(); }
+            void levelOrder() { _rbt.levelOrder(); }
 
 	    private:
 			key_compare					_comp;
             allocator_type              _allocator;
-			ft::RBTree<value_type>		_rbt;
+			tree_type					_rbt;
 	};
 }
 

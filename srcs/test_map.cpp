@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/08 14:23:38 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/03/08 15:50:19 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/03/14 16:16:07 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,13 @@ void test_init_map() {
 	std::cout << "INIT MAP" << std::endl;
 
 	ft::map<int, std::string> m;
+    m.insert(ft::make_pair(3, "hihi"));
     m.insert(ft::make_pair(1, "lol"));
+    m.insert(ft::make_pair(2, "ahah"));
+    m.insert(ft::make_pair(4, "uh?"));
+    m.insert(ft::make_pair(2, "rewrite"));
+    m.insert(ft::make_pair(2, "rerewrite"));
+	m.levelOrder();
 }
 
 void test_map_main(void) {
