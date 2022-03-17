@@ -45,10 +45,6 @@ namespace ft {
 			typedef typename ft::reverse_iterator< const_iterator >     						const_reverse_iterator;
 			typedef typename ft::iterator_traits<iterator>::difference_type     				difference_type;
 
-			typedef typename ft::RBTree<value_type>												tree_type;
-			typedef typename ft::RBTree<value_type>::value_type									node_type;
-			typedef typename ft::RBTree<value_type>::pointer									node_ptr;
-
 			class value_compare : public std::binary_function<value_type, value_type, bool> {   // in C++98, it is required to inherit binary_function<value_type,value_type,bool>
 				friend class map<key_type, mapped_type, key_compare, allocator_type>;
 				protected:
@@ -82,6 +78,10 @@ namespace ft {
             void levelOrder() { _rbt.levelOrder(); }
 
 	    private:
+			typedef typename ft::RBTree<value_type>												tree_type;
+			typedef typename ft::RBTree<value_type>::value_type									node_type;
+			typedef typename ft::RBTree<value_type>::pointer									node_ptr;
+
 			key_compare					_comp;
             allocator_type              _allocator;
 			tree_type					_rbt;

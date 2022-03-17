@@ -18,7 +18,6 @@
 # include "utils.hpp"
 # include "array_iterator.hpp"
 # include "iterator.hpp"
-# include "iVector.hpp"
 # include "tester.hpp"
 
 #define __VECTOR_INSERT(__RESOLVER, __RESOLVER2) \
@@ -96,29 +95,6 @@
 
 namespace ft
 {
-
-    struct false_type { static const bool value = false; };
-    struct true_type { static const bool value = true; };
-
-    template <class T> struct is_integral : public false_type {};
-    template <> struct is_integral<int> : public true_type {};
-    template <> struct is_integral<unsigned int> : public true_type {};
-    template <> struct is_integral<bool> : public true_type {};
-    template <> struct is_integral<char> : public true_type {};
-    template <> struct is_integral<unsigned char> : public true_type {};
-    template <> struct is_integral<signed char> : public true_type {};
-    template <> struct is_integral<short> : public true_type {};
-    template <> struct is_integral<unsigned short> : public true_type {};
-    template <> struct is_integral<long> : public true_type {};
-    template <> struct is_integral<unsigned long> : public true_type {};
-    template <> struct is_integral<long long> : public true_type {};
-    template <> struct is_integral<unsigned long long> : public true_type {};
-
-    template<bool B, typename T = void>
-        struct enable_if {};
-
-    template<typename T>
-    struct enable_if<true, T> { typedef T type; };
     /**
      * @brief Vector class
      * @see https://en.cppreference.com/w/cpp/container/vector
@@ -424,11 +400,7 @@ namespace ft
         VDBG("lhs == rhs");
         if (lhs.size() != rhs.size())
             return false;
-        
-        for (typename vector<T,Alloc>::size_type i = 0; i < lhs.size(); i++)
-            if (!(lhs.at(i) == rhs.at(i)))
-                return false;
-        return true;
+        return ft::equal(lhs.begin(), lhs.end(), rhs.begin());
     }
     template <class T, class Alloc>
     bool operator != (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs) {

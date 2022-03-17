@@ -60,12 +60,10 @@ namespace ft
             // bool operator < (const binary_tree_iterator & rhs) const { return this->_p < rhs._p; }
             // bool operator > (const binary_tree_iterator & rhs) const { return this->_p > rhs._p; }
        
-            binary_tree_iterator & operator ++ (void) { ++(this->_p); return *this; }
+            binary_tree_iterator & operator ++ (void) { _p++; return *this; }
             binary_tree_iterator operator ++ (int) { binary_tree_iterator tmp(*this); operator++(); return tmp; }
             binary_tree_iterator & operator -- (void) { --(this->_p); return *this; }
             binary_tree_iterator operator -- (int) { binary_tree_iterator tmp(*this); operator--(); return tmp; }
-            binary_tree_iterator & operator += (difference_type dt) { this->_p += dt; return *this; }
-            binary_tree_iterator & operator -= (difference_type dt) { this->_p -= dt; return *this; }
             // contains: *a++ *a-- *a = T
             reference operator * () { return *(this->_p); }
             pointer operator -> () { return this->_p; }

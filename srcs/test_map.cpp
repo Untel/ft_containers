@@ -18,10 +18,12 @@ void test_init_map() {
 	ft::map<int, std::string> m;
     m.insert(ft::make_pair(3, "hihi"));
     m.insert(ft::make_pair(1, "lol"));
+    m.insert(ft::make_pair(1, "truc"));
     m.insert(ft::make_pair(2, "ahah"));
     m.insert(ft::make_pair(4, "uh?"));
     m.insert(ft::make_pair(2, "rewrite"));
     m.insert(ft::make_pair(2, "rerewrite"));
+	// m[1] = "yolo";
 	m.levelOrder();
 }
 

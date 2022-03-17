@@ -11,7 +11,7 @@
 /* ************************************************************************** */
 
 #ifndef TESTER_HPP
-# define TESTER_HPP
+# define TESTER_HPP 1
 
 # include <string>
 # include <iostream>
@@ -19,17 +19,17 @@
 # include "awesome.hpp"
 # include "term.hpp"
 
-# ifdef STL
-    #  include <map>
-    #  include <stack>
-    #  include <vector>
-    namespace ft = std;
-# else
-    #  include "vector.hpp"
-    #  include "map.hpp"
-    #  include "stack.hpp"
-    #  include "utils.hpp"
-# endif
+// # ifdef STL
+//     #  include <map>
+//     #  include <stack>
+//     #  include <vector>
+//     namespace ft = std;
+// # else
+//     #  include "vector.hpp"
+//     #  include "map.hpp"
+//     #  include "stack.hpp"
+//     #  include "utils.hpp"
+// # endif
 
 void        test_vector_main(void);
 void        test_map_main(void);
