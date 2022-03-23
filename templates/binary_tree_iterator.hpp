@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/19 19:48:57 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/03/18 19:05:05 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/03/23 15:45:58 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,9 +37,12 @@ namespace ft
             typedef std::bidirectional_iterator_tag     	    iterator_category;
             typedef binary_tree_iterator<value_type>     	    iterator;
             typedef binary_tree_iterator<const value_type>     	const_iterator;
+
+            typedef RBTNode<value_type>				            node_type;
+			typedef node_type *						            node_ptr;
             // Member types
             binary_tree_iterator(void) : _p(NULL) {}
-            binary_tree_iterator(pointer x) : _p(x) {}
+            binary_tree_iterator(node_ptr x) : _p(x) {}
             binary_tree_iterator(const binary_tree_iterator & cpy) : _p(cpy._p) {}
             binary_tree_iterator & operator = (const binary_tree_iterator & rhs) {
                 _p = rhs._p;
@@ -52,9 +55,9 @@ namespace ft
             // binary_tree_iterator & operator = (reference val) { *this->_p = val; return *this; }
             ~binary_tree_iterator(void) {}
        
-            // binary_tree_iterator & operator ++ (void) {
-            //     // return binary_tree_iterator();
-            // }
+            binary_tree_iterator & operator ++ (void) {
+                return binary_tree_iterator(_p->getNext());
+            }
             binary_tree_iterator operator ++ (int) { binary_tree_iterator tmp(*this); operator++(); return tmp; }
             binary_tree_iterator & operator -- (void) { --(this->_p); return *this; }
             binary_tree_iterator operator -- (int) { binary_tree_iterator tmp(*this); operator--(); return tmp; }
@@ -62,7 +65,7 @@ namespace ft
             pointer operator -> () { return this->_p; }
 
         private:
-            RBTNode<T> *     _p;
+            node_ptr           _p;
 
     };
 

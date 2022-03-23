@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/18 19:02:40 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/03/23 13:45:40 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/03/23 14:43:43 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -131,7 +131,7 @@ namespace ft {
         
                     /* Case : 1
                     The uncle of pt is also _RED
-                    Only Recoloring requi_RED */
+                    Only Recoloring required */
                     if (uncle_pt != sentry && uncle_pt->color == RED_NODE)
                     {
                         grand_parent_pt->color = RED_NODE;
@@ -156,8 +156,7 @@ namespace ft {
                         pt is left child of its parent
                         Right-rotation required */
                         rotateRight(root, grand_parent_pt, sentry);
-                        std::swap(parent_pt->color,
-                                grand_parent_pt->color);
+                        std::swap(parent_pt->color, grand_parent_pt->color);
                         pt = parent_pt;
                     }
                 }
@@ -195,23 +194,26 @@ namespace ft {
                         pt is right child of its parent
                         Left-rotation required */
                         rotateLeft(root, grand_parent_pt, sentry);
-                        std::swap(parent_pt->color,
-                                grand_parent_pt->color);
+                        std::swap(parent_pt->color, grand_parent_pt->color);
                         pt = parent_pt;
                     }
                 }
             }
-
             root->color = BLACK_NODE;
         }
 
     };
 
     template <class T>
-    std::ostream & operator << (std::ostream & o, RBTNode<T> const & n){
+    std::ostream & operator << (std::ostream & o, RBTNode<T> const & n) {
+        if (n.color == BLACK_NODE)
+            o << BLACK;
+        else
+            o << RED;
         o << "Node(" << *n.data << ")";
         o << " - L( " << n.left << " )" << " R( " << n.right << " )";
         o << " - P( " << n.parent << " )";
+        o << RESET;
 	    return o;
     }
 }
