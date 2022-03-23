@@ -29,12 +29,19 @@ namespace ft {
         Node * left;
         Node * right;
         Node * parent;
-        bool color;
+        Color color;
     
         // Constructor
         Node(pointer el = NULL)
-            : data(el), left(NULL), parent(NULL), color(_RED)
+            : data(el), left(NULL), right(NULL), parent(NULL), color(_RED)
         {};
+
+        bool is_left() {
+            return (parent && parent->left == this);
+        }
+        bool is_right() {
+            return (parent && parent->right == this);
+        }
     };
     
     // Class to represent _RED-_BLACK Tree
@@ -44,15 +51,25 @@ namespace ft {
             typedef ft::Node<T>                     value_type;
             typedef typename ft::Node<T> *          pointer;
             // Constructor
-            RBTree() { root = NULL; }
+            RBTree() {
+                sentry = new value_type();
+                root = NULL;
+            }
             void insert(pointer pt) {            
                 // Do a normal BST insert
-                root = BSTInsert(root, pt);
+                // pt->right = sentry;
+                // pt->left = sentry;
+                root = BSTInsert(root, pt, sentry);
                 // fix _RED _BLACK Tree violations
+                // if (pt < sentry->left)
+                //     sentry->left = pt;
+                // else if (pt > sentry->right)
+                //     sentry->right = pt;
                 fixViolation(root, pt);
             }
-            void inorder() { inorderHelper(root); }
-            void levelOrder() { {  levelOrderHelper(root); } }
+            void inorder() { inorderHelper(root, sentry); }
+            void levelOrder() { levelOrderHelper(root, sentry); }
+            pointer sentry;
 
         private:
             pointer root;
@@ -63,7 +80,7 @@ namespace ft {
             
                 pt->right = pt_right->left;
             
-                if (pt->right != NULL)
+                if (pt->right != sentry)
                     pt->right->parent = pt;
             
                 pt_right->parent = pt->parent;
@@ -83,7 +100,7 @@ namespace ft {
             
                 pt->left = pt_left->right;
             
-                if (pt->left != NULL)
+                if (pt->left != sentry)
                     pt->left->parent = pt;
             
                 pt_left->parent = pt->parent;
@@ -120,7 +137,7 @@ namespace ft {
                         /* Case : 1
                         The uncle of pt is also _RED
                         Only Recoloring requi_RED */
-                        if (uncle_pt != NULL && uncle_pt->color == _RED)
+                        if (uncle_pt != sentry && uncle_pt->color == _RED)
                         {
                             grand_parent_pt->color = _RED;
                             parent_pt->color = _BLACK;
@@ -160,8 +177,7 @@ namespace ft {
                         /*  Case : 1
                             The uncle of pt is also _RED
                             Only Recoloring requi_RED */
-                        if ((uncle_pt != NULL) && (uncle_pt->color ==
-                                                                _RED))
+                        if ((uncle_pt != sentry) && (uncle_pt->color ==  _RED))
                         {
                             grand_parent_pt->color = _RED;
                             parent_pt->color = _BLACK;
@@ -197,35 +213,35 @@ namespace ft {
     
     // A recursive function to do inorder traversal
     template <class T>
-    void inorderHelper(ft::Node<T> *root)
+    void inorderHelper(ft::Node<T> *root, ft::Node<T> * sentry = NULL)
     {
         if (root == NULL)
             return;
     
-        inorderHelper(root->left);
+        inorderHelper(root->left, sentry);
         std::cout << *(root->data) << "  ";
-        inorderHelper(root->right);
+        inorderHelper(root->right, sentry);
     }
     
     /* A utility function to insert
         a new node with given key
     in BST */
     template <class T>
-    ft::Node<T>* BSTInsert(ft::Node<T>* root, ft::Node<T> *pt)
+    ft::Node<T>* BSTInsert(ft::Node<T>* root, ft::Node<T> *pt, ft::Node<T> * sentry = NULL)
     {
         /* If the tree is empty, return a new node */
         if (root == NULL)
-        return pt;
+            return pt;
     
         /* Otherwise, recur down the tree */
         if (pt->data < root->data)
         {
-            root->left  = BSTInsert(root->left, pt);
+            root->left  = BSTInsert(root->left, pt, sentry);
             root->left->parent = root;
         }
         else if (pt->data > root->data)
         {
-            root->right = BSTInsert(root->right, pt);
+            root->right = BSTInsert(root->right, pt, sentry);
             root->right->parent = root;
         }
     
@@ -235,7 +251,7 @@ namespace ft {
     
     // Utility function to do level order traversal
     template <class T>
-    void levelOrderHelper(ft::Node<T> *root)
+    void levelOrderHelper(ft::Node<T> *root, ft::Node<T> * sentry)
     {
         if (root == NULL)
             return;
@@ -249,10 +265,10 @@ namespace ft {
             std::cout << *(temp->data) << "  ";
             q.pop();
     
-            if (temp->left != NULL)
+            if (temp->left != sentry)
                 q.push(temp->left);
     
-            if (temp->right != NULL)
+            if (temp->right != sentry)
                 q.push(temp->right);
         }
     }

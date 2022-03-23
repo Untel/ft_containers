@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/19 19:48:57 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/03/08 14:58:57 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/03/18 19:05:05 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 # define BINARYTREEITERATOR_HPP 1
 # include <iostream>
 # include "iterator.hpp"
+# include "rbt_node.hpp"
 
 namespace ft
 {
@@ -39,8 +40,6 @@ namespace ft
             // Member types
             binary_tree_iterator(void) : _p(NULL) {}
             binary_tree_iterator(pointer x) : _p(x) {}
-            // binary_tree_iterator(const_pointer x) : _p(x) {}
-            // binary_tree_iterator(const_iterator & cpy) : _p(cpy._p) {}
             binary_tree_iterator(const binary_tree_iterator & cpy) : _p(cpy._p) {}
             binary_tree_iterator & operator = (const binary_tree_iterator & rhs) {
                 _p = rhs._p;
@@ -52,69 +51,20 @@ namespace ft
             // maybe return void *a = t
             // binary_tree_iterator & operator = (reference val) { *this->_p = val; return *this; }
             ~binary_tree_iterator(void) {}
-  
-            // bool operator == (const binary_tree_iterator & rhs) const { return this->_p == rhs._p; }
-            // bool operator != (const binary_tree_iterator & rhs) const { return this->_p != rhs._p; }
-            // bool operator >= (const binary_tree_iterator & rhs) const { return this->_p >= rhs._p; }
-            // bool operator <= (const binary_tree_iterator & rhs) const { return this->_p <= rhs._p; }
-            // bool operator < (const binary_tree_iterator & rhs) const { return this->_p < rhs._p; }
-            // bool operator > (const binary_tree_iterator & rhs) const { return this->_p > rhs._p; }
        
-            binary_tree_iterator & operator ++ (void) { _p++; return *this; }
+            // binary_tree_iterator & operator ++ (void) {
+            //     // return binary_tree_iterator();
+            // }
             binary_tree_iterator operator ++ (int) { binary_tree_iterator tmp(*this); operator++(); return tmp; }
             binary_tree_iterator & operator -- (void) { --(this->_p); return *this; }
             binary_tree_iterator operator -- (int) { binary_tree_iterator tmp(*this); operator--(); return tmp; }
-            // contains: *a++ *a-- *a = T
             reference operator * () { return *(this->_p); }
             pointer operator -> () { return this->_p; }
-		    reference operator [] (difference_type at) const {
-				IDBG("op[" << at << "] = " << _p[at]);
-                return (_p[at]); 
-            }
-			binary_tree_iterator operator + (difference_type n) const { IDBG("this + n"); return this->_p + n; }
-			binary_tree_iterator operator - (difference_type n) const { return this->_p - n; }
-			difference_type operator - (binary_tree_iterator rhs) const { return this->_p - rhs._p; }
-
-            pointer base(void) const { return _p; }
 
         private:
-            pointer     _p;
+            RBTNode<T> *     _p;
+
     };
-
-    template<typename T>
-    ft::binary_tree_iterator<T> operator + (
-        typename ft::binary_tree_iterator<T>::difference_type lhs,
-        typename ft::binary_tree_iterator<T> & rhs
-    ) {
-        IDBG("T + n");
-        return (&(*rhs) + lhs);
-    }
-
-    template<typename T>
-    ft::binary_tree_iterator<T> operator - (
-        typename ft::binary_tree_iterator<T>::difference_type lhs,
-        typename ft::binary_tree_iterator<T> & rhs
-    ) {
-        return (&(*rhs) - lhs);
-    }
-
-    // template<typename T>
-    // typename ft::binary_tree_iterator<T>::difference_type operator - (
-    //     typename ft::binary_tree_iterator<T> & lhs,
-    //     typename ft::binary_tree_iterator<T> & rhs
-    // ) {
-    //     IDBG("T - T");
-    //     return (lhs.base() - rhs.base());
-    // }
-
-    template<typename T, typename U>
-    typename ft::binary_tree_iterator<T>::difference_type operator - (
-        const ft::binary_tree_iterator<T> & lhs,
-        const ft::binary_tree_iterator<U> & rhs
-    ) {
-        IDBG("T - U");
-        return (&(lhs[0]) - &(rhs[0]));
-    }
 
     template <typename T>
     bool operator == (
@@ -133,10 +83,6 @@ namespace ft
         IDBG("T == U");
         return (&(lhs[0]) == &(rhs[0]));
     }
-	// template <typename T, typename U>
-	// bool operator == (const ft::binary_tree_iterator<T> & lhs, const ft::binary_tree_iterator<U> & rhs) {
-	// 	return &(lhs[0]) == &(rhs[0]);
-	// }
 
 	template <typename T, typename U>
 	bool operator != (
@@ -144,22 +90,6 @@ namespace ft
         const ft::binary_tree_iterator<U> & rhs
     ) {
 		return !(lhs == rhs);
-	}
-	template <typename T, typename U>
-	bool operator < (const ft::binary_tree_iterator<T> & lhs, const ft::binary_tree_iterator<U> & rhs) {
-		return !(lhs >= rhs);
-	}
-	template <typename T, typename U>
-	bool operator > (const ft::binary_tree_iterator<T> & lhs, const ft::binary_tree_iterator<U> & rhs) {
-		return !(lhs <= rhs);
-	}
-	template <typename T, typename U>
-	bool operator <= (const ft::binary_tree_iterator<T> & lhs, const ft::binary_tree_iterator<U> & rhs) {
-		return &(lhs[0]) <= &(rhs[0]);
-	}
-	template <typename T, typename U>
-	bool operator >= (const ft::binary_tree_iterator<T> & lhs, const ft::binary_tree_iterator<U> & rhs) {
-		return &(lhs[0]) >= &(rhs[0]);
 	}
 
 }
