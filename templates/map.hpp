@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/16 12:01:27 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/03/28 21:55:56 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/03/28 22:05:05 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,10 +68,12 @@ namespace ft {
 			explicit map (
 				const key_compare & comp = key_compare(),
 				const allocator_type& alloc = allocator_type()
-			) : _comp_values(value_compare(comp)), _comp_keys(comp), _allocator(alloc)
-			{
-				_init_tree();
-			}
+			) :
+				_comp_values(value_compare(comp)),
+				_comp_keys(comp),
+				_allocator(alloc),
+				_root(_init_sentry())
+			{}
 
 			~map() {
 				erase(begin(), end());
@@ -93,44 +95,12 @@ namespace ft {
 				return iterator(_sentry);
 			}
 
-			// ft::pair<iterator, bool> insert (const value_type &val) {
-			// pair<iterator, bool> insert (const value_type &val) {
-			// 	node_ptr n = _new_node(val);
-			// 	std::cout << RED << "BEFORE INSERT" << _root << " | " << n << RESET << std::endl;
-			// 	node_ptr still_exist = NULL;
-			// 	_root = _insert_node(_root, n, &still_exist);
-			// 	std::cout << RED << "AFTER INSERT" << _root << " | " << n << RESET << std::endl;
-			// 	// print();
-
-			// 	if (still_exist) {
-			// 		std::cout << "Still exist ? " << *still_exist << " root is " << *_root << std::endl;
-			// 		return ft::make_pair<iterator, bool>(iterator(still_exist), false);
-			// 	} else {
-			// 		if (_sentry->left == _sentry || _comp_values(*(n->data), *(_sentry->left->data)))
-			// 			_sentry->left = n;
-			// 		else if (_sentry->right == _sentry || _comp_values(*(_sentry->left->data), *(n->data)))
-			// 			_sentry->right = n;
-			// 		_sentry->parent = _root;
-			// 		// _root->fixViolation(_root, n, _sentry);
-			// 		return ft::make_pair<iterator, bool>(iterator(n), true);
-			// 	}
-			// 	// MDBG("Root is " << *_root);
-			// }
-
 			// helped from https://www.techiedelight.com/deletion-from-bst/
-			size_type erase(const key_type & k) {
-				pair<node_ptr, bool> found = _find(k);
-
-				if (!found.second)
-					return (0);
-				node_ptr d = found.first;
-				_erase(d);
-				return (1);
-			}
-			
 			void _erase(node_ptr d) {
-				_prepare_sentry_kill(d);
-				MDBG("Deleting case");
+				if (d == _sentry->left)
+					_sentry->left = d->getNext();
+				if (d == _sentry->right)
+					_sentry->right = d->getPrev();
 				if (d->is_leaf()) {
 					MDBG("Deleting case 1");
 					// case 1
@@ -159,35 +129,34 @@ namespace ft {
 						child->parent = d->parent;
 					}
 				} else if (d->has_two_childs()) {
-					MDBG("Third case delete");
+					MDBG("Deleting case 2");
 					node_ptr next = d->getNext();
 					node_ptr next_parent = next->parent;
 
-					MDBG("Third case next " << *next);
-					MDBG("Third case next_parent " << *next_parent);
-					// 1
 					if (d != next_parent) {
-						MDBG("UUUH? " << *next << " AND " << *next->right);
 						next_parent->left = next->right;
 						next->right->parent = next_parent;
 					} else {
-						MDBG("YOOO " << *next << " AND " << *next->right);
 						if (next->right->exist())
 							next->right->parent = d;
 						d->right = next->right;
 					}
-					// 2
-					MDBG("A " << *d);
-					MDBG("B " << *next);
 					// Vu qu'on switch les data et pas les nodes, attention à la sentinelle
 					if (_sentry->right == next)
 						_sentry->right = d;
 					std::swap(next->data, d->data);
-					MDBG("C " << *d);
-					MDBG("D " << *next);
 					d = next;
 				}
 				_delete_node(d);
+			}
+
+			size_type erase(const key_type & k) {
+				pair<node_ptr, bool> found = _find(k);
+
+				if (!found.second)
+					return (0);
+				_erase(found.first);
+				return (1);
 			}
 
 			void erase (iterator it) {
@@ -202,34 +171,32 @@ namespace ft {
 			pair<iterator, bool> insert(const value_type &val) {
 				pair<node_ptr, bool> found = _find(val.first);
 				node_ptr parent = found.first;
-				MDBG("Found" << found.second << " | " << *parent);
 				if (found.second) {
 					return ft::make_pair(iterator(parent), false);
-				} else {
-					node_ptr node = _new_node(val);
-					if (_root == _sentry) {
-						_root = node;
-						node->parent = _sentry;
-						_sentry->right = node;
-						_sentry->left = node;
-						_sentry->parent = node;
-					} else {
-						node->parent = parent;
-						MDBG("Inserting " << *node);
-						if (_comp_values(*(parent->data), val)) {
-							parent->right = node;
-						} else {
-							parent->left = node;
-						}
-						if (_comp_values(*(_sentry->right->data), val)) {
-							_sentry->right = node;
-						} else if (_comp_values(val, *(_sentry->left->data))) {
-							_sentry->left = node;
-						}
-						// _root->fixViolation(_root, node, _sentry);
-					}
-					return ft::make_pair<iterator, bool>(iterator(node), true);
 				}
+				node_ptr node = _new_node(val);
+				if (_root == _sentry) {
+					_root = node;
+					node->parent = _sentry;
+					_sentry->right = node;
+					_sentry->left = node;
+					_sentry->parent = node;
+				} else {
+					node->parent = parent;
+					MDBG("Inserting " << *node);
+					if (_comp_values(*(parent->data), val)) {
+						parent->right = node;
+					} else {
+						parent->left = node;
+					}
+					if (_comp_values(*(_sentry->right->data), val)) {
+						_sentry->right = node;
+					} else if (_comp_values(val, *(_sentry->left->data))) {
+						_sentry->left = node;
+					}
+					// _root->fixViolation(_root, node, _sentry);
+				}
+				return ft::make_pair<iterator, bool>(iterator(node), true);
 			}
 
 			void print() {
@@ -272,7 +239,7 @@ namespace ft {
 			node_ptr					_root;
 			node_ptr					_sentry;
 
-			void _init_tree(void) {
+			node_ptr _init_sentry(void) {
 				_sentry = new node_type();
 				_sentry->data = new value_type(make_pair(-1, "sentry"));
 				_sentry->color = BLACK_NODE;
@@ -282,7 +249,7 @@ namespace ft {
 				_sentry->parent = _sentry;
 				_sentry->sentry = _sentry;
 				std::cout << "Sentry " << *_sentry << std::endl;
-				_root = _sentry;
+				return _sentry;
 			}
 
 			node_ptr _new_node(const value_type &val) {
@@ -300,20 +267,6 @@ namespace ft {
 				_allocator.destroy(node->data);
 				_allocator.deallocate(node->data, 1);
 				delete node;
-			}
-
-			void _prepare_sentry_kill(node_ptr node) {
-				if (node == _sentry->left) {
-					node_ptr n = node->getNext();
-					MDBG("Sentry left reset to " << *n);
-					_sentry->left = n;
-				}
-				if (node == _sentry->right) {
-					node_ptr n = node->getPrev();
-					MDBG("Sentry right reset to " << *n);
-					_sentry->right = n;
-				}
-				// _sentry->parent = _root;
 			}
 
 			pair<node_ptr, bool> _find(key_type k) {
