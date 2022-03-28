@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/18 19:02:40 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/03/28 19:47:46 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/03/28 21:31:50 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,7 @@ namespace ft {
         };
 
 		bool is_root() {
-			return parent->is_nil();
+			return parent->nil();
 		}
         bool is_left() {
             return (parent && parent->left == this);
@@ -50,15 +50,15 @@ namespace ft {
         bool is_right() {
             return (parent && parent->right == this);
         }
-        bool is_nil() {
+        bool nil() {
             // MDBG("Is nil?" << this << " vs " << sentry);
             return (this == sentry);
         }
         bool exist() {
-            return !is_nil();
+            return !nil();
         }
         bool is_leaf() {
-            return (right->is_nil() && left->is_nil());
+            return (right->nil() && left->nil());
         }
         bool has_one_childs() {
             return (
@@ -73,24 +73,24 @@ namespace ft {
             return (left->exist() ? left : right);
         }
 		node_ptr getNext() {
-            if (!right->is_nil()) {
+            if (!right->nil()) {
                 MDBG("Case 1 " << right << " | " << *right);
 
 				node_ptr el = right;
-				while (!el->left->is_nil())
+				while (!el->left->nil())
 					el = el->left;
 				return el;
-			} else if (!parent->is_nil() && is_left()) {
+			} else if (!parent->nil() && is_left()) {
                 MDBG("Case 2");
 
 				return parent;
-			} else if (!parent->is_nil() && is_right()) {
+			} else if (!parent->nil() && is_right()) {
                 MDBG("Case 3");
 
 				node_ptr el = this;
 				while (el->is_right())
 					el = el->parent;
-				if (!el->parent->is_nil())
+				if (!el->parent->nil())
 					return (right);
 				return el->parent; 
 			} else {
@@ -100,20 +100,20 @@ namespace ft {
 
         node_ptr getPrev() {
             MDBG("Search prev of " << this);
-            if (!left->is_nil()) {
+            if (!left->nil()) {
 				node_ptr el = left;
-				while (!el->right->is_nil())
+				while (!el->right->nil())
 					el = el->right;
                 MDBG("Case 1 " << el);
 				return el;
-			} else if (!parent->is_nil() && is_right()) {
+			} else if (!parent->nil() && is_right()) {
                 MDBG("Case 2 " << parent);
 				return parent;
-			} else if (!parent->is_nil() && is_left()) {
+			} else if (!parent->nil() && is_left()) {
 				node_ptr el = this;
 				while (el->is_left())
 					el = el->parent;
-				if (!el->parent->is_nil())
+				if (!el->parent->nil())
 					return (left);
                 MDBG("Case 3 " << el);
 				return el->parent; 

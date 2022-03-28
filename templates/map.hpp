@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/16 12:01:27 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/03/28 20:06:43 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/03/28 21:55:56 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -118,13 +118,17 @@ namespace ft {
 			// }
 
 			// helped from https://www.techiedelight.com/deletion-from-bst/
-			size_type erase (const key_type & k) {
+			size_type erase(const key_type & k) {
 				pair<node_ptr, bool> found = _find(k);
 
 				if (!found.second)
 					return (0);
-
 				node_ptr d = found.first;
+				_erase(d);
+				return (1);
+			}
+			
+			void _erase(node_ptr d) {
 				_prepare_sentry_kill(d);
 				MDBG("Deleting case");
 				if (d->is_leaf()) {
@@ -139,7 +143,6 @@ namespace ft {
 					} else {
 						_root = _sentry;
 					}
-					_delete_node(d);
 				} else if (d->has_one_childs()) {
 					MDBG("Deleting case 2");
 					node_ptr child = d->get_uniq_child();
@@ -155,7 +158,6 @@ namespace ft {
 						}
 						child->parent = d->parent;
 					}
-					_delete_node(d);
 				} else if (d->has_two_childs()) {
 					MDBG("Third case delete");
 					node_ptr next = d->getNext();
@@ -183,13 +185,13 @@ namespace ft {
 					std::swap(next->data, d->data);
 					MDBG("C " << *d);
 					MDBG("D " << *next);
-					_delete_node(next);
+					d = next;
 				}
-				return (1);
+				_delete_node(d);
 			}
 
 			void erase (iterator it) {
-				erase(it->first);
+				_erase(it.base());
 			}
 
 			void erase (iterator first, iterator last) {
@@ -212,7 +214,6 @@ namespace ft {
 						_sentry->left = node;
 						_sentry->parent = node;
 					} else {
-
 						node->parent = parent;
 						MDBG("Inserting " << *node);
 						if (_comp_values(*(parent->data), val)) {
@@ -320,7 +321,7 @@ namespace ft {
 				node_ptr prev = _root;
 
 				MDBG("Start");
-				while (!next->is_nil()) {
+				while (!next->nil()) {
 					prev = next;
 					MDBG("Slt" << *next);
 					if (_comp_keys(next->data->first, k)) {
