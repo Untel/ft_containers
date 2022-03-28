@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/19 19:48:57 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/03/23 15:45:58 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/03/23 16:44:00 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,14 +56,25 @@ namespace ft
             ~binary_tree_iterator(void) {}
        
             binary_tree_iterator & operator ++ (void) {
-                return binary_tree_iterator(_p->getNext());
+                IDBG("1 ++");
+                IDBG("Prev is " << *_p);
+                _p = _p->getNext();
+                IDBG("Next is " << *_p);
+                return (*this);
             }
-            binary_tree_iterator operator ++ (int) { binary_tree_iterator tmp(*this); operator++(); return tmp; }
-            binary_tree_iterator & operator -- (void) { --(this->_p); return *this; }
-            binary_tree_iterator operator -- (int) { binary_tree_iterator tmp(*this); operator--(); return tmp; }
-            reference operator * () { return *(this->_p); }
-            pointer operator -> () { return this->_p; }
+            binary_tree_iterator operator ++ (int) {
+                IDBG("2 ++");
+                binary_tree_iterator tmp(*this); operator++(); return tmp;
+            }
+            reference operator * () {
+                IDBG("* " << *(this->_p->data));
+                return *(this->_p->data);
+            }
+            pointer operator -> () { return this->_p->data; }
 
+            node_ptr base() const { return _p; }
+// ft::binary_tree_iterator<ft::pair<const int, std::__cxx11::basic_string<char> > >&
+// ft::binary_tree_iterator<ft::pair<const int, std::__cxx11::basic_string<char> > >
         private:
             node_ptr           _p;
 
@@ -75,7 +86,7 @@ namespace ft
         const ft::binary_tree_iterator<T> & rhs
     ) {
         IDBG("T == T");
-        return (&(lhs[0]) == &(rhs[0]));
+        return lhs.base() == rhs.base();
     }
 
     template<typename T, typename U>
@@ -84,7 +95,7 @@ namespace ft
         const ft::binary_tree_iterator<U> & rhs
     ) {
         IDBG("T == U");
-        return (&(lhs[0]) == &(rhs[0]));
+        return lhs.base() == rhs.base();
     }
 
 	template <typename T, typename U>

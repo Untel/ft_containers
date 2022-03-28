@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/16 12:01:27 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/03/23 15:49:30 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/03/28 20:06:43 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,57 +68,196 @@ namespace ft {
 			explicit map (
 				const key_compare & comp = key_compare(),
 				const allocator_type& alloc = allocator_type()
-			) : _comparator(value_compare(comp)), _allocator(alloc)
+			) : _comp_values(value_compare(comp)), _comp_keys(comp), _allocator(alloc)
 			{
 				_init_tree();
 			}
 
+			~map() {
+				erase(begin(), end());
+				//to delete;
+				delete _sentry->data;
+				delete _sentry;
+			}
+
 			iterator begin() {
+				return iterator(_sentry->left);
+			}
+			iterator end() {
+				return iterator(_sentry);
+			}
+			iterator rbegin() {
+				return iterator(_sentry->right);
+			}
+			iterator rend() {
+				return iterator(_sentry);
 			}
 
 			// ft::pair<iterator, bool> insert (const value_type &val) {
-			pair<iterator, bool> insert (const value_type &val) {
-				node_ptr n = _new_node(val);
-				std::cout << RED << "BEFORE INSERT" << _root << " | " << n << RESET << std::endl;
-				node_ptr still_exist = NULL;
-				_root = _insert_node(_root, n, &still_exist);
-				std::cout << RED << "AFTER INSERT" << _root << " | " << n << RESET << std::endl;
-				// print();
+			// pair<iterator, bool> insert (const value_type &val) {
+			// 	node_ptr n = _new_node(val);
+			// 	std::cout << RED << "BEFORE INSERT" << _root << " | " << n << RESET << std::endl;
+			// 	node_ptr still_exist = NULL;
+			// 	_root = _insert_node(_root, n, &still_exist);
+			// 	std::cout << RED << "AFTER INSERT" << _root << " | " << n << RESET << std::endl;
+			// 	// print();
 
-				if (still_exist) {
-					std::cout << "Still exist ? " << *still_exist << " root is " << *_root << std::endl;
-					return ft::make_pair<iterator, bool>(iterator(still_exist), false);
-				} else {
-					if (_sentry->left == _sentry || _comparator(*(n->data), *(_sentry->left->data)))
-						_sentry->left = n;
-					else if (_sentry->right == _sentry || _comparator(*(_sentry->left->data), *(n->data)))
-						_sentry->right = n;
-					_sentry->parent = _root;
-					_root->fixViolation(_root, n, _sentry);
-					return ft::make_pair<iterator, bool>(iterator(n), true);
+			// 	if (still_exist) {
+			// 		std::cout << "Still exist ? " << *still_exist << " root is " << *_root << std::endl;
+			// 		return ft::make_pair<iterator, bool>(iterator(still_exist), false);
+			// 	} else {
+			// 		if (_sentry->left == _sentry || _comp_values(*(n->data), *(_sentry->left->data)))
+			// 			_sentry->left = n;
+			// 		else if (_sentry->right == _sentry || _comp_values(*(_sentry->left->data), *(n->data)))
+			// 			_sentry->right = n;
+			// 		_sentry->parent = _root;
+			// 		// _root->fixViolation(_root, n, _sentry);
+			// 		return ft::make_pair<iterator, bool>(iterator(n), true);
+			// 	}
+			// 	// MDBG("Root is " << *_root);
+			// }
+
+			// helped from https://www.techiedelight.com/deletion-from-bst/
+			size_type erase (const key_type & k) {
+				pair<node_ptr, bool> found = _find(k);
+
+				if (!found.second)
+					return (0);
+
+				node_ptr d = found.first;
+				_prepare_sentry_kill(d);
+				MDBG("Deleting case");
+				if (d->is_leaf()) {
+					MDBG("Deleting case 1");
+					// case 1
+					if (!d->is_root()) {
+						if (d->is_left()) {
+							d->parent->left = _sentry;
+						} else {
+							d->parent->right = _sentry;
+						}
+					} else {
+						_root = _sentry;
+					}
+					_delete_node(d);
+				} else if (d->has_one_childs()) {
+					MDBG("Deleting case 2");
+					node_ptr child = d->get_uniq_child();
+					if (d->is_root()) {
+						_root = child;
+						child->parent = _sentry;
+						_sentry->parent = child;
+					} else {
+						if (d->is_left()) {
+							d->parent->left = child;
+						} else if (d->is_right()) {
+							d->parent->right = child;
+						}
+						child->parent = d->parent;
+					}
+					_delete_node(d);
+				} else if (d->has_two_childs()) {
+					MDBG("Third case delete");
+					node_ptr next = d->getNext();
+					node_ptr next_parent = next->parent;
+
+					MDBG("Third case next " << *next);
+					MDBG("Third case next_parent " << *next_parent);
+					// 1
+					if (d != next_parent) {
+						MDBG("UUUH? " << *next << " AND " << *next->right);
+						next_parent->left = next->right;
+						next->right->parent = next_parent;
+					} else {
+						MDBG("YOOO " << *next << " AND " << *next->right);
+						if (next->right->exist())
+							next->right->parent = d;
+						d->right = next->right;
+					}
+					// 2
+					MDBG("A " << *d);
+					MDBG("B " << *next);
+					// Vu qu'on switch les data et pas les nodes, attention à la sentinelle
+					if (_sentry->right == next)
+						_sentry->right = d;
+					std::swap(next->data, d->data);
+					MDBG("C " << *d);
+					MDBG("D " << *next);
+					_delete_node(next);
 				}
-				// MDBG("Root is " << *_root);
+				return (1);
+			}
+
+			void erase (iterator it) {
+				erase(it->first);
+			}
+
+			void erase (iterator first, iterator last) {
+				while (first != last)
+					erase(first++);
+			}
+
+			pair<iterator, bool> insert(const value_type &val) {
+				pair<node_ptr, bool> found = _find(val.first);
+				node_ptr parent = found.first;
+				MDBG("Found" << found.second << " | " << *parent);
+				if (found.second) {
+					return ft::make_pair(iterator(parent), false);
+				} else {
+					node_ptr node = _new_node(val);
+					if (_root == _sentry) {
+						_root = node;
+						node->parent = _sentry;
+						_sentry->right = node;
+						_sentry->left = node;
+						_sentry->parent = node;
+					} else {
+
+						node->parent = parent;
+						MDBG("Inserting " << *node);
+						if (_comp_values(*(parent->data), val)) {
+							parent->right = node;
+						} else {
+							parent->left = node;
+						}
+						if (_comp_values(*(_sentry->right->data), val)) {
+							_sentry->right = node;
+						} else if (_comp_values(val, *(_sentry->left->data))) {
+							_sentry->left = node;
+						}
+						// _root->fixViolation(_root, node, _sentry);
+					}
+					return ft::make_pair<iterator, bool>(iterator(node), true);
+				}
 			}
 
 			void print() {
+				std::cout << "-------------------" << std::endl;
+				// std::cout << "First" << *(_sentry->left) << std::endl;
+				std::cout << "Sentry" << *_sentry << std::endl;
+				// std::cout << "Last" << *(_sentry->right) << std::endl;
+				std::cout << "-------------------" << std::endl;
 				print_node(_root);
 			}
-			void print_node(node_ptr node) {
+
+			void print_node(node_ptr node, int level = 0) {
+				std::cout << "PRINNNNT --- \n";
 				if (node == _sentry) {
 					std::cout << "Nothing";
 					return ;
 				}
-				std::cout << YELLOW << *node;
+				std::cout << "Lvl " << level << YELLOW;
+				std::cout << " Node: " << *node;
 				std::cout << RED << "left(";
 				if (node->left != _sentry) {
-					print_node(node->left);
+					print_node(node->left, level += 1);
 				} else {
 					std::cout << "🍂";
 				}
 				std::cout << ") " << BLUE << "right(";
 				if (node->right != _sentry) {
 					std::cout << "right: ";
-					print_node(node->right);
+					print_node(node->right, level += 1);
 				} else {
 					std::cout << "🍂";
 				}
@@ -126,7 +265,8 @@ namespace ft {
 			}
 
 	    private:
-			value_compare				_comparator;
+			value_compare				_comp_values;
+			key_compare					_comp_keys;
             allocator_type              _allocator;
 			node_ptr					_root;
 			node_ptr					_sentry;
@@ -138,6 +278,8 @@ namespace ft {
 				// risque de poser pb
 				_sentry->right = _sentry;
 				_sentry->left = _sentry;
+				_sentry->parent = _sentry;
+				_sentry->sentry = _sentry;
 				std::cout << "Sentry " << *_sentry << std::endl;
 				_root = _sentry;
 			}
@@ -148,21 +290,62 @@ namespace ft {
 				_allocator.construct(node->data, val);
 				node->right = _sentry;
 				node->left = _sentry;
+				node->sentry = _sentry;
 				return node;
 			}
 
+			void _delete_node(node_ptr node) {
+				std::cout << "deleting " << *node << std::endl; 
+				_allocator.destroy(node->data);
+				_allocator.deallocate(node->data, 1);
+				delete node;
+			}
+
+			void _prepare_sentry_kill(node_ptr node) {
+				if (node == _sentry->left) {
+					node_ptr n = node->getNext();
+					MDBG("Sentry left reset to " << *n);
+					_sentry->left = n;
+				}
+				if (node == _sentry->right) {
+					node_ptr n = node->getPrev();
+					MDBG("Sentry right reset to " << *n);
+					_sentry->right = n;
+				}
+				// _sentry->parent = _root;
+			}
+
+			pair<node_ptr, bool> _find(key_type k) {
+				node_ptr next = _root;
+				node_ptr prev = _root;
+
+				MDBG("Start");
+				while (!next->is_nil()) {
+					prev = next;
+					MDBG("Slt" << *next);
+					if (_comp_keys(next->data->first, k)) {
+						next = next->right;
+					} else if (_comp_keys(k, next->data->first)) {
+						next = next->left;
+					} else {
+						return ft::make_pair<node_ptr, bool>(next, true);
+					}
+				}
+				return ft::make_pair<node_ptr, bool>(prev, false);
+			}
+
 			node_ptr _insert_node(node_ptr base, node_ptr el, node_ptr *still_exist) {
-				MDBG("Still ex " << *still_exist << std::endl);
+				MDBG("Inserting " << *still_exist << std::endl);
 				el->parent = base;
 				if (base == _sentry) {
 					return el;
 				}
 				MDBG("Inserting el: " << *el << " | " << el << std::endl);
 				MDBG("Inserting base: " << base << " | " << *base << std::endl);
-				if (_comparator(*(el->data), *(base->data))) {
+				if (_comp_values(*(el->data), *(base->data))) {
 					MDBG("Inserting left: " << *el << " | " << el);
 					base->left = _insert_node(base->left, el, still_exist);
-				} else if (_comparator(*(base->data), *(el->data))) {
+				} else if (_comp_values(*(base->data), *(el->data))) {
 					MDBG("Inserting right: " << *el << " | " << el);
 					base->right = _insert_node(base->right, el, still_exist);
 				} else {

@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/18 19:02:40 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/03/23 14:43:43 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/03/28 19:47:46 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,15 +29,20 @@ namespace ft {
        	node_ptr left;
         node_ptr right;
         node_ptr parent;
+        node_ptr sentry;
         Color color;
     
         // Constructor
         RBTNode(pointer el = NULL) :
-            data(el), left(NULL), right(NULL), parent(NULL), color(RED_NODE)
+            data(el), left(NULL), right(NULL), parent(NULL), sentry(NULL), color(RED_NODE)
         {};
 
+        ~RBTNode(void) {
+            std::cout << "Destroy" << std::endl;
+        };
+
 		bool is_root() {
-			return !parent;
+			return parent->is_nil();
 		}
         bool is_left() {
             return (parent && parent->left == this);
@@ -45,26 +50,78 @@ namespace ft {
         bool is_right() {
             return (parent && parent->right == this);
         }
-
+        bool is_nil() {
+            // MDBG("Is nil?" << this << " vs " << sentry);
+            return (this == sentry);
+        }
+        bool exist() {
+            return !is_nil();
+        }
+        bool is_leaf() {
+            return (right->is_nil() && left->is_nil());
+        }
+        bool has_one_childs() {
+            return (
+                !is_leaf() &&
+                !has_two_childs()
+            );
+        }
+        bool has_two_childs() {
+            return (right->exist() && left->exist());
+        }
+        node_ptr get_uniq_child() {
+            return (left->exist() ? left : right);
+        }
 		node_ptr getNext() {
-			if (this->right) {
+            if (!right->is_nil()) {
+                MDBG("Case 1 " << right << " | " << *right);
+
 				node_ptr el = right;
-				while (el->left)
+				while (!el->left->is_nil())
 					el = el->left;
 				return el;
-			} else if (parent && is_left()) {
-				return this->parent;
-			} else if (parent && is_right()) {
+			} else if (!parent->is_nil() && is_left()) {
+                MDBG("Case 2");
+
+				return parent;
+			} else if (!parent->is_nil() && is_right()) {
+                MDBG("Case 3");
+
 				node_ptr el = this;
 				while (el->is_right())
 					el = el->parent;
-				if (!el->parent)
+				if (!el->parent->is_nil())
 					return (right);
 				return el->parent; 
 			} else {
 				return right;
 			}
 		}
+
+        node_ptr getPrev() {
+            MDBG("Search prev of " << this);
+            if (!left->is_nil()) {
+				node_ptr el = left;
+				while (!el->right->is_nil())
+					el = el->right;
+                MDBG("Case 1 " << el);
+				return el;
+			} else if (!parent->is_nil() && is_right()) {
+                MDBG("Case 2 " << parent);
+				return parent;
+			} else if (!parent->is_nil() && is_left()) {
+				node_ptr el = this;
+				while (el->is_left())
+					el = el->parent;
+				if (!el->parent->is_nil())
+					return (left);
+                MDBG("Case 3 " << el);
+				return el->parent; 
+			} else {
+                MDBG("Case 4 " << left);
+                return left;
+            }
+        }
 
         void rotateLeft(node_ptr &root, node_ptr &pt, node_ptr sentry) {
             MDBG("Rotating left " << *root << " with " << *pt);
@@ -211,8 +268,15 @@ namespace ft {
         else
             o << RED;
         o << "Node(" << *n.data << ")";
-        o << " - L( " << n.left << " )" << " R( " << n.right << " )";
-        o << " - P( " << n.parent << " )";
+        o << " - L( " << (n.left->data->first) << " )" << " R( " << (n.right->data->first) << " ) \n\n";
+        if (n.parent &&
+            n.parent->data &&
+            n.parent->data->first
+        ) {
+            o << " - P( " << n.parent->data->first << " )";
+        } else {
+            o << YELLOW << " !! ERROR !!";
+        }
         o << RESET;
 	    return o;
     }
