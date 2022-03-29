@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/16 12:01:27 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/03/29 14:19:20 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/03/29 14:22:54 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,56 +98,56 @@ namespace ft {
 			}
 
 			// helped from https://www.techiedelight.com/deletion-from-bst/
-			void _erase(node_ptr d) {
-				if (d == _sentry->left)
-					_sentry->left = d->getNext();
-				if (d == _sentry->right)
-					_sentry->right = d->getPrev();
-				if (d->is_leaf()) {
+			void _erase(node_ptr node) {
+				if (node == _sentry->left)
+					_sentry->left = node->getNext();
+				if (node == _sentry->right)
+					_sentry->right = node->getPrev();
+				if (node->is_leaf()) {
 					MDBG("Deleting case 1");
 					// case 1
-					if (!d->is_root()) {
-						if (d->is_left())
-							d->parent->left = _sentry;
+					if (!node->is_root()) {
+						if (node->is_left())
+							node->parent->left = _sentry;
 						else
-							d->parent->right = _sentry;
+							node->parent->right = _sentry;
 					} else
 						_root = _sentry;
-				} else if (d->has_one_childs()) {
+				} else if (node->has_one_childs()) {
 					MDBG("Deleting case 2");
-					node_ptr child = d->get_uniq_child();
-					if (d->is_root()) {
+					node_ptr child = node->get_uniq_child();
+					if (node->is_root()) {
 						_root = child;
 						child->parent = _sentry;
 						_sentry->parent = child;
 					} else {
-						if (d->is_left()) {
-							d->parent->left = child;
-						} else if (d->is_right()) {
-							d->parent->right = child;
+						if (node->is_left()) {
+							node->parent->left = child;
+						} else if (node->is_right()) {
+							node->parent->right = child;
 						}
-						child->parent = d->parent;
+						child->parent = node->parent;
 					}
-				} else if (d->has_two_childs()) {
+				} else if (node->has_two_childs()) {
 					MDBG("Deleting case 2");
-					node_ptr next = d->getNext();
+					node_ptr next = node->getNext();
 					node_ptr next_parent = next->parent;
 
-					if (d != next_parent) {
+					if (node != next_parent) {
 						next_parent->left = next->right;
 						next->right->parent = next_parent;
 					} else {
 						if (next->right->exist())
-							next->right->parent = d;
-						d->right = next->right;
+							next->right->parent = node;
+						node->right = next->right;
 					}
 					// Vu qu'on switch les data et pas les nodes, attention à la sentinelle
 					if (_sentry->right == next)
-						_sentry->right = d;
-					std::swap(next->data, d->data);
-					d = next;
+						_sentry->right = node;
+					std::swap(next->data, node->data);
+					node = next;
 				}
-				_delete_node(d);
+				_delete_node(node);
 			}
 
 			size_type erase(const key_type & k) {
