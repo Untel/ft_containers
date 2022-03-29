@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/16 12:01:27 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/03/29 22:28:41 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/03/29 22:37:48 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,9 +74,10 @@ namespace ft {
 				_comp_values(value_compare(comp)),
 				_comp_keys(comp),
 				_allocator(alloc),
-				_root(_init_sentry()),
 				_size(0)
-			{}
+			{
+				_init_sentry();
+			}
 
 			template <class InputIterator>
   			map(InputIterator first, InputIterator last,
@@ -86,9 +87,9 @@ namespace ft {
 				_comp_values(value_compare(comp)),
 				_comp_keys(comp),
 				_allocator(alloc),
-				_root(_init_sentry()),
 				_size(0)
 			{
+				_init_sentry();
 				insert(first, last);
 			}
 
@@ -127,14 +128,13 @@ namespace ft {
 						else
 							node->parent->right = _sentry;
 					} else
-						_root = _sentry;
+						_sentry->parent = _sentry;
 				} else if (node->has_one_childs()) {
 					MDBG("Deleting case 2");
 					node_ptr child = node->get_uniq_child();
 					if (node->is_root()) {
-						_root = child;
-						child->parent = _sentry;
 						_sentry->parent = child;
+						child->parent = _sentry;
 					} else {
 						if (node->is_left()) {
 							node->parent->left = child;
@@ -207,11 +207,10 @@ namespace ft {
 				node->parent = parent;
 				switch (pos) {
 					case NO_ELEMS:
-						_root = node;
+						_sentry->parent = node;
 						node->parent = _sentry;
 						_sentry->right = node;
 						_sentry->left = node;
-						_sentry->parent = node;
 						break;
 					case IS_RIGHT:
 						parent->right = node;
@@ -320,7 +319,7 @@ namespace ft {
 				std::cout << "Sentry" << *_sentry << std::endl;
 				// std::cout << "Last" << *(_sentry->right) << std::endl;
 				std::cout << "-------------------" << std::endl;
-				print_node(_root);
+				print_node(_sentry->parent);
 			}
 
 			void print_node(node_ptr node, int level = 0) {
@@ -351,7 +350,6 @@ namespace ft {
 			value_compare				_comp_values;
 			key_compare					_comp_keys;
             allocator_type              _allocator;
-			node_ptr					_root;
 			node_ptr					_sentry;
 			size_type					_size;
 
@@ -386,8 +384,8 @@ namespace ft {
 			}
 
 			pair<node_ptr, NodeFinder> _find(key_type k) {
-				node_ptr next = _root;
-				node_ptr prev = _root;
+				node_ptr next = _sentry->parent;
+				node_ptr prev = _sentry->parent;
 				NodeFinder state = NO_ELEMS;
 				while (!next->nil()) {
 					prev = next;
