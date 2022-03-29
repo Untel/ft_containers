@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/16 12:01:27 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/03/07 17:39:48 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/03/29 17:31:56 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,83 +18,8 @@
 # include "utils.hpp"
 # include "array_iterator.hpp"
 # include "iterator.hpp"
-# include "tester.hpp"
 
-#define __VECTOR_INSERT(__RESOLVER, __RESOLVER2) \
-    size_type required_cap = _size + n_to_insert; \
-    size_type at = std::distance(begin(), position); \
-    iterator it_end = end(); \
-    bool is_collapsing = (it_end != position && ((position + n_to_insert) > it_end)); \
-    size_type collapse_at = is_collapsing ? (it_end - position) : at; \
-    size_type remaining_to_insert = is_collapsing ? n_to_insert - (collapse_at - at) : n_to_insert; \
-    (void)collapse_at; \
-    VDBG("INSERTING at: " << at << " length: " << n_to_insert << " actual_size: " << _size); \
-    if (required_cap > _capacity) { \
-        VDBG("NOT ENOUGH CAP "); \
-        VDBG(CYAN << "remaining_to_insert " << remaining_to_insert << std::endl); \
-        VDBG(RED << "collpase " << is_collapsing << std::endl); \
-        VDBG(MAGENTA << "collapse_at " << collapse_at << std::endl); \
-        VDBG(YELLOW << "at " << at << std::endl << RESET); \
-        size_type s = _size; \
-        size_type next_capacity = (required_cap > (_capacity * 2) \
-            ? required_cap \
-            : _capacity * 2 \
-        ); \
-        VDBG("Alloc = " << next_capacity); \
-        pointer tmp = _allocator.allocate(next_capacity + 1); \
-        VDBG("Copying length" << at); \
-        for (size_type i = 0; i < at; i++) {\
-            VDBG("Copying " << _c[i] << " at " << i); \
-            _allocator.construct(tmp + i, _c[i]); \
-        } \
-        VDBG("Constructing length" << n_to_insert); \
-        for (size_type i = 0; i < n_to_insert; i++) { \
-            VDBG("Constructing " << __RESOLVER << " at " << at + i); \
-            _allocator.construct(tmp + at + i, __RESOLVER); \
-        } \
-        VDBG("Collapsing length" << remaining_to_insert); \
-            for (size_type i = 0; i < remaining_to_insert; i++) { \
-                VDBG("Collapsing " << *(_c + s - remaining_to_insert + i) << " at " <<  at + n_to_insert + i); \
-                _allocator.construct(tmp + at + n_to_insert + i, *(_c + s - remaining_to_insert + i)); \
-            } \
-        _clean(); \
-        _c = tmp; \
-        _size = required_cap; \
-        _capacity = next_capacity; \
-        return ; \
-    } \
-    size_type construct_from_end = n_to_insert - collapse_at; \
-    VDBG("ENOUGH CAP: " << _capacity); \
-    VDBG("Construct from end: " << construct_from_end); \
-    for (size_type i = 0; i < construct_from_end; i++) { \
-        _allocator.construct(_c + _size + i, __RESOLVER2); \
-    } \
-    VDBG(YELLOW << "Construct from actual list: " << RESET << n_to_insert - construct_from_end); \
-    for (size_type i = 0; i < n_to_insert - construct_from_end; i++) { \
-        _allocator.construct(_c + _size + i + construct_from_end, *(_c + _size - construct_from_end + i)); \
-    } \
-    if (is_collapsing && it_end > position) { \
-        size_type to_move = it_end - position - construct_from_end; \
-        VDBG(CYAN << "Moving if collapsing: " << RESET << to_move); \
-        VDBG("Collapse is(" << is_collapsing << ") N=" << to_move); \
-        for (size_type i = 0; i < to_move; i++) { \
-            *(_c + _size - (i + 1)) = *(_c + _size - (i + n_to_insert + 1)); \
-        } \
-    } else if (!is_collapsing && it_end != position) { \
-        size_type to_move = n_to_insert; \
-        VDBG(MAGENTA << "Moving if not collapsing: " << RESET << to_move << " at " << at << " size: " << _size << " n " << n_to_insert); \
-        for (size_type i = 0; i < to_move; i++) { \
-            *(_c + at + n_to_insert + to_move - (i + 1)) = *(_c + to_move + at - (i + 1)); \
-        } \
-    } \
-    VDBG(BLUE << "Remaining is " << RESET << remaining_to_insert); \
-    if (position != it_end) \
-        for (size_type i = 0; i < remaining_to_insert; i++) \
-            *(_c + at + i) = __RESOLVER; \
-    _size += n_to_insert;
-
-namespace ft
-{
+namespace ft {
     /**
      * @brief Vector class
      * @see https://en.cppreference.com/w/cpp/container/vector
@@ -366,6 +291,8 @@ namespace ft
             }
 
             void _buildMemoryHole(size_type additional, iterator position) {
+                if (_size + additional >= max_size())
+                    throw std::length_error("Length error");
                 size_type required_cap = _size + additional;
                 pointer ref = _c;
                 size_type to_move = end() - position;

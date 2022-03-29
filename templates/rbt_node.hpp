@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/18 19:02:40 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/03/28 21:31:50 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/03/29 21:49:14 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 namespace ft {
 
     enum Color { RED_NODE, BLACK_NODE };
+    enum Childs { NO_CHILDS, CHILD_LEFT, CHILD_RIGHT, TWO_CHILDS };
 
 	template <class T>
     struct RBTNode
@@ -45,13 +46,36 @@ namespace ft {
 			return parent->nil();
 		}
         bool is_left() {
-            return (parent && parent->left == this);
+            return (parent->exist() && parent->left == this);
         }
         bool is_right() {
-            return (parent && parent->right == this);
+            return (parent->exist() && parent->right == this);
         }
+        node_ptr grand_parent() {
+            if (parent->exist())
+                return (parent->parent);
+            return sentry;
+        }
+
+        node_ptr oldest_left_ancestor() {
+            node_ptr ancestor = this;
+            while (ancestor->is_left() && !ancestor->parent->is_root())
+                ancestor = ancestor->parent;
+            return ancestor;
+        }
+
+        node_ptr next_right_bend() {
+            node_ptr ancestor = this;
+            while (ancestor->is_right())
+                ancestor = ancestor->parent;
+            return ancestor;
+        }
+
+        node_ptr next_bend() {
+            return (is_left() ? next_left_bend() : next_right_bend());
+        }
+
         bool nil() {
-            // MDBG("Is nil?" << this << " vs " << sentry);
             return (this == sentry);
         }
         bool exist() {
@@ -69,9 +93,20 @@ namespace ft {
         bool has_two_childs() {
             return (right->exist() && left->exist());
         }
+        Childs has_childs() {
+            if (is_leaf())
+                return NO_CHILDS;
+            if (left->exist() && right->exist())
+                return TWO_CHILDS;
+            if (left->exist())
+                return CHILD_LEFT;
+            return CHILD_RIGHT;
+        }
+
         node_ptr get_uniq_child() {
             return (left->exist() ? left : right);
         }
+
 		node_ptr getNext() {
             if (!right->nil()) {
                 MDBG("Case 1 " << right << " | " << *right);

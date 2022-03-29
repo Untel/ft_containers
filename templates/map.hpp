@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/16 12:01:27 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/03/29 14:22:54 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/03/29 21:47:01 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,11 +74,26 @@ namespace ft {
 				_comp_values(value_compare(comp)),
 				_comp_keys(comp),
 				_allocator(alloc),
-				_root(_init_sentry())
+				_root(_init_sentry()),
+				_size(0)
 			{}
 
+			template <class InputIterator>
+  			map(InputIterator first, InputIterator last,
+				const key_compare& comp = key_compare(),
+				const allocator_type& alloc = allocator_type()
+			) :
+				_comp_values(value_compare(comp)),
+				_comp_keys(comp),
+				_allocator(alloc),
+				_root(_init_sentry()),
+				_size(0)
+			{
+				insert(first, last);
+			}
+
 			~map() {
-				erase(begin(), end());
+				clear();
 				//to delete;
 				delete _sentry->data;
 				delete _sentry;
@@ -148,6 +163,7 @@ namespace ft {
 					node = next;
 				}
 				_delete_node(node);
+				_size--;
 			}
 
 			size_type erase(const key_type & k) {
@@ -168,15 +184,28 @@ namespace ft {
 					erase(first++);
 			}
 
-			pair<iterator, bool> insert(const value_type &val) {
-				pair<node_ptr, NodeFinder> found = _find(val.first);
-				node_ptr parent = found.first;
+			iterator find (const key_type & k) {
+				pair<node_ptr, NodeFinder> found = _find(k);
 				if (found.second == FOUND) {
-					return ft::make_pair(iterator(parent), false);
+					return (iterator(found.first));
 				}
-				node_ptr node = _new_node(val);
+				return (end());
+			}
+			const_iterator find (const key_type & k) const {
+				pair<node_ptr, NodeFinder> found = _find(k);
+				if (found.second == FOUND) {
+					return (iterator(found.first));
+				}
+				return (end());
+			}
+
+			mapped_type & operator[] (const key_type & k) {
+				return (*((this->insert(ft::make_pair(k, mapped_type()))).first)).second;
+			}
+
+			void _insert(node_ptr parent, node_ptr node, NodeFinder pos) {
 				node->parent = parent;
-				switch (found.second) {
+				switch (pos) {
 					case NO_ELEMS:
 						_root = node;
 						node->parent = _sentry;
@@ -186,20 +215,100 @@ namespace ft {
 						break;
 					case IS_RIGHT:
 						parent->right = node;
-						if (_comp_values(*(_sentry->right->data), val))
+						if (_comp_values(*(_sentry->right->data), *(node->data)))
 							_sentry->right = node;
 						break;
 					case IS_LEFT:
 						parent->left = node;
-						if (_comp_values(val, *(_sentry->left->data)))
+						if (_comp_values(*(node->data), *(_sentry->left->data)))
 							_sentry->left = node;
 						break;
+					case FOUND:
 					default:
-						MDBG("ERROR SWITCH CASE");
-						break;
+						MDBG("Should never happen");
+						throw std::exception();
 				}
+				_size++;
+			}
+
+			pair<iterator, bool> insert(const value_type & val) {
+				if (_size >= max_size())
+                    throw std::length_error("Length error");
+				pair<node_ptr, NodeFinder> found = _find(val.first);
+				node_ptr parent = found.first;
+				if (found.second == FOUND)
+					return ft::make_pair(iterator(parent), false);
+				node_ptr node = _new_node(val);
+				_insert(parent, node, found.second);
 				// _root->fixViolation(_root, node, _sentry);
 				return ft::make_pair<iterator, bool>(iterator(node), true);
+			}
+
+			template <class InputIterator>
+  			void insert(
+				InputIterator first,
+                typename enable_if <!is_integral <InputIterator>::value, InputIterator >::type last
+			) {
+				while (first != last)
+					insert(first, *(first++));
+			}
+
+			/**
+			 * Bon en vrai ça c'est galère. Le but étant de donner une position "indice"
+			 * Tout en vérifiant que la position donnée est "valide" (et donc qu'il n'y a pas une meilleur position)
+			 */
+			iterator insert (iterator position, const value_type & val) {
+				// Fast insert if pos is begin or rbegin (sentry values)
+				if ((position == rbegin()) && _comp_values(*(position), val)) {
+					node_ptr node = _new_node(val);
+					_insert(position, node, IS_RIGHT);
+					_sentry->right = node;
+					return (iterator(node));
+				} else if (position == begin() && _comp_values(val, *(position))) {
+					node_ptr node = _new_node(val);
+					_insert(position, node, IS_LEFT);
+					_sentry->left = node;
+					return (iterator(node));
+				}
+				// val = 105
+				node_ptr parent = position; // = 110
+				// 105 < 110, so insert left
+				if (_comp_values(val, *parent->data)) {
+					MDBG("Should insert left");
+					// Should insert left but left still occuped, wrong hint
+					if (parent->left->exist())
+						return insert(val).first; // BAD HINT, return default behavior
+					// Get the oldest left ancestor (stop when the ancestor is a right child)
+					node_ptr ancestor = oldest_left_ancestor();
+					// So, val should be between ancestor and his parent right ?
+					if (_comp_values(*ancestor->data, val) &&
+						_comp_values(val, *ancestor->parent->data)
+					) {
+						// GOOD HINT ?
+						node_ptr = _new_node(val);
+						_insert(position, node, IS_LEFT);
+						return iterator(node);
+					} else {
+						return insert(val).first; // BAD HINT ? return default behavior
+					}
+				} else if (_comp_values(*parent->data, val)) {
+					MDBG("Should insert right");
+					// Do the same with the other side
+					return ;
+				}
+				return iterator(parent); // Same value, return the existing elem
+			}
+
+			size_type 			count(const key_type & k) const { return (find(k) != (end())); }
+            size_type           size() const { return _size; }
+            bool                empty() const { return _size == 0; }
+            size_type           max_size() const { return _allocator.max_size(); }
+            key_compare         key_comp() const { return _comp_keys; }
+            value_compare       value_comp() const { return _comp_values; }
+            allocator_type      get_allocator() const { return _allocator; }
+
+			void clear() {
+				erase(begin(), end());
 			}
 
 			void print() {
@@ -241,6 +350,7 @@ namespace ft {
             allocator_type              _allocator;
 			node_ptr					_root;
 			node_ptr					_sentry;
+			size_type					_size;
 
 			node_ptr _init_sentry(void) {
 				_sentry = new node_type();
