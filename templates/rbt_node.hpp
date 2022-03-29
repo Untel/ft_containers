@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/18 19:02:40 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/03/29 21:49:14 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/03/29 22:29:13 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,15 +64,15 @@ namespace ft {
             return ancestor;
         }
 
-        node_ptr next_right_bend() {
+        node_ptr oldest_right_ancestor() {
             node_ptr ancestor = this;
             while (ancestor->is_right())
                 ancestor = ancestor->parent;
             return ancestor;
         }
 
-        node_ptr next_bend() {
-            return (is_left() ? next_left_bend() : next_right_bend());
+        node_ptr oldest_side_ancestor() {
+            return (is_left() ? oldest_left_ancestor() : oldest_right_ancestor());
         }
 
         bool nil() {

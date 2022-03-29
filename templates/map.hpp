@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/16 12:01:27 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/03/29 21:47:01 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/03/29 22:28:41 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -256,47 +256,50 @@ namespace ft {
 			/**
 			 * Bon en vrai ça c'est galère. Le but étant de donner une position "indice"
 			 * Tout en vérifiant que la position donnée est "valide" (et donc qu'il n'y a pas une meilleur position)
+			 * Si c'est begin() ou end() c'est simple, par contre si le hint est au millieu de l'arbre
+			 * il faut vérifier sa validité, et donc vérifié qu'il est cohérent à la position indiquée.
 			 */
-			iterator insert (iterator position, const value_type & val) {
+			iterator insert (iterator hint, const value_type & val) {
 				// Fast insert if pos is begin or rbegin (sentry values)
-				if ((position == rbegin()) && _comp_values(*(position), val)) {
+				if ((hint == rbegin()) && _comp_values(*(hint), val)) {
 					node_ptr node = _new_node(val);
-					_insert(position, node, IS_RIGHT);
-					_sentry->right = node;
+					_insert(hint, node, IS_RIGHT);
 					return (iterator(node));
-				} else if (position == begin() && _comp_values(val, *(position))) {
+				} else if (hint == begin() && _comp_values(val, *(hint))) {
 					node_ptr node = _new_node(val);
-					_insert(position, node, IS_LEFT);
-					_sentry->left = node;
+					_insert(hint, node, IS_LEFT);
 					return (iterator(node));
 				}
+				return insert(val).first;
+
+
 				// val = 105
-				node_ptr parent = position; // = 110
+				// hint = 110
 				// 105 < 110, so insert left
-				if (_comp_values(val, *parent->data)) {
+				if (_comp_values(val, *hint->data)) {
 					MDBG("Should insert left");
 					// Should insert left but left still occuped, wrong hint
-					if (parent->left->exist())
+					if (hint->left->exist())
 						return insert(val).first; // BAD HINT, return default behavior
 					// Get the oldest left ancestor (stop when the ancestor is a right child)
-					node_ptr ancestor = oldest_left_ancestor();
+					node_ptr ancestor = hint->oldest_left_ancestor();
 					// So, val should be between ancestor and his parent right ?
 					if (_comp_values(*ancestor->data, val) &&
 						_comp_values(val, *ancestor->parent->data)
 					) {
 						// GOOD HINT ?
-						node_ptr = _new_node(val);
-						_insert(position, node, IS_LEFT);
+						node_ptr node = _new_node(val);
+						_insert(hint, node, IS_LEFT);
 						return iterator(node);
 					} else {
 						return insert(val).first; // BAD HINT ? return default behavior
 					}
-				} else if (_comp_values(*parent->data, val)) {
+				} else if (_comp_values(*hint->data, val)) {
 					MDBG("Should insert right");
 					// Do the same with the other side
-					return ;
+					return iterator(hint);
 				}
-				return iterator(parent); // Same value, return the existing elem
+				return iterator(hint); // Same value, return the existing elem
 			}
 
 			size_type 			count(const key_type & k) const { return (find(k) != (end())); }
