@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/16 12:01:27 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/03/28 22:05:05 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/03/29 14:19:20 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,8 @@
 # include "binary_tree_iterator.hpp"
 
 namespace ft {
+
+	enum NodeFinder { NO_ELEMS, IS_LEFT, IS_RIGHT, FOUND };
 
 	template <
 		class Key,                                     											// map::key_type
@@ -105,14 +107,12 @@ namespace ft {
 					MDBG("Deleting case 1");
 					// case 1
 					if (!d->is_root()) {
-						if (d->is_left()) {
+						if (d->is_left())
 							d->parent->left = _sentry;
-						} else {
+						else
 							d->parent->right = _sentry;
-						}
-					} else {
+					} else
 						_root = _sentry;
-					}
 				} else if (d->has_one_childs()) {
 					MDBG("Deleting case 2");
 					node_ptr child = d->get_uniq_child();
@@ -151,9 +151,9 @@ namespace ft {
 			}
 
 			size_type erase(const key_type & k) {
-				pair<node_ptr, bool> found = _find(k);
+				pair<node_ptr, NodeFinder> found = _find(k);
 
-				if (!found.second)
+				if (found.second != FOUND)
 					return (0);
 				_erase(found.first);
 				return (1);
@@ -169,33 +169,36 @@ namespace ft {
 			}
 
 			pair<iterator, bool> insert(const value_type &val) {
-				pair<node_ptr, bool> found = _find(val.first);
+				pair<node_ptr, NodeFinder> found = _find(val.first);
 				node_ptr parent = found.first;
-				if (found.second) {
+				if (found.second == FOUND) {
 					return ft::make_pair(iterator(parent), false);
 				}
 				node_ptr node = _new_node(val);
-				if (_root == _sentry) {
-					_root = node;
-					node->parent = _sentry;
-					_sentry->right = node;
-					_sentry->left = node;
-					_sentry->parent = node;
-				} else {
-					node->parent = parent;
-					MDBG("Inserting " << *node);
-					if (_comp_values(*(parent->data), val)) {
-						parent->right = node;
-					} else {
-						parent->left = node;
-					}
-					if (_comp_values(*(_sentry->right->data), val)) {
+				node->parent = parent;
+				switch (found.second) {
+					case NO_ELEMS:
+						_root = node;
+						node->parent = _sentry;
 						_sentry->right = node;
-					} else if (_comp_values(val, *(_sentry->left->data))) {
 						_sentry->left = node;
-					}
-					// _root->fixViolation(_root, node, _sentry);
+						_sentry->parent = node;
+						break;
+					case IS_RIGHT:
+						parent->right = node;
+						if (_comp_values(*(_sentry->right->data), val))
+							_sentry->right = node;
+						break;
+					case IS_LEFT:
+						parent->left = node;
+						if (_comp_values(val, *(_sentry->left->data)))
+							_sentry->left = node;
+						break;
+					default:
+						MDBG("ERROR SWITCH CASE");
+						break;
 				}
+				// _root->fixViolation(_root, node, _sentry);
 				return ft::make_pair<iterator, bool>(iterator(node), true);
 			}
 
@@ -269,46 +272,25 @@ namespace ft {
 				delete node;
 			}
 
-			pair<node_ptr, bool> _find(key_type k) {
+			pair<node_ptr, NodeFinder> _find(key_type k) {
 				node_ptr next = _root;
 				node_ptr prev = _root;
-
-				MDBG("Start");
+				NodeFinder state = NO_ELEMS;
 				while (!next->nil()) {
 					prev = next;
-					MDBG("Slt" << *next);
 					if (_comp_keys(next->data->first, k)) {
+						state = IS_RIGHT;
 						next = next->right;
 					} else if (_comp_keys(k, next->data->first)) {
+						state = IS_LEFT;
 						next = next->left;
 					} else {
-						return ft::make_pair<node_ptr, bool>(next, true);
+						return ft::make_pair<node_ptr, NodeFinder>(next, FOUND);
 					}
 				}
-				return ft::make_pair<node_ptr, bool>(prev, false);
+				return ft::make_pair<node_ptr, NodeFinder>(prev, state);
 			}
-
-			node_ptr _insert_node(node_ptr base, node_ptr el, node_ptr *still_exist) {
-				MDBG("Inserting " << *still_exist << std::endl);
-				el->parent = base;
-				if (base == _sentry) {
-					return el;
-				}
-				MDBG("Inserting el: " << *el << " | " << el << std::endl);
-				MDBG("Inserting base: " << base << " | " << *base << std::endl);
-				if (_comp_values(*(el->data), *(base->data))) {
-					MDBG("Inserting left: " << *el << " | " << el);
-					base->left = _insert_node(base->left, el, still_exist);
-				} else if (_comp_values(*(base->data), *(el->data))) {
-					MDBG("Inserting right: " << *el << " | " << el);
-					base->right = _insert_node(base->right, el, still_exist);
-				} else {
-					MDBG("Inserting unchanged" << *el << " | " << el);
-					*still_exist = base;
-				}
-				return base;
-			}
-	};
+		};
 }
 
 #endif // !STACK_HPP
