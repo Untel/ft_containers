@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/16 12:01:27 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/03/30 02:11:06 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/03/30 02:13:39 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -273,8 +273,10 @@ namespace ft {
 				InputIterator last
                 // typename enable_if <!is_integral <InputIterator>::value, InputIterator >::type last
 			) {
-				while (first != last)
-					insert(*(first++));
+				while (first != last) {
+					insert(*first);
+					first++;
+				}
 			}
 
 			/**
