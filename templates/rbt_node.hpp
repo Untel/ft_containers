@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/18 19:02:40 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/03/29 22:29:13 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/03/29 22:55:23 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -303,14 +303,16 @@ namespace ft {
         else
             o << RED;
         o << "Node(" << *n.data << ")";
-        o << " - L( " << (n.left->data->first) << " )" << " R( " << (n.right->data->first) << " ) \n\n";
-        if (n.parent &&
+        o << " - L( " << (n.left->data->first) << " )" << " R( " << (n.right->data->first) << " )";
+        if (
+            n.parent->exist() &&
             n.parent->data &&
             n.parent->data->first
         ) {
             o << " - P( " << n.parent->data->first << " )";
         } else {
-            o << YELLOW << " !! ERROR !!";
+            o << " - P(NIL)";
+
         }
         o << RESET;
 	    return o;

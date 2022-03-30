@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/07 16:22:03 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/03/22 02:30:45 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/03/30 01:01:59 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,7 +75,7 @@ namespace ft {
 
     template <class T1, class T2>
     std::ostream & operator << (std::ostream & o, ft::pair<T1, T2> const & pr){
-        o << "Pair(" << pr.first << ", " << pr.second << ")"; 
+        o << "[" << pr.first << "] " << pr.second; 
 	    return o;
     }
 }

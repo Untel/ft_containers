@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/16 12:01:27 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/03/29 22:37:48 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/03/30 01:05:12 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -204,6 +204,8 @@ namespace ft {
 			}
 
 			void _insert(node_ptr parent, node_ptr node, NodeFinder pos) {
+				if (_size >= max_size())
+                    throw std::length_error("Length error");
 				node->parent = parent;
 				switch (pos) {
 					case NO_ELEMS:
@@ -231,8 +233,6 @@ namespace ft {
 			}
 
 			pair<iterator, bool> insert(const value_type & val) {
-				if (_size >= max_size())
-                    throw std::length_error("Length error");
 				pair<node_ptr, NodeFinder> found = _find(val.first);
 				node_ptr parent = found.first;
 				if (found.second == FOUND)
@@ -313,38 +313,32 @@ namespace ft {
 				erase(begin(), end());
 			}
 
-			void print() {
-				std::cout << "-------------------" << std::endl;
-				// std::cout << "First" << *(_sentry->left) << std::endl;
-				std::cout << "Sentry" << *_sentry << std::endl;
-				// std::cout << "Last" << *(_sentry->right) << std::endl;
-				std::cout << "-------------------" << std::endl;
-				print_node(_sentry->parent);
-			}
+		void	print(node_ptr node)
+		{
+			std::stringstream	buffer;
 
-			void print_node(node_ptr node, int level = 0) {
-				std::cout << "PRINNNNT --- \n";
-				if (node == _sentry) {
-					std::cout << "Nothing";
-					return ;
-				}
-				std::cout << "Lvl " << level << YELLOW;
-				std::cout << " Node: " << *node;
-				std::cout << RED << "left(";
-				if (node->left != _sentry) {
-					print_node(node->left, level += 1);
-				} else {
-					std::cout << "🍂";
-				}
-				std::cout << ") " << BLUE << "right(";
-				if (node->right != _sentry) {
-					std::cout << "right: ";
-					print_node(node->right, level += 1);
-				} else {
-					std::cout << "🍂";
-				}
-				std::cout << ")" << RESET;
+			if (node->exist()) {
+				_print(node, buffer, true, "");
+				std::cout << buffer.str();
 			}
+		}
+
+		void	print(void) {
+			std::cout << "size: " << this->size() << std::endl;
+			print(_sentry->parent);
+		}
+
+		void _print(node_ptr node, std::stringstream &buffer, bool isTail, std::string prefix)
+		{
+			if (node->right->exist())
+				this->_print(node->right, buffer, false, std::string(prefix).append(isTail ? "│   " : "    "));
+			buffer << prefix << (isTail ? "└── " : "┌── ");
+			if (node->color == RED_NODE)
+				buffer << "\033[31m";
+			buffer << *(node->data) << "\033[0m" << (node->is_leaf() ? "🌱" : "") << std::endl;
+			if (node->left->exist())
+				this->_print(node->left, buffer, true, std::string(prefix).append(isTail ? "    " : "│   "));
+		}
 
 	    private:
 			value_compare				_comp_values;
@@ -355,7 +349,7 @@ namespace ft {
 
 			node_ptr _init_sentry(void) {
 				_sentry = new node_type();
-				_sentry->data = new value_type(make_pair(-1, "sentry"));
+				_sentry->data = new value_type(key_type(), mapped_type());
 				_sentry->color = BLACK_NODE;
 				// risque de poser pb
 				_sentry->right = _sentry;
