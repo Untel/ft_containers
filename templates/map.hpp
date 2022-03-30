@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/16 12:01:27 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/03/30 02:13:39 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/03/30 02:21:18 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,9 +95,7 @@ namespace ft {
 
 			~map() {
 				clear();
-				//to delete;
-				delete _sentry->data;
-				delete _sentry;
+				_delete_node(_sentry);
 			}
 
             iterator begin() {
@@ -330,7 +328,7 @@ namespace ft {
 			}
 		}
 
-		#ifdef DEBUG
+		// #ifdef DEBUG
 		void	print(void) {
 			std::cout << "size: " << this->size() << std::endl;
 			print(_root());
@@ -347,7 +345,7 @@ namespace ft {
 			if (node->left->exist())
 				this->_print(node->left, buffer, true, std::string(prefix).append(isTail ? "    " : "│   "));
 		}
-		#endif
+		// #endif
 
 	    private:
 			value_compare				_comp_values;
@@ -362,9 +360,9 @@ namespace ft {
 
 			node_ptr _init_sentry(void) {
 				_sentry = new node_type();
-				_sentry->data = new value_type(key_type(), mapped_type());
+				_sentry->data = _allocator.allocate(1);
+				_allocator.construct(_sentry->data, value_type(key_type(), mapped_type()));
 				_sentry->color = BLACK_NODE;
-				// risque de poser pb
 				_sentry->right = _sentry;
 				_sentry->left = _sentry;
 				_sentry->parent = _sentry;
