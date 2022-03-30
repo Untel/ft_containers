@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/18 19:02:40 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/03/29 22:55:23 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/03/30 03:11:03 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -158,142 +158,88 @@ namespace ft {
             }
         }
 
-        void rotateLeft(node_ptr &root, node_ptr &pt, node_ptr sentry) {
-            MDBG("Rotating left " << *root << " with " << *pt);
-            node_ptr pt_right = pt->right;
+        void rotateLeft(void) {
+            node_ptr right_node = right;
         
-            pt->right = pt_right->left;
-        
-            if (pt->right != sentry)
-                pt->right->parent = pt;
-        
-            pt_right->parent = pt->parent;
-        
-            if (pt->parent == sentry)
-                root = pt_right;
-            else if (pt == pt->parent->left)
-                pt->parent->left = pt_right;
+            right = right_node->left;
+            if (right->exist())
+                right->parent = this;
+            right_node->parent = parent;
+            if (is_root())
+                sentry->parent = right_node;
+            else if (this == parent->left)
+                parent->left = right_node;
             else
-                pt->parent->right = pt_right;
-            pt_right->left = pt;
-            pt->parent = pt_right;
+                parent->right = right_node;
+            right_node->left = this;
+            parent = right_node;
         }
-        void rotateRight(node_ptr &root, node_ptr &pt, node_ptr sentry) {
-            MDBG("Rotating right " << *root << " with " << *pt);
-            node_ptr pt_left = pt->left;
+        void rotateRight(void) {
+            node_ptr left_node = left;
         
-            pt->left = pt_left->right;
-        
-            if (pt->left != sentry)
-                pt->left->parent = pt;
-        
-            pt_left->parent = pt->parent;
-        
-            if (pt->parent == sentry)
-                root = pt_left;
-            else if (pt == pt->parent->left)
-                pt->parent->left = pt_left;
+            left = left_node->right;        
+            if (left != sentry)
+                left->parent = this;
+            left_node->parent = parent;
+            if (is_root())
+                sentry->parent = left_node;
+            else if (this == parent->left)
+                parent->left = left_node;
             else
-                pt->parent->right = pt_left;
-        
-            pt_left->right = pt;
-            pt->parent = pt_left;
+                parent->right = left_node;
+            left_node->right = this;
+            parent = left_node;
         }
 
-        void fixViolation(node_ptr &root, node_ptr &pt, node_ptr &sentry) {
-            node_ptr parent_pt = sentry;
-            node_ptr grand_parent_pt = sentry;
+        void fixViolation() {
+            node_ptr node = this;
+            node_ptr parent_node = sentry;
+            node_ptr grand_parent_node = sentry;
 
             while (
-                (pt != root) &&
-                (pt->color != BLACK_NODE) &&
-                (pt->parent->color == RED_NODE)
+                (!node->is_root()) &&
+                (node->color != BLACK_NODE) &&
+                (node->parent->color == RED_NODE)
             ) {
-				std::cout << RED << "ITER\n";
-                parent_pt = pt->parent;
-                grand_parent_pt = pt->parent->parent;
-        
-                /*  Case : A
-                    Parent of pt is left child
-                    of Grand-parent of pt */
-                if (parent_pt == grand_parent_pt->left)
-                {
-        
-                    node_ptr uncle_pt = grand_parent_pt->right;
-        
-                    /* Case : 1
-                    The uncle of pt is also _RED
-                    Only Recoloring required */
-                    if (uncle_pt != sentry && uncle_pt->color == RED_NODE)
-                    {
-                        grand_parent_pt->color = RED_NODE;
-                        parent_pt->color = BLACK_NODE;
+                parent_node = node->parent;
+                grand_parent_node = node->grand_parent();
+                if (parent_node == grand_parent_node->left) {
+                    node_ptr uncle_pt = grand_parent_node->right;
+                    if (uncle_pt->exist() && uncle_pt->color == RED_NODE) {
+                        grand_parent_node->color = RED_NODE;
+                        parent_node->color = BLACK_NODE;
                         uncle_pt->color = BLACK_NODE;
-                        pt = grand_parent_pt;
-                    }
-        
-                    else
-                    {
-                        /* Case : 2
-                        pt is right child of its parent
-                        Left-rotation required */
-                        if (pt == parent_pt->right)
-                        {
-                            rotateLeft(root, parent_pt, sentry);
-                            pt = parent_pt;
-                            parent_pt = pt->parent;
+                        node = grand_parent_node;
+                    } else {
+                        if (node->is_right()) {
+                            parent_node->rotateLeft();
+                            node = parent_node;
+                            parent_node = node->parent;
                         }
-        
-                        /* Case : 3
-                        pt is left child of its parent
-                        Right-rotation required */
-                        rotateRight(root, grand_parent_pt, sentry);
-                        std::swap(parent_pt->color, grand_parent_pt->color);
-                        pt = parent_pt;
+                        grand_parent_node->rotateRight();
+                        std::swap(parent_node->color, grand_parent_node->color);
+                        node = parent_node;
                     }
-                }
-        
-                /* Case : B
-                Parent of pt is right child
-                of Grand-parent of pt */
-                else
-                {
-                    node_ptr uncle_pt = grand_parent_pt->left;
-        
-                    /*  Case : 1
-                        The uncle of pt is also RED_NODE
-                        Only Recoloring required */
-                    if ((uncle_pt != sentry) && (uncle_pt->color == RED_NODE))
-                    {
-                        grand_parent_pt->color = RED_NODE;
-                        parent_pt->color = BLACK_NODE;
+                } else {
+                    node_ptr uncle_pt = grand_parent_node->left;
+                    if (uncle_pt->exist() && (uncle_pt->color == RED_NODE)) {
+                        grand_parent_node->color = RED_NODE;
+                        parent_node->color = BLACK_NODE;
                         uncle_pt->color = BLACK_NODE;
-                        pt = grand_parent_pt;
-                    }
-                    else
-                    {
-                        /* Case : 2
-                        pt is left child of its parent
-                        Right-rotation required */
-                        if (pt == parent_pt->left)
-                        {
-                            rotateRight(root, parent_pt, sentry);
-                            pt = parent_pt;
-                            parent_pt = pt->parent;
+                        node = grand_parent_node;
+                    } else {
+                        if (node == parent_node->left) {
+                            parent_node->rotateRight();
+                            node = parent_node;
+                            parent_node = node->parent;
                         }
-        
-                        /* Case : 3
-                        pt is right child of its parent
-                        Left-rotation required */
-                        rotateLeft(root, grand_parent_pt, sentry);
-                        std::swap(parent_pt->color, grand_parent_pt->color);
-                        pt = parent_pt;
+                        grand_parent_node->rotateLeft();
+                        std::swap(parent_node->color, grand_parent_node->color);
+                        node = parent_node;
                     }
                 }
             }
-            root->color = BLACK_NODE;
         }
-
     };
 
     template <class T>

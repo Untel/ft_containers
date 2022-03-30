@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/16 12:01:27 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/03/30 02:21:18 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/03/30 03:09:11 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -257,7 +257,8 @@ namespace ft {
 					return ft::make_pair(iterator(parent), false);
 				node_ptr node = _new_node(val);
 				_attach(parent, node, found.second);
-				_sentry->fixViolation(_sentry->parent, node, _sentry);
+				node->fixViolation();
+				_sentry->parent->color = BLACK_NODE;
 				return ft::make_pair<iterator, bool>(iterator(node), true);
 			}
 
@@ -277,12 +278,6 @@ namespace ft {
 				}
 			}
 
-			/**
-			 * Bon en vrai ça c'est galère. Le but étant de donner une position "indice"
-			 * Tout en vérifiant que la position donnée est "valide" (et donc qu'il n'y a pas une meilleur position)
-			 * Si c'est begin() ou end() c'est simple, par contre si le hint est au millieu de l'arbre
-			 * il faut vérifier sa validité, et donc vérifié qu'il est cohérent à la position indiquée.
-			 */
 			iterator insert (iterator hint, const value_type & val) {
 				// Fast insert if pos is begin or rbegin (sentry values)
 				if ((hint == rbegin()) && _comp_values(*(hint), val)) {
