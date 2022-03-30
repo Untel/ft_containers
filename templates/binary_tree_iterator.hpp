@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/19 19:48:57 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/03/29 19:53:08 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/03/30 02:12:47 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,9 +48,10 @@ namespace ft
                 _p = rhs._p;
                 return *this;
             }
-            operator binary_tree_iterator<const value_type>() const {
-                return (binary_tree_iterator<const value_type>(this->_p));
+            operator binary_tree_iterator<const value_type>(void) const {
+                return (binary_tree_iterator<const value_type>(_p));
             }
+
             // maybe return void *a = t
             // binary_tree_iterator & operator = (reference val) { *this->_p = val; return *this; }
             ~binary_tree_iterator(void) {}

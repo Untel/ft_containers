@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/16 12:01:27 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/03/30 01:05:12 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/03/30 02:11:06 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,7 @@ namespace ft {
 			typedef typename allocator_type::const_pointer										const_pointer; //for the default allocator: const value_type*
 			typedef typename allocator_type::size_type                          				size_type;
 			typedef typename ft::binary_tree_iterator< value_type >::iterator					iterator; //a bidirectional iterator to value_type	convertible to const_iterator
-			typedef typename ft::binary_tree_iterator<const value_type>::const_iterator			const_iterator; //a bidirectional iterator to const value_type	
+			typedef typename ft::binary_tree_iterator< value_type>::const_iterator			const_iterator; //a bidirectional iterator to const value_type	
 			typedef typename ft::reverse_iterator< iterator >           						reverse_iterator;
 			typedef typename ft::reverse_iterator< const_iterator >     						const_reverse_iterator;
 			typedef typename ft::iterator_traits<iterator>::difference_type     				difference_type;
@@ -100,18 +100,38 @@ namespace ft {
 				delete _sentry;
 			}
 
-			iterator begin() {
-				return iterator(_sentry->left);
-			}
-			iterator end() {
-				return iterator(_sentry);
-			}
-			iterator rbegin() {
-				return iterator(_sentry->right);
-			}
-			iterator rend() {
-				return iterator(_sentry);
-			}
+            iterator begin() {
+                VDBG("Begin iterator");
+                return iterator(_sentry->left);
+            }
+            const_iterator begin() const {
+                // return const_iterator(iterator(_sentry->left));
+                return const_iterator(_sentry->left);
+            }
+            iterator end() {
+                VDBG("End iterator");
+                return iterator(_sentry);
+            }
+            const_iterator end() const {
+                VDBG("Const End iterator");
+                return const_iterator(_sentry);
+            }
+
+            reverse_iterator rbegin() {
+                VDBG("Begin reverse_iterator");
+                return reverse_iterator(_sentry->right);
+            }
+            const_reverse_iterator rbegin() const {
+                return const_reverse_iterator(_sentry->right);
+            }
+            reverse_iterator rend() {
+                VDBG("End reverse_iterator");
+                return reverse_iterator(end());
+            }
+            const_reverse_iterator rend() const {
+                VDBG("Const End reverse_iterator");
+                return const_reverse_iterator(end());
+            }
 
 			// helped from https://www.techiedelight.com/deletion-from-bst/
 			void _erase(node_ptr node) {
@@ -203,7 +223,7 @@ namespace ft {
 				return (*((this->insert(ft::make_pair(k, mapped_type()))).first)).second;
 			}
 
-			void _insert(node_ptr parent, node_ptr node, NodeFinder pos) {
+			void _attach(node_ptr parent, node_ptr node, NodeFinder pos) {
 				if (_size >= max_size())
                     throw std::length_error("Length error");
 				node->parent = parent;
@@ -232,24 +252,29 @@ namespace ft {
 				_size++;
 			}
 
-			pair<iterator, bool> insert(const value_type & val) {
-				pair<node_ptr, NodeFinder> found = _find(val.first);
+			pair<iterator, bool> _insert(const value_type & val, node_ptr from) {
+				pair<node_ptr, NodeFinder> found = _find(val.first, from);
 				node_ptr parent = found.first;
 				if (found.second == FOUND)
 					return ft::make_pair(iterator(parent), false);
 				node_ptr node = _new_node(val);
-				_insert(parent, node, found.second);
-				// _root->fixViolation(_root, node, _sentry);
+				_attach(parent, node, found.second);
+				_sentry->fixViolation(_sentry->parent, node, _sentry);
 				return ft::make_pair<iterator, bool>(iterator(node), true);
+			}
+
+			pair<iterator, bool> insert(const value_type & val) {
+				return (_insert(val, _root()));
 			}
 
 			template <class InputIterator>
   			void insert(
 				InputIterator first,
-                typename enable_if <!is_integral <InputIterator>::value, InputIterator >::type last
+				InputIterator last
+                // typename enable_if <!is_integral <InputIterator>::value, InputIterator >::type last
 			) {
 				while (first != last)
-					insert(first, *(first++));
+					insert(*(first++));
 			}
 
 			/**
@@ -262,43 +287,23 @@ namespace ft {
 				// Fast insert if pos is begin or rbegin (sentry values)
 				if ((hint == rbegin()) && _comp_values(*(hint), val)) {
 					node_ptr node = _new_node(val);
-					_insert(hint, node, IS_RIGHT);
+					_attach(hint, node, IS_RIGHT);
 					return (iterator(node));
 				} else if (hint == begin() && _comp_values(val, *(hint))) {
 					node_ptr node = _new_node(val);
-					_insert(hint, node, IS_LEFT);
+					_attach(hint, node, IS_LEFT);
 					return (iterator(node));
 				}
-				return insert(val).first;
 
-
-				// val = 105
-				// hint = 110
-				// 105 < 110, so insert left
-				if (_comp_values(val, *hint->data)) {
-					MDBG("Should insert left");
-					// Should insert left but left still occuped, wrong hint
-					if (hint->left->exist())
-						return insert(val).first; // BAD HINT, return default behavior
-					// Get the oldest left ancestor (stop when the ancestor is a right child)
-					node_ptr ancestor = hint->oldest_left_ancestor();
-					// So, val should be between ancestor and his parent right ?
-					if (_comp_values(*ancestor->data, val) &&
-						_comp_values(val, *ancestor->parent->data)
-					) {
-						// GOOD HINT ?
-						node_ptr node = _new_node(val);
-						_insert(hint, node, IS_LEFT);
-						return iterator(node);
-					} else {
-						return insert(val).first; // BAD HINT ? return default behavior
-					}
-				} else if (_comp_values(*hint->data, val)) {
-					MDBG("Should insert right");
-					// Do the same with the other side
-					return iterator(hint);
+				node_ptr	base = hint.base();
+				node_ptr	parent = base->parent;
+				while (parent->exist() && this->_comp(*(parent->data), val)) {
+					base = base->parent;
+					parent = parent->parent;
 				}
-				return iterator(hint); // Same value, return the existing elem
+				if (hint.base()->nil() || parent->nil())
+					base = _root();
+				return _insert(val, base).first;
 			}
 
 			size_type 			count(const key_type & k) const { return (find(k) != (end())); }
@@ -323,9 +328,10 @@ namespace ft {
 			}
 		}
 
+		#ifdef DEBUG
 		void	print(void) {
 			std::cout << "size: " << this->size() << std::endl;
-			print(_sentry->parent);
+			print(_root());
 		}
 
 		void _print(node_ptr node, std::stringstream &buffer, bool isTail, std::string prefix)
@@ -339,6 +345,7 @@ namespace ft {
 			if (node->left->exist())
 				this->_print(node->left, buffer, true, std::string(prefix).append(isTail ? "    " : "│   "));
 		}
+		#endif
 
 	    private:
 			value_compare				_comp_values;
@@ -346,6 +353,10 @@ namespace ft {
             allocator_type              _allocator;
 			node_ptr					_sentry;
 			size_type					_size;
+
+			node_ptr _root() {
+				return _sentry->parent;
+			}
 
 			node_ptr _init_sentry(void) {
 				_sentry = new node_type();
@@ -378,8 +389,12 @@ namespace ft {
 			}
 
 			pair<node_ptr, NodeFinder> _find(key_type k) {
-				node_ptr next = _sentry->parent;
-				node_ptr prev = _sentry->parent;
+				return _find(k, _root());
+			}
+
+			pair<node_ptr, NodeFinder> _find(key_type k, node_ptr from) {
+				node_ptr next = from;
+				node_ptr prev = from;
 				NodeFinder state = NO_ELEMS;
 				while (!next->nil()) {
 					prev = next;
