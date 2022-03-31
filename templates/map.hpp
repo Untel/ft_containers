@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/16 12:01:27 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/03/30 03:09:11 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/03/30 20:06:17 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,15 +43,17 @@ namespace ft {
 			typedef typename allocator_type::pointer											pointer; //for the default allocator: value_type*
 			typedef typename allocator_type::const_pointer										const_pointer; //for the default allocator: const value_type*
 			typedef typename allocator_type::size_type                          				size_type;
-			typedef typename ft::binary_tree_iterator< value_type >::iterator					iterator; //a bidirectional iterator to value_type	convertible to const_iterator
-			typedef typename ft::binary_tree_iterator< value_type>::const_iterator			const_iterator; //a bidirectional iterator to const value_type	
+			typedef typename ft::binary_tree_iterator< value_type >					iterator; //a bidirectional iterator to value_type	convertible to const_iterator
+			typedef typename ft::binary_tree_iterator< const value_type>		const_iterator; //a bidirectional iterator to const value_type	
 			typedef typename ft::reverse_iterator< iterator >           						reverse_iterator;
 			typedef typename ft::reverse_iterator< const_iterator >     						const_reverse_iterator;
 			typedef typename ft::iterator_traits<iterator>::difference_type     				difference_type;
 			// typedef typename ft::RBTree<value_type>												tree_type;
 
 			typedef RBTNode<value_type>															node_type;
+			typedef RBTNode<const value_type>													const_node_type;
 			typedef node_type *																	node_ptr;
+			typedef const_node_type *															const_node_ptr;
 			
 			class value_compare : public std::binary_function<value_type, value_type, bool> {   // in C++98, it is required to inherit binary_function<value_type,value_type,bool>
 				friend class map<key_type, mapped_type, key_compare, allocator_type>;
@@ -99,24 +101,20 @@ namespace ft {
 			}
 
             iterator begin() {
-                VDBG("Begin iterator");
                 return iterator(_sentry->left);
             }
             const_iterator begin() const {
                 // return const_iterator(iterator(_sentry->left));
-                return const_iterator(_sentry->left);
+                return const_iterator(reinterpret_cast<const_node_ptr>(_sentry->left));
             }
             iterator end() {
-                VDBG("End iterator");
                 return iterator(_sentry);
             }
             const_iterator end() const {
-                VDBG("Const End iterator");
-                return const_iterator(_sentry);
+                return const_iterator(reinterpret_cast<const_node_ptr>(_sentry));
             }
 
             reverse_iterator rbegin() {
-                VDBG("Begin reverse_iterator");
                 return reverse_iterator(_sentry->right);
             }
             const_reverse_iterator rbegin() const {
@@ -138,7 +136,7 @@ namespace ft {
 				if (node == _sentry->right)
 					_sentry->right = node->getPrev();
 				if (node->is_leaf()) {
-					MDBG("Deleting case 1");
+					//MDBG("Deleting case 1");
 					// case 1
 					if (!node->is_root()) {
 						if (node->is_left())
@@ -148,7 +146,7 @@ namespace ft {
 					} else
 						_sentry->parent = _sentry;
 				} else if (node->has_one_childs()) {
-					MDBG("Deleting case 2");
+					//MDBG("Deleting case 2");
 					node_ptr child = node->get_uniq_child();
 					if (node->is_root()) {
 						_sentry->parent = child;
@@ -162,7 +160,7 @@ namespace ft {
 						child->parent = node->parent;
 					}
 				} else if (node->has_two_childs()) {
-					MDBG("Deleting case 2");
+					//MDBG("Deleting case 2");
 					node_ptr next = node->getNext();
 					node_ptr next_parent = next->parent;
 
@@ -244,7 +242,7 @@ namespace ft {
 						break;
 					case FOUND:
 					default:
-						MDBG("Should never happen");
+						//MDBG("Should never happen");
 						throw std::exception();
 				}
 				_size++;
@@ -280,24 +278,33 @@ namespace ft {
 
 			iterator insert (iterator hint, const value_type & val) {
 				// Fast insert if pos is begin or rbegin (sentry values)
-				if ((hint == rbegin()) && _comp_values(*(hint), val)) {
-					node_ptr node = _new_node(val);
-					_attach(hint, node, IS_RIGHT);
-					return (iterator(node));
-				} else if (hint == begin() && _comp_values(val, *(hint))) {
-					node_ptr node = _new_node(val);
-					_attach(hint, node, IS_LEFT);
-					return (iterator(node));
-				}
-
 				node_ptr	base = hint.base();
+				// if ((base == _sentry->right) && _comp_values(*base->data, val)) {
+				// 	node_ptr node = _new_node(val);
+				// 	_attach(base, node, IS_RIGHT);
+
+				// 	return (iterator(node));
+				// } else if (base == _sentry->left && _comp_values(val, *base->data)) {
+				// 	MDBG("Insert min value " << val << " from " << *base);
+				// 	node_ptr node = _new_node(val);
+				// 	_attach(base, node, IS_LEFT);
+				// 	return (iterator(node));
+				// }
+
 				node_ptr	parent = base->parent;
-				while (parent->exist() && this->_comp(*(parent->data), val)) {
+				while (parent->exist() &&
+					_comp_values(*(parent->data), val)
+					// _comp_values(*(parent->data), val)
+				) {
+					MDBG("Insert from " << *base << " is not safe ");
 					base = base->parent;
 					parent = parent->parent;
 				}
-				if (hint.base()->nil() || parent->nil())
-					base = _root();
+
+				if (parent->nil())
+					return _insert(val, _root()).first;
+
+				MDBG("I will start inserting " << val << " from " << *base);
 				return _insert(val, base).first;
 			}
 
@@ -313,34 +320,78 @@ namespace ft {
 				erase(begin(), end());
 			}
 
-		void	print(node_ptr node)
-		{
-			std::stringstream	buffer;
-
-			if (node->exist()) {
-				_print(node, buffer, true, "");
-				std::cout << buffer.str();
+			iterator lower_bound(const key_type k) {
+				iterator it = begin();
+				iterator ite = end();
+				for (; it != ite; it++)
+					if (!(_comp_keys(it->first, k)))
+						return (it);
+				return (it);
 			}
-		}
 
-		// #ifdef DEBUG
-		void	print(void) {
-			std::cout << "size: " << this->size() << std::endl;
-			print(_root());
-		}
+			const_iterator lower_bound(const key_type k) const {
+				const_iterator it = begin();
+				const_iterator ite = end();
+				for (; it != ite; it++)
+					if (!(_comp_keys(it->first, k)))
+						return (it);
+				return (end());
+			}
 
-		void _print(node_ptr node, std::stringstream &buffer, bool isTail, std::string prefix)
-		{
-			if (node->right->exist())
-				this->_print(node->right, buffer, false, std::string(prefix).append(isTail ? "│   " : "    "));
-			buffer << prefix << (isTail ? "└── " : "┌── ");
-			if (node->color == RED_NODE)
-				buffer << "\033[31m";
-			buffer << *(node->data) << "\033[0m" << (node->is_leaf() ? "🌱" : "") << std::endl;
-			if (node->left->exist())
-				this->_print(node->left, buffer, true, std::string(prefix).append(isTail ? "    " : "│   "));
-		}
-		// #endif
+			iterator upper_bound(const key_type &k) {
+				iterator it = begin();
+				iterator ite = end();
+				for (; it != ite; it++)
+					if (!(_comp_keys(it->first, k)) && _comp_keys(k, it->first))
+						return (it);
+				return (it);
+			}
+
+			const_iterator upper_bound(const key_type &k) const {
+				const_iterator it = begin();
+				const_iterator ite = end();
+				for (; it != ite; it++)
+					if (!(_comp_keys(it->first, k)) && _comp_keys(k, it->first))
+						return (it);
+				return (end());
+			}
+
+			ft::pair<iterator, iterator> equal_range(const key_type &k) {
+				return (ft::make_pair(lower_bound(k), upper_bound(k)));
+			}
+
+			ft::pair<const_iterator, const_iterator> equal_range(const key_type &k) const {
+				return (ft::make_pair(lower_bound(k), upper_bound(k)));
+			}
+
+			void	print(node_ptr node)
+			{
+				std::stringstream	buffer;
+
+				if (node->exist()) {
+					_print(node, buffer, true, "");
+					std::cout << buffer.str();
+				}
+			}
+
+			// #ifdef DEBUG
+			void	print(void) {
+				std::cout << "size: " << this->size() << std::endl;
+				print(_root());
+			}
+
+			void _print(node_ptr node, std::stringstream &buffer, bool isTail, std::string prefix)
+			{
+				if (node->right->exist())
+					this->_print(node->right, buffer, false, std::string(prefix).append(isTail ? "│   " : "    "));
+				buffer << prefix << (isTail ? "└── " : "┌── ");
+				if (node->color == RED_NODE)
+					buffer << "\033[31m";
+				buffer << *(node->data) << "\033[0m" << (node->is_leaf() ? "🌱" : "") << std::endl;
+				if (node->left->exist())
+					this->_print(node->left, buffer, true, std::string(prefix).append(isTail ? "    " : "│   "));
+			}
+			// #endif
 
 	    private:
 			value_compare				_comp_values;
@@ -362,7 +413,6 @@ namespace ft {
 				_sentry->left = _sentry;
 				_sentry->parent = _sentry;
 				_sentry->sentry = _sentry;
-				std::cout << "Sentry " << *_sentry << std::endl;
 				return _sentry;
 			}
 
@@ -377,7 +427,6 @@ namespace ft {
 			}
 
 			void _delete_node(node_ptr node) {
-				std::cout << "deleting " << *node << std::endl; 
 				_allocator.destroy(node->data);
 				_allocator.deallocate(node->data, 1);
 				delete node;

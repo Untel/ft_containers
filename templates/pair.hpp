@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/07 16:22:03 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/03/30 01:01:59 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/03/30 17:39:29 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,19 @@ namespace ft {
                 second = pr.second;
                 return *this;
             };
+
+            operator pair<const T1, T2>(void) const {
+                return (pair<const T1, T2>(first, second));
+            }
+
+            template <class U, class K>
+            operator pair<U, K>(void) const {
+                DBG("static cast");
+                return (pair<U, K>(
+                    static_cast<U>(first),
+                    static_cast<K>(second)
+                ));
+            }
 
             // void swap (pair & x) {
             //     size_type   tmp_first   = first;

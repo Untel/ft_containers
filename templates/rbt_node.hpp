@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/18 19:02:40 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/03/30 03:11:03 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/03/30 17:34:12 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,7 @@ namespace ft {
         typedef T *                 pointer;
         typedef T &                 reference;
         typedef	RBTNode<T> *        node_ptr;
+        typedef	RBTNode<const T> *  const_node_ptr;
 
         pointer data;
        	node_ptr left;
@@ -38,9 +39,20 @@ namespace ft {
             data(el), left(NULL), right(NULL), parent(NULL), sentry(NULL), color(RED_NODE)
         {};
 
-        ~RBTNode(void) {
-            std::cout << "Destroy" << std::endl;
-        };
+        RBTNode(pointer el, node_ptr l, node_ptr r, node_ptr p, node_ptr s, Color c) :
+            data(el), left(l), right(r), parent(p), sentry(s), color(c)
+        {};
+ 
+        RBTNode(RBTNode & n) :
+            data(n.data), left(n.left), right(n.right), parent(n.parent), sentry(n.sentry), color(n.color)
+        {};
+
+        ~RBTNode(void) {};
+// RBTNode<ft::pair<const int, foo<int> > > *
+// binary_tree_iterator<const ft::pair<const int, foo<int> > >
+        operator RBTNode<const value_type>(void) const {
+            return (RBTNode<const value_type>(data, left, right, parent, sentry, color));
+        }
 
 		bool is_root() {
 			return parent->nil();
@@ -109,18 +121,18 @@ namespace ft {
 
 		node_ptr getNext() {
             if (!right->nil()) {
-                MDBG("Case 1 " << right << " | " << *right);
+                //MDBG("Case 1 " << right << " | " << *right);
 
 				node_ptr el = right;
 				while (!el->left->nil())
 					el = el->left;
 				return el;
 			} else if (!parent->nil() && is_left()) {
-                MDBG("Case 2");
+                //MDBG("Case 2");
 
 				return parent;
 			} else if (!parent->nil() && is_right()) {
-                MDBG("Case 3");
+                //MDBG("Case 3");
 
 				node_ptr el = this;
 				while (el->is_right())
@@ -134,15 +146,15 @@ namespace ft {
 		}
 
         node_ptr getPrev() {
-            MDBG("Search prev of " << this);
+            //MDBG("Search prev of " << this);
             if (!left->nil()) {
 				node_ptr el = left;
 				while (!el->right->nil())
 					el = el->right;
-                MDBG("Case 1 " << el);
+                //MDBG("Case 1 " << el);
 				return el;
 			} else if (!parent->nil() && is_right()) {
-                MDBG("Case 2 " << parent);
+                //MDBG("Case 2 " << parent);
 				return parent;
 			} else if (!parent->nil() && is_left()) {
 				node_ptr el = this;
@@ -150,10 +162,10 @@ namespace ft {
 					el = el->parent;
 				if (!el->parent->nil())
 					return (left);
-                MDBG("Case 3 " << el);
+                //MDBG("Case 3 " << el);
 				return el->parent; 
 			} else {
-                MDBG("Case 4 " << left);
+                //MDBG("Case 4 " << left);
                 return left;
             }
         }
