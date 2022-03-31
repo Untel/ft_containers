@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/08 14:23:38 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/03/30 20:30:51 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/03/31 17:59:48 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,19 +107,38 @@ void const_pair() {
 	const ft::pair<int, std::string> y(f);
 }
 
-template <class K, class V>
-void insert_range(int size) {
-	std::list<ft::pair<K, V> > lst;
+// template <class K, class V>
+// void insert_range(int size) {
+// 	std::list<ft::pair<K, V> > lst;
 
-	for (int i = 1; i < size + 1; i++)
-		lst.push_back(ft::pair<K, V>(K(i), V(i * 3)));
+// 	for (int i = 1; i < size + 1; i++)
+// 		lst.push_back(ft::pair<K, V>(K(i), V(i * 3)));
 	
-	ft::map<K, V> m;
-	m.insert((lst.begin(), lst.end()));
-	ft::map<K, V>::iterator it = m.begin();
-	ft::map<K, V>::iterator ite = m.end();
-	for (; it != ite; it++)
-		std::cout << "R " << it->first << " | " << it->second << std::endl;
+// 	ft::map<K, V> m;
+// 	m.insert((lst.begin(), lst.end()));
+// 	ft::map<K, V>::iterator it = m.begin();
+// 	ft::map<K, V>::iterator ite = m.end();
+// 	for (; it != ite; it++)
+// 		std::cout << "R " << it->first << " | " << it->second << std::endl;
+// }
+
+template <class K, class V>
+void insert_test(K a, V b, V c) {
+	typedef typename ft::map<K, V>::iterator iter;
+	typedef typename ft::pair<iter, bool> inserter;
+	ft::map<K, V>	m;
+
+	inserter ins;
+	iter it;
+
+	ins = m.insert(ft::make_pair<K, V>(a, b));
+	it = ins.first;
+	std::cout << "Inserted " << ins.second << " :: " << it->first << " value: " << it->second << std::endl;
+
+	ins = m.insert(ft::make_pair<K, V>(a, c));
+	it = ins.first;
+	std::cout << "Reinsert " << ins.second << " :: " << it->first << " value: " << it->second << std::endl;
+
 }
 
 void test_map_main(void) {
@@ -129,7 +148,8 @@ void test_map_main(void) {
 		std::cout << "IS FT" << std::endl;
 	#endif
 
-	insert_range<int, char>(20);
+	// insert_range<int, char>(20);
+	insert_test<int, std::string>(1, "yolo", "re");
 	// const_pair();
 	// mescande_example();
 	// test_init_map();

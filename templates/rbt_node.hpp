@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/18 19:02:40 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/03/30 17:34:12 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/03/31 18:47:51 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -120,29 +120,24 @@ namespace ft {
         }
 
 		node_ptr getNext() {
-            if (!right->nil()) {
+            if (right->exist()) {
                 //MDBG("Case 1 " << right << " | " << *right);
 
 				node_ptr el = right;
-				while (!el->left->nil())
+				while (el->left->exist())
 					el = el->left;
 				return el;
-			} else if (!parent->nil() && is_left()) {
-                //MDBG("Case 2");
-
+			} else if (is_left()) {
 				return parent;
-			} else if (!parent->nil() && is_right()) {
-                //MDBG("Case 3");
-
-				node_ptr el = this;
-				while (el->is_right())
+			} else if (is_right()) {
+				node_ptr el = this->parent;
+				while (el->exist() && el->is_right())
 					el = el->parent;
-				if (!el->parent->nil())
-					return (right);
+				if (el->nil())
+					return (el->right);
 				return el->parent; 
-			} else {
-				return right;
 			}
+            return right;
 		}
 
         node_ptr getPrev() {

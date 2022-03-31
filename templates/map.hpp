@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/16 12:01:27 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/03/30 20:06:17 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/03/31 18:53:19 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -279,33 +279,12 @@ namespace ft {
 			iterator insert (iterator hint, const value_type & val) {
 				// Fast insert if pos is begin or rbegin (sentry values)
 				node_ptr	base = hint.base();
-				// if ((base == _sentry->right) && _comp_values(*base->data, val)) {
-				// 	node_ptr node = _new_node(val);
-				// 	_attach(base, node, IS_RIGHT);
-
-				// 	return (iterator(node));
-				// } else if (base == _sentry->left && _comp_values(val, *base->data)) {
-				// 	MDBG("Insert min value " << val << " from " << *base);
-				// 	node_ptr node = _new_node(val);
-				// 	_attach(base, node, IS_LEFT);
-				// 	return (iterator(node));
-				// }
-
-				node_ptr	parent = base->parent;
-				while (parent->exist() &&
-					_comp_values(*(parent->data), val)
-					// _comp_values(*(parent->data), val)
-				) {
-					MDBG("Insert from " << *base << " is not safe ");
-					base = base->parent;
-					parent = parent->parent;
+				if ((base == _sentry->right) && _comp_values(*base->data, val)) {
+					return _insert(val, base).first;
+				} else if (base == _sentry->left && _comp_values(val, *base->data)) {
+					return _insert(val, base).first;
 				}
-
-				if (parent->nil())
-					return _insert(val, _root()).first;
-
-				MDBG("I will start inserting " << val << " from " << *base);
-				return _insert(val, base).first;
+				return _insert(val, _root()).first;
 			}
 
 			size_type 			count(const key_type & k) const { return (find(k) != (end())); }
@@ -377,6 +356,8 @@ namespace ft {
 			// #ifdef DEBUG
 			void	print(void) {
 				std::cout << "size: " << this->size() << std::endl;
+				std::cout << "Sentry left: " << *_sentry->left << std::endl;
+				std::cout << "Sentry right: " << *_sentry->right << std::endl;
 				print(_root());
 			}
 
