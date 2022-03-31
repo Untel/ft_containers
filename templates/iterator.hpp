@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/19 20:05:28 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/03/04 08:09:56 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/03/31 21:45:34 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,7 +65,7 @@ namespace ft {
 			template <class Iter>
 			reverse_iterator (const reverse_iterator<Iter> & rev_it) : _base(rev_it.base()) {}
 
-			reverse_iterator & operator ++ (void) { --this->_base; return *this; }
+			reverse_iterator & operator ++ (void) { --_base; return *this; }
 			reverse_iterator operator ++ (int) { reverse_iterator tmp(*this); operator++(); return tmp; }
 			reverse_iterator & operator -- (void) { ++_base; return *this; }	
 			reverse_iterator operator -- (int) { reverse_iterator tmp(*this); operator--(); return tmp; }
@@ -93,7 +93,8 @@ namespace ft {
 			}
 			// PEUT ETRE PAS BON CA
 			pointer operator -> () const {
-				return &(operator*());
+				iterator_type b = _base;
+				return (--b).operator->();
 			}
 			reverse_iterator & operator += (difference_type n) {
 				_base -= n;

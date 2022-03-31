@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/16 12:01:27 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/03/31 19:39:26 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/03/31 22:14:34 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,8 +98,12 @@ namespace ft {
 			map(const map &cpy) :
 				_comp_values(value_compare(cpy._comp_keys)),
 				_comp_keys(cpy._comp_keys),
-				_allocator(cpy._allocator)
-			{ *this = cpy; }
+				_allocator(cpy._allocator),
+				_size(0)
+			{
+				_init_sentry();
+				insert(cpy.begin(), cpy.end());
+			}
 			map & operator = ( const map &cpy) {
 				_size = 0;
 				_allocator = cpy._allocator;
@@ -130,28 +134,28 @@ namespace ft {
             }
 
             reverse_iterator rbegin() {
-                return reverse_iterator(_sentry->right);
+                return reverse_iterator(end());
             }
             const_reverse_iterator rbegin() const {
-                return const_reverse_iterator(_sentry->right);
+                return const_reverse_iterator(end());
             }
             reverse_iterator rend() {
                 VDBG("End reverse_iterator");
-                return reverse_iterator(end());
+                return reverse_iterator(begin());
             }
             const_reverse_iterator rend() const {
                 VDBG("Const End reverse_iterator");
-                return const_reverse_iterator(end());
+                return const_reverse_iterator(begin());
             }
 
 			// helped from https://www.techiedelight.com/deletion-from-bst/
 			void _erase(node_ptr node) {
 				if (node == _sentry->left)
-					_sentry->left = node->getNext();
+					_sentry->left = node->parent;
 				if (node == _sentry->right)
-					_sentry->right = node->getPrev();
+					_sentry->right = node->parent;
 				if (node->is_leaf()) {
-					//MDBG("Deleting case 1");
+					MDBG("Deleting case 1");
 					// case 1
 					if (!node->is_root()) {
 						if (node->is_left())
@@ -161,7 +165,7 @@ namespace ft {
 					} else
 						_sentry->parent = _sentry;
 				} else if (node->has_one_childs()) {
-					//MDBG("Deleting case 2");
+					MDBG("Deleting case 2");
 					node_ptr child = node->get_uniq_child();
 					if (node->is_root()) {
 						_sentry->parent = child;
@@ -175,26 +179,33 @@ namespace ft {
 						child->parent = node->parent;
 					}
 				} else if (node->has_two_childs()) {
-					//MDBG("Deleting case 2");
+					MDBG("Deleting case 2");
 					node_ptr next = node->getNext();
 					node_ptr next_parent = next->parent;
 
 					if (node != next_parent) {
+						MDBG("2.a");
 						next_parent->left = next->right;
 						next->right->parent = next_parent;
 					} else {
-						if (next->right->exist())
+						MDBG("2.b");
+						if (next->right->exist()) {
+							MDBG("2.b.a");
 							next->right->parent = node;
+						}
 						node->right = next->right;
 					}
 					// Vu qu'on switch les data et pas les nodes, attention à la sentinelle
-					if (_sentry->right == next)
+					if (_sentry->right == next) {
+						MDBG("2.c");
 						_sentry->right = node;
+					}
+					MDBG("Replace next " << *next << " with " << *node);
 					std::swap(next->data, node->data);
 					node = next;
 				}
-				_delete_node(node);
 				_size--;
+				_delete_node(node);
 			}
 
 			size_type erase(const key_type & k) {
@@ -358,6 +369,23 @@ namespace ft {
 				return (ft::make_pair(lower_bound(k), upper_bound(k)));
 			}
 
+            void swap (map & x) {
+				value_compare		tmp_comp_values = _comp_values;
+				key_compare			tmp_comp_keys = _comp_keys;
+				node_ptr			tmp_sentry = _sentry;
+				size_type			tmp_size = _size;
+
+				_comp_values = x._comp_values;
+				_comp_keys = x._comp_keys;
+				_sentry = x._sentry;
+				_size = x._size;
+
+				x._comp_values = tmp_comp_values;
+				x._comp_keys = tmp_comp_keys;
+				x._sentry = tmp_sentry;
+				x._size = tmp_size;
+            }
+
 			void	print(node_ptr node)
 			{
 				std::stringstream	buffer;
@@ -450,7 +478,41 @@ namespace ft {
 				}
 				return ft::make_pair<node_ptr, NodeFinder>(prev, state);
 			}
-		};
+	};
+
+	template <class K, class V, class Cmp, class Alc>
+    bool operator == (const ft::map<K,V,Cmp,Alc> & lhs, const ft::map<K,V,Cmp,Alc> & rhs) {
+        VDBG("lhs == rhs");
+        if (lhs.size() != rhs.size())
+            return false;
+        return ft::equal(lhs.begin(), lhs.end(), rhs.begin());
+    }
+    template <class K, class V, class Cmp, class Alc>
+    bool operator != (const ft::map<K,V,Cmp,Alc>& lhs, const ft::map<K,V,Cmp,Alc>& rhs) {
+        VDBG("lhs != rhs");
+        return (!(lhs == rhs));
+    }
+    template <class K, class V, class Cmp, class Alc>
+    bool operator < (const ft::map<K,V,Cmp,Alc>& lhs, const ft::map<K,V,Cmp,Alc>& rhs) {
+        return ft::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
+    }
+    template <class K, class V, class Cmp, class Alc>
+    bool operator > (const ft::map<K,V,Cmp,Alc>& lhs, const ft::map<K,V,Cmp,Alc>& rhs) {
+        return (rhs < lhs);
+    }
+    template <class K, class V, class Cmp, class Alc>
+    bool operator <= (const ft::map<K,V,Cmp,Alc>& lhs, const ft::map<K,V,Cmp,Alc>& rhs) {
+        return !(rhs < lhs);
+    }
+    template <class K, class V, class Cmp, class Alc>
+    bool operator >= (const ft::map<K,V,Cmp,Alc>& lhs, const ft::map<K,V,Cmp,Alc>& rhs) {
+        return !(lhs < rhs);
+    }
+
+    template <class K, class V, class Cmp, class Alc>
+    void swap (ft::map<K,V,Cmp,Alc> & x, ft::map<K,V,Cmp,Alc> & y) {
+        x.swap(y);
+    }
 }
 
 #endif // !STACK_HPP

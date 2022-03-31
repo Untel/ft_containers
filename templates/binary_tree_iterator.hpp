@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/19 19:48:57 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/03/31 19:23:13 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/03/31 21:40:58 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,10 +61,11 @@ namespace ft
             ~binary_tree_iterator(void) {}
        
             binary_tree_iterator & operator ++ (void) {
-                //IDBG("1 ++");
-                //IDBG("Prev is " << *_p);
-                _p = _p->getNext();
-                //IDBG("Next is " << *_p);
+                if (_p->nil()) {
+                    // std::cout << "-- sentry, reset to right most\n";
+                    _p = _p->left;
+                } else
+                    _p = _p->getNext();
                 return (*this);
             }
             binary_tree_iterator operator ++ (int) {
@@ -72,15 +73,18 @@ namespace ft
                 binary_tree_iterator tmp(*this); operator++(); return tmp;
             }
             binary_tree_iterator & operator -- (void) {
-                //IDBG("1 --");
-                //IDBG("Prev is " << *_p);
-                _p = _p->getPrev();
-                //IDBG("Next is " << *_p);
+                // Si le courant == end() == la sentry, alors on set automatiquement à _sentry->right qui est le max value
+                
+                if (_p->nil()) {
+                    // std::cout << "-- sentry, reset to right most\n";
+                    _p = _p->right;
+                } else
+                    _p = _p->getPrev();
                 return (*this);
             }
             binary_tree_iterator operator -- (int) {
                 //IDBG("2 --");
-                binary_tree_iterator tmp(*this); operator++(); return tmp;
+                binary_tree_iterator tmp(*this); operator--(); return tmp;
             }
             reference operator * () const {
                 //IDBG("* " << *(this->_p->data));

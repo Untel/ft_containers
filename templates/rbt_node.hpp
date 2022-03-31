@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/18 19:02:40 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/03/31 18:47:51 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/03/31 20:29:48 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -121,8 +121,6 @@ namespace ft {
 
 		node_ptr getNext() {
             if (right->exist()) {
-                //MDBG("Case 1 " << right << " | " << *right);
-
 				node_ptr el = right;
 				while (el->left->exist())
 					el = el->left;
@@ -130,7 +128,7 @@ namespace ft {
 			} else if (is_left()) {
 				return parent;
 			} else if (is_right()) {
-				node_ptr el = this->parent;
+				node_ptr el = parent;
 				while (el->exist() && el->is_right())
 					el = el->parent;
 				if (el->nil())
@@ -141,28 +139,22 @@ namespace ft {
 		}
 
         node_ptr getPrev() {
-            //MDBG("Search prev of " << this);
-            if (!left->nil()) {
+            if (left->exist()) {
 				node_ptr el = left;
-				while (!el->right->nil())
+				while (el->right->exist())
 					el = el->right;
-                //MDBG("Case 1 " << el);
 				return el;
-			} else if (!parent->nil() && is_right()) {
-                //MDBG("Case 2 " << parent);
+			} else if (is_right()) {
 				return parent;
-			} else if (!parent->nil() && is_left()) {
-				node_ptr el = this;
-				while (el->is_left())
+			} else if (is_left()) {
+				node_ptr el = parent;
+				while (el->exist() && el->is_left())
 					el = el->parent;
-				if (!el->parent->nil())
-					return (left);
-                //MDBG("Case 3 " << el);
+				if (el->nil())
+					return (el->left);
 				return el->parent; 
-			} else {
-                //MDBG("Case 4 " << left);
-                return left;
-            }
+			}
+            return left;
         }
 
         void rotateLeft(void) {
