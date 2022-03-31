@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/16 12:01:27 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/03/31 18:53:19 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/03/31 19:39:26 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,6 +94,21 @@ namespace ft {
 				_init_sentry();
 				insert(first, last);
 			}
+
+			map(const map &cpy) :
+				_comp_values(value_compare(cpy._comp_keys)),
+				_comp_keys(cpy._comp_keys),
+				_allocator(cpy._allocator)
+			{ *this = cpy; }
+			map & operator = ( const map &cpy) {
+				_size = 0;
+				_allocator = cpy._allocator;
+				_comp_keys = cpy._comp_keys;
+				_comp_values = value_compare(_comp_keys);
+				_init_sentry();
+				insert(cpy.begin(), cpy.end());
+                return *this;
+            }
 
 			~map() {
 				clear();
@@ -381,7 +396,7 @@ namespace ft {
 			node_ptr					_sentry;
 			size_type					_size;
 
-			node_ptr _root() {
+			node_ptr _root() const {
 				return _sentry->parent;
 			}
 
@@ -413,11 +428,11 @@ namespace ft {
 				delete node;
 			}
 
-			pair<node_ptr, NodeFinder> _find(key_type k) {
+			ft::pair<node_ptr, NodeFinder> _find(const key_type & k) const {
 				return _find(k, _root());
 			}
 
-			pair<node_ptr, NodeFinder> _find(key_type k, node_ptr from) {
+			ft::pair<node_ptr, NodeFinder> _find(const key_type & k, node_ptr from) const {
 				node_ptr next = from;
 				node_ptr prev = from;
 				NodeFinder state = NO_ELEMS;

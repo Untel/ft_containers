@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/19 19:48:57 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/03/30 18:08:37 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/03/31 19:23:13 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,7 +103,8 @@ namespace ft
         const ft::binary_tree_iterator<T> & rhs
     ) {
         //IDBG("T == T");
-        return lhs.base() == rhs.base();
+        typedef typename ft::binary_tree_iterator<T>::const_node_ptr n;
+        return reinterpret_cast<n>(lhs.base()) == reinterpret_cast<n>(rhs.base());
     }
 
     template<typename T, typename U>
@@ -111,8 +112,9 @@ namespace ft
         const ft::binary_tree_iterator<T> & lhs,
         const ft::binary_tree_iterator<U> & rhs
     ) {
-        //IDBG("T == U");
-        return lhs.base() == rhs.base();
+        typedef typename ft::binary_tree_iterator<T>::const_node_ptr n;
+        typedef typename ft::binary_tree_iterator<U>::const_node_ptr m;
+        return reinterpret_cast<n>(lhs.base()) == reinterpret_cast<m>(rhs.base());
     }
 
 	template <typename T, typename U>
