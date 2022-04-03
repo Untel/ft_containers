@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/18 19:02:40 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/03/31 20:29:48 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/04/03 19:21:53 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,7 @@ namespace ft {
         }
 
 		bool is_root() {
-			return parent->nil();
+			return this == sentry->parent;
 		}
         bool is_left() {
             return (parent->exist() && parent->left == this);
@@ -105,6 +105,151 @@ namespace ft {
         bool has_two_childs() {
             return (right->exist() && left->exist());
         }
+
+        void transplant(node_ptr with) {
+            MDBG("Transplanting " << *with);
+            if (parent->nil()) {
+                MDBG("2 " << *parent->right);
+                sentry->parent = with;
+            }  else if (this == parent->left) {
+                MDBG("3 " << *parent->right);
+                parent->left = with;
+            } else {
+                MDBG("4 " << *parent->right);
+                parent->right = with;
+            }
+            MDBG("Assign par " << *parent);
+
+            //In fact, we shall exploit the ability to assign to v.p when v point to nil.
+            // NO, because our NIL.parent == root in our case
+            // if (with->exist())
+            with->parent = parent;
+        }
+
+        node_ptr min_subtree() {
+            if (nil())
+                return this;
+            node_ptr l = this;
+            while (l->left->exist())
+                l = l->left;
+            return l;
+        }
+
+        node_ptr max_subtree() {
+            if (nil())
+                return this;
+            node_ptr r = this;
+            while (r->right->exist())
+                r = r->right;
+            return r;
+        }
+
+        // page 324, 17/31
+        void remove() {
+            MDBG("Start, sentry is " << *sentry);
+            node_ptr y = this;
+            node_ptr x;
+            Color origin = color;
+            if (left->nil()) {
+                x = right;
+                transplant(right);
+            } else if (right->nil()) {
+                x = left;
+                transplant(left);
+            } else {
+                y = right->min_subtree();
+                MDBG("Min subtree " << *y);
+                origin = y->color;
+                x = y->right;
+                MDBG("2, sentry is " << *sentry);
+                if (y->parent == this) {
+                    MDBG("y parent == this " << *y);
+                    x->parent = y;
+                }
+                else if (y->exist()) {
+                    MDBG("3, sentry is " << *sentry);
+                    MDBG("y parent != this " << *y);
+                    y->transplant(y->right);
+                    MDBG("after transpl" << *y);
+                    MDBG("4, sentry is " << *sentry);
+                    
+                    y->right = right;
+                    y->right->parent = y;
+                    MDBG("27 " << *y);
+                    MDBG("30" << *y->right);
+                    MDBG("5, sentry is " << *sentry);
+                }
+                transplant(y);
+                y->left = left;
+                y->left->parent = y;
+                y->color = color;
+
+                MDBG("Y is " << *y);
+                MDBG("X is " << *x);
+            }
+            if (origin == BLACK_NODE)
+                fixDelete(x);
+            MDBG("End, sentry is " << *sentry);
+        }
+
+        void fixDelete(node_ptr x) {
+            if (x->nil())
+                return ;
+            while (!x->is_root() && x->color == BLACK_NODE) {
+                if (x == x->parent->left) {
+                    node_ptr w = x->parent->right;
+                    if (w->color == RED_NODE) {
+                        w->color = BLACK_NODE;
+                        x->parent->color = RED_NODE;
+                        x->parent->rotateLeft();
+                        w = x->parent->right;
+                    }
+                    if (w->left->color == BLACK_NODE && w->right->color == BLACK_NODE) {
+                        w->color = RED_NODE;
+                        x = x->parent;
+                    } else {
+                        if (x->right->color == BLACK_NODE) {
+                            w->left->color = BLACK_NODE;
+                            w->color = RED_NODE;
+                            w->rotateRight();
+                            w = x->parent->right;
+                        }
+                        w->color = x->parent->color;
+                        x->parent->color = BLACK_NODE;
+                        w->right->color = BLACK_NODE;
+                        x->parent->rotateLeft();
+                        x = sentry->parent;
+                    }
+                }
+                else {
+                    node_ptr w = x->parent->left;
+                    if (w->color == RED_NODE) {
+                        w->color = BLACK_NODE;
+                        x->parent->color = RED_NODE;
+                        x->parent->rotateLeft();
+                        w = x->parent->right;
+                    }
+                    if (w->left->color == BLACK_NODE && w->right->color == BLACK_NODE) {
+                        w->color = RED_NODE;
+                        x = x->parent;
+                    } else {
+                        if (x->right->color == BLACK_NODE) {
+                            w->left->color = BLACK_NODE;
+                            w->color = RED_NODE;
+                            w->rotateRight();
+                            w = x->parent->right;
+                        }
+                        w->color = x->parent->color;
+                        x->parent->color = BLACK_NODE;
+                        w->right->color = BLACK_NODE;
+                        x->parent->rotateLeft();
+                        x = sentry->parent;
+                    }
+                }
+            }
+            x->color = BLACK_NODE;
+        }
+
         Childs has_childs() {
             if (is_leaf())
                 return NO_CHILDS;
