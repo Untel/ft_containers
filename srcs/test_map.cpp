@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/08 14:23:38 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/03/31 19:18:13 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/04/05 22:47:30 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@ void test_iterators() {
     m.insert(ft::make_pair(5, "lol"));
     m.insert(ft::make_pair(4, "lol"));
     m.insert(ft::make_pair(6, "lol"));
+	
     // m.insert(ft::make_pair(12, "lol"));
 
 	m.print();
@@ -96,6 +97,8 @@ void mescande_example() {
 
     m.insert(m.find(90), ft::make_pair(99, ""));
 	m.print();
+
+	// m.erase(110);
 	std::cout << "\n";
 }
 
@@ -148,10 +151,12 @@ void test_map_main(void) {
 		std::cout << "IS FT" << std::endl;
 	#endif
 
+	// test_iterators();
+
 	// insert_range<int, char>(20);
-	insert_test<int, std::string>(1, "yolo", "re");
+	// insert_test<int, std::string>(1, "yolo", "re");
 	// const_pair();
-	// mescande_example();
+	mescande_example();
 	// test_init_map();
 	// test_iterators();
 }

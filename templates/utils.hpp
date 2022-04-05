@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/18 15:18:01 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/03/22 02:22:28 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/04/05 23:40:08 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 
 # include <sstream>
 # include "term.hpp"
-# ifdef DEBUG
+# ifdef YOLO
     #define VDBG(...) std::cerr << "<Vector> " << YELLOW << __VA_ARGS__ << RESET << std::endl
     #define IDBG(...) std::cerr << "<Iterator> " << CYAN << __VA_ARGS__ << RESET << std::endl
     #define MDBG(...) std::cerr << "<Map> " << BOLDCYAN << __VA_ARGS__ << RESET << std::endl

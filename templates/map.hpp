@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/16 12:01:27 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/03/31 22:14:34 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/04/05 23:41:02 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -120,6 +120,7 @@ namespace ft {
 			}
 
             iterator begin() {
+				MDBG("Begin nig" << *_sentry);
                 return iterator(_sentry->left);
             }
             const_iterator begin() const {
@@ -150,62 +151,21 @@ namespace ft {
 
 			// helped from https://www.techiedelight.com/deletion-from-bst/
 			void _erase(node_ptr node) {
+				MDBG("Pre Before delete " << *node << " sentry: " << *_sentry);
 				if (node == _sentry->left)
-					_sentry->left = node->parent;
+					_sentry->left = node->parent->exist() ? node->parent : node->right;
 				if (node == _sentry->right)
-					_sentry->right = node->parent;
-				if (node->is_leaf()) {
-					MDBG("Deleting case 1");
-					// case 1
-					if (!node->is_root()) {
-						if (node->is_left())
-							node->parent->left = _sentry;
-						else
-							node->parent->right = _sentry;
-					} else
-						_sentry->parent = _sentry;
-				} else if (node->has_one_childs()) {
-					MDBG("Deleting case 2");
-					node_ptr child = node->get_uniq_child();
-					if (node->is_root()) {
-						_sentry->parent = child;
-						child->parent = _sentry;
-					} else {
-						if (node->is_left()) {
-							node->parent->left = child;
-						} else if (node->is_right()) {
-							node->parent->right = child;
-						}
-						child->parent = node->parent;
-					}
-				} else if (node->has_two_childs()) {
-					MDBG("Deleting case 2");
-					node_ptr next = node->getNext();
-					node_ptr next_parent = next->parent;
-
-					if (node != next_parent) {
-						MDBG("2.a");
-						next_parent->left = next->right;
-						next->right->parent = next_parent;
-					} else {
-						MDBG("2.b");
-						if (next->right->exist()) {
-							MDBG("2.b.a");
-							next->right->parent = node;
-						}
-						node->right = next->right;
-					}
-					// Vu qu'on switch les data et pas les nodes, attention à la sentinelle
-					if (_sentry->right == next) {
-						MDBG("2.c");
-						_sentry->right = node;
-					}
-					MDBG("Replace next " << *next << " with " << *node);
-					std::swap(next->data, node->data);
-					node = next;
+					_sentry->right = node->parent->exist() ? node->parent : node->left;
+				MDBG("Before delete " << *node << " sentry: " << *_sentry);
+				if (_size > 1)
+					_unlink_node(node);
+				else {
+					_root = _sentry;
 				}
-				_size--;
+				MDBG("After delete " << *node << " sentry: " << *_sentry);
+
 				_delete_node(node);
+				_size--;
 			}
 
 			size_type erase(const key_type & k) {
@@ -251,7 +211,7 @@ namespace ft {
 				node->parent = parent;
 				switch (pos) {
 					case NO_ELEMS:
-						_sentry->parent = node;
+						_root = node;
 						node->parent = _sentry;
 						_sentry->right = node;
 						_sentry->left = node;
@@ -281,13 +241,13 @@ namespace ft {
 					return ft::make_pair(iterator(parent), false);
 				node_ptr node = _new_node(val);
 				_attach(parent, node, found.second);
-				node->fixViolation();
-				_sentry->parent->color = BLACK_NODE;
+				_fixViolation(node);
+				_root->color = BLACK_NODE;
 				return ft::make_pair<iterator, bool>(iterator(node), true);
 			}
 
 			pair<iterator, bool> insert(const value_type & val) {
-				return (_insert(val, _root()));
+				return (_insert(val, _root));
 			}
 
 			template <class InputIterator>
@@ -310,7 +270,7 @@ namespace ft {
 				} else if (base == _sentry->left && _comp_values(val, *base->data)) {
 					return _insert(val, base).first;
 				}
-				return _insert(val, _root()).first;
+				return _insert(val, _root).first;
 			}
 
 			size_type 			count(const key_type & k) const { return (find(k) != (end())); }
@@ -401,7 +361,7 @@ namespace ft {
 				std::cout << "size: " << this->size() << std::endl;
 				std::cout << "Sentry left: " << *_sentry->left << std::endl;
 				std::cout << "Sentry right: " << *_sentry->right << std::endl;
-				print(_root());
+				print(_root);
 			}
 
 			void _print(node_ptr node, std::stringstream &buffer, bool isTail, std::string prefix)
@@ -422,11 +382,9 @@ namespace ft {
 			key_compare					_comp_keys;
             allocator_type              _allocator;
 			node_ptr					_sentry;
+			node_ptr					_root;
 			size_type					_size;
 
-			node_ptr _root() const {
-				return _sentry->parent;
-			}
 
 			node_ptr _init_sentry(void) {
 				_sentry = new node_type();
@@ -437,6 +395,7 @@ namespace ft {
 				_sentry->left = _sentry;
 				_sentry->parent = _sentry;
 				_sentry->sentry = _sentry;
+				_root = _sentry;
 				return _sentry;
 			}
 
@@ -450,6 +409,193 @@ namespace ft {
 				return node;
 			}
 
+			void _unlink_node(node_ptr node) {
+				node_ptr y = node;
+				node_ptr x;
+				Color origin = node->color;
+				if (node->left->nil()) {
+					x = node->right;
+					_transplant(node, node->right);
+				} else if (node->right->nil()) {
+					x = node->left;
+					_transplant(node, node->left);
+				} else {
+					y = node->right->min_subtree();
+					origin = y->color;
+					x = y->right;
+					if (y->parent == node) {
+						x->parent = y;
+					}
+					else {
+						_transplant(y, y->right);
+						y->right = node->right;
+						y->right->parent = y;
+					}
+					_transplant(node, y);
+					y->left = node->left;
+					y->left->parent = y;
+					y->color = node->color;
+				}
+				if (origin == BLACK_NODE)
+					_fixDelete(x);
+			}
+
+			void _rotateLeft(node_ptr node) {
+				node_ptr right_node = node->right;
+			
+				node->right = right_node->left;
+				if (node->right->exist())
+					node->right->parent = node;
+				right_node->parent = node->parent;
+				if (node->is_root()) {
+					_root = right_node;
+				}
+				else if (node == node->parent->left)
+					node->parent->left = right_node;
+				else
+					node->parent->right = right_node;
+				right_node->left = node;
+				node->parent = right_node;
+			}
+			void _rotateRight(node_ptr node) {
+				node_ptr left_node = node->left;
+			
+				node->left = left_node->right;        
+				if (node->left != _sentry)
+					node->left->parent = node;
+				left_node->parent = node->parent;
+				if (node == _root)
+					_root = left_node;
+				else if (node == node->parent->left)
+					node->parent->left = left_node;
+				else
+					node->parent->right = left_node;
+				left_node->right = node;
+				node->parent = left_node;
+			}
+
+			void _fixViolation(node_ptr node) {
+				node_ptr parent_node = _sentry;
+				node_ptr grand_parent_node = _sentry;
+
+				while (
+					(!node->is_root()) &&
+					(node->color != BLACK_NODE) &&
+					(node->parent->color == RED_NODE)
+				) {
+					parent_node = node->parent;
+					grand_parent_node = node->grand_parent();
+					if (parent_node == grand_parent_node->left) {
+						node_ptr uncle_pt = grand_parent_node->right;
+						if (uncle_pt->exist() && uncle_pt->color == RED_NODE) {
+							grand_parent_node->color = RED_NODE;
+							parent_node->color = BLACK_NODE;
+							uncle_pt->color = BLACK_NODE;
+							node = grand_parent_node;
+						} else {
+							if (node->is_right()) {
+								_rotateLeft(parent_node);
+								node = parent_node;
+								parent_node = node->parent;
+							}
+							_rotateRight(grand_parent_node);
+							std::swap(parent_node->color, grand_parent_node->color);
+							node = parent_node;
+						}
+					} else {
+						node_ptr uncle_pt = grand_parent_node->left;
+						if (uncle_pt->exist() && (uncle_pt->color == RED_NODE)) {
+							grand_parent_node->color = RED_NODE;
+							parent_node->color = BLACK_NODE;
+							uncle_pt->color = BLACK_NODE;
+							node = grand_parent_node;
+						} else {
+							if (node == parent_node->left) {
+								_rotateRight(parent_node);
+								node = parent_node;
+								parent_node = node->parent;
+							}
+							_rotateLeft(grand_parent_node);
+							std::swap(parent_node->color, grand_parent_node->color);
+							node = parent_node;
+						}
+					}
+				}
+			}
+
+			void _fixDelete(node_ptr x) {
+				while (!x->is_root() && x->color == BLACK_NODE) {
+					if (x == x->parent->left) {
+						node_ptr w = x->parent->right;
+						if (w->color == RED_NODE) {
+							w->color = BLACK_NODE;
+							x->parent->color = RED_NODE;
+							_rotateLeft(x->parent);
+							w = x->parent->right;
+						}
+						if (w->left->color == BLACK_NODE && w->right->color == BLACK_NODE) {
+							w->color = RED_NODE;
+							x = x->parent;
+						} else {
+							if (x->right->color == BLACK_NODE) {
+								w->left->color = BLACK_NODE;
+								w->color = RED_NODE;
+								_rotateRight(w);
+								w = x->parent->right;
+							}
+							w->color = x->parent->color;
+							x->parent->color = BLACK_NODE;
+							w->right->color = BLACK_NODE;
+							_rotateLeft(x->parent);
+							x = _root;
+						}
+					}
+					else {
+						node_ptr w = x->parent->left;
+						if (w->color == RED_NODE) {
+							w->color = BLACK_NODE;
+							x->parent->color = RED_NODE;
+							_rotateRight(x->parent);
+							w = x->parent->left;
+						}
+						if (w->right->color == BLACK_NODE && w->left->color == BLACK_NODE) {
+							w->color = RED_NODE;
+							x = x->parent;
+						} else {
+							if (x->left->color == BLACK_NODE) {
+								w->right->color = BLACK_NODE;
+								w->color = RED_NODE;
+								_rotateLeft(w);
+								w = x->parent->left;
+							}
+							w->color = x->parent->color;
+							x->parent->color = BLACK_NODE;
+							w->left->color = BLACK_NODE;
+							_rotateRight(x->parent);
+							x = _root;
+						}
+					}
+				}
+				x->color = BLACK_NODE;
+			}
+
+
+			void _transplant(node_ptr node, node_ptr with) {
+				MDBG("Transplanting " << *node << " with " << *with << " Size left " << _size);
+				if (node == _root) {
+					MDBG("2 " << *node->parent->right);
+					_root = with;
+					//todo
+				}  else if (node->is_left()) {
+					MDBG("3 " << *node->parent->right);
+					node->parent->left = with;
+				} else {
+					MDBG("4 " << *node->parent->right);
+					node->parent->right = with;
+				}
+				with->parent = node->parent;
+			}
+
 			void _delete_node(node_ptr node) {
 				_allocator.destroy(node->data);
 				_allocator.deallocate(node->data, 1);
@@ -457,7 +603,7 @@ namespace ft {
 			}
 
 			ft::pair<node_ptr, NodeFinder> _find(const key_type & k) const {
-				return _find(k, _root());
+				return _find(k, _root);
 			}
 
 			ft::pair<node_ptr, NodeFinder> _find(const key_type & k, node_ptr from) const {
