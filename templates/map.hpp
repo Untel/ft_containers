@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/16 12:01:27 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/04/05 23:41:02 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/04/06 22:05:50 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,8 +17,8 @@
 # include <stdexcept>
 # include "utils.hpp"
 # include "pair.hpp"
+# include "common.hpp"
 # include "rbt_node.hpp"
-// # include "rbtree.hpp"
 # include "binary_tree_iterator.hpp"
 
 namespace ft {
@@ -346,36 +346,36 @@ namespace ft {
 				x._size = tmp_size;
             }
 
-			void	print(node_ptr node)
-			{
-				std::stringstream	buffer;
+			#ifdef DEBUG
+				void	print(node_ptr node)
+				{
+					std::stringstream	buffer;
 
-				if (node->exist()) {
-					_print(node, buffer, true, "");
-					std::cout << buffer.str();
+					if (node->exist()) {
+						_print(node, buffer, true, "");
+						std::cout << buffer.str();
+					}
 				}
-			}
 
-			// #ifdef DEBUG
-			void	print(void) {
-				std::cout << "size: " << this->size() << std::endl;
-				std::cout << "Sentry left: " << *_sentry->left << std::endl;
-				std::cout << "Sentry right: " << *_sentry->right << std::endl;
-				print(_root);
-			}
+				void	print(void) {
+					std::cout << "size: " << this->size() << std::endl;
+					std::cout << "Sentry left: " << *_sentry->left << std::endl;
+					std::cout << "Sentry right: " << *_sentry->right << std::endl;
+					print(_root);
+				}
 
-			void _print(node_ptr node, std::stringstream &buffer, bool isTail, std::string prefix)
-			{
-				if (node->right->exist())
-					this->_print(node->right, buffer, false, std::string(prefix).append(isTail ? "│   " : "    "));
-				buffer << prefix << (isTail ? "└── " : "┌── ");
-				if (node->color == RED_NODE)
-					buffer << "\033[31m";
-				buffer << *(node->data) << "\033[0m" << (node->is_leaf() ? "🌱" : "") << std::endl;
-				if (node->left->exist())
-					this->_print(node->left, buffer, true, std::string(prefix).append(isTail ? "    " : "│   "));
-			}
-			// #endif
+				void _print(node_ptr node, std::stringstream &buffer, bool isTail, std::string prefix)
+				{
+					if (node->right->exist())
+						this->_print(node->right, buffer, false, std::string(prefix).append(isTail ? "│   " : "    "));
+					buffer << prefix << (isTail ? "└── " : "┌── ");
+					if (node->color == RED_NODE)
+						buffer << "\033[31m";
+					buffer << *(node->data) << "\033[0m" << (node->is_leaf() ? "🌱" : "") << std::endl;
+					if (node->left->exist())
+						this->_print(node->left, buffer, true, std::string(prefix).append(isTail ? "    " : "│   "));
+				}
+			#endif
 
 	    private:
 			value_compare				_comp_values;

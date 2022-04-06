@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/18 15:09:35 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/03/29 17:32:12 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/04/06 22:06:19 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 # include <string>
 # include <iostream>
 # include <queue>
-# include "awesome.hpp"
+# include "utils.hpp"
 
 # ifdef STL
     #  include <map>
@@ -27,7 +27,6 @@
     #  include "vector.hpp"
     #  include "map.hpp"
     #  include "stack.hpp"
-    #  include "utils.hpp"
 # endif
 
 // void        test_vector_main(void);

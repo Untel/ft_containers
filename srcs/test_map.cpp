@@ -6,12 +6,41 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/08 14:23:38 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/04/05 22:47:30 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/04/06 22:04:25 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "tester.hpp"
 #include <list>
+
+template <class key, class value>
+void    print_map( ft::map<key, value> &test)
+{
+    size_t i = 0;
+    typename  ft::map<key, value>::const_iterator        beg = test.begin();
+    typename  ft::map<key, value>::const_iterator        end = test.end();
+    typename  ft::map<key, value>::const_reverse_iterator        rbeg = test.rbegin();
+    typename  ft::map<key, value>::const_reverse_iterator        rend = test.rend();
+    std::cout << "size : " << test.size() << std::endl;
+    for (typename  ft::map<key, value>::const_iterator it = beg; it != end; it++)
+    {
+        std::cout << "\"" << it->first << "\" : " << it->second;
+        if (i % 5 == 4 || i == test.size() - 1)
+            std::cout << std::endl;
+        else
+            std::cout << " - ";
+        i++;
+    }
+    for (typename  ft::map<key, value>::const_reverse_iterator it = rbeg; it != rend; it++)
+    {
+        std::cout << "\"" << it->first << "\" : " << it->second;
+        if (i % 5 == 4 || i == test.size() - 1)
+            std::cout << std::endl;
+        else
+            std::cout << " - ";
+        i++;
+    }
+}
 
 void test_iterators() {
 	ft::map<int, std::string> m;
@@ -24,19 +53,15 @@ void test_iterators() {
 	
     // m.insert(ft::make_pair(12, "lol"));
 
-	m.print();
+	MAP_PRINT(m);
 	m.erase(5);
-	m.print();
+	MAP_PRINT(m);
 
 
 	ft::map<int, std::string>::iterator it = m.begin();
 	ft::map<int, std::string>::iterator ite = m.end();
-
-	std::cout << "YOOO\n\n\n";
-	std::cout << "Lol" << *it << std::endl;
-	std::cout << "aj" << *ite << std::endl;
 	for (; it != ite; it++) {
-		std::cout << "Iter " << *it << std::endl;
+		std::cout << "Iter " << it->second << std::endl;
 	}
 }
 
@@ -54,8 +79,8 @@ void test_init_map() {
     m.insert(ft::make_pair(147, ""));
     m.insert(m.find(5547), ft::make_pair(6063, ""));
 	// m[1] = "yolo";
-	m.print();
-	// m.print();
+	MAP_PRINT(m);
+	// MAP_PRINT(m);
 	std::cout << "\n";
 }
 
@@ -78,12 +103,12 @@ void mescande_example() {
     m.insert(ft::make_pair(120, ""));
 
 	m[10] = "yolo";
-	m.print();
+	MAP_PRINT(m);
     m.insert(m.find(110), ft::make_pair(105, ""));
-	m.print();
+	MAP_PRINT(m);
 
     m.insert(m.find(105), ft::make_pair(102, ""));
-	m.print();
+	MAP_PRINT(m);
 	m.insert(m.begin(), ft::make_pair(9, ""));
 	m.insert(m.begin(), ft::make_pair(8, ""));
 	m.insert(m.begin(), ft::make_pair(7, ""));
@@ -93,10 +118,10 @@ void mescande_example() {
 	m.insert(m.begin(), ft::make_pair(3, ""));
 	m.insert(m.begin(), ft::make_pair(2, ""));
 	m.insert(m.begin(), ft::make_pair(1, ""));
-	m.print();
+	MAP_PRINT(m);
 
     m.insert(m.find(90), ft::make_pair(99, ""));
-	m.print();
+	MAP_PRINT(m);
 
 	// m.erase(110);
 	std::cout << "\n";
@@ -109,21 +134,6 @@ void const_pair() {
 	f = s;
 	const ft::pair<int, std::string> y(f);
 }
-
-// template <class K, class V>
-// void insert_range(int size) {
-// 	std::list<ft::pair<K, V> > lst;
-
-// 	for (int i = 1; i < size + 1; i++)
-// 		lst.push_back(ft::pair<K, V>(K(i), V(i * 3)));
-	
-// 	ft::map<K, V> m;
-// 	m.insert((lst.begin(), lst.end()));
-// 	ft::map<K, V>::iterator it = m.begin();
-// 	ft::map<K, V>::iterator ite = m.end();
-// 	for (; it != ite; it++)
-// 		std::cout << "R " << it->first << " | " << it->second << std::endl;
-// }
 
 template <class K, class V>
 void insert_test(K a, V b, V c) {
@@ -141,22 +151,34 @@ void insert_test(K a, V b, V c) {
 	ins = m.insert(ft::make_pair<K, V>(a, c));
 	it = ins.first;
 	std::cout << "Reinsert " << ins.second << " :: " << it->first << " value: " << it->second << std::endl;
+}
 
+void                            massive_tests()
+{
+    std::cout << std::endl << "MASSIVE TESTS" << std::endl;
+    ft::map<int, std::string> *test2 = new ft::map<int, std::string>();
+    std::string str;
+    for (int i = 0; i < 50000; i++)
+    {
+        test2->insert(ft::make_pair<int, std::string>(i, toString(i)));
+    }
+    print_map<int, std::string>(*test2);
+    for (int i = 49999; i >= 0; i--)
+        std::cout << (*test2)[i] << std::endl;
+    for (int i = 0; i < 50000; i++)
+        std::cout << (*test2)[i] << std::endl;
+    delete test2;
 }
 
 void test_map_main(void) {
-	#ifdef STL
-		std::cout << "IS STL" << std::endl;
-	#else
-		std::cout << "IS FT" << std::endl;
-	#endif
 
 	// test_iterators();
 
 	// insert_range<int, char>(20);
 	// insert_test<int, std::string>(1, "yolo", "re");
 	// const_pair();
-	mescande_example();
+	// mescande_example();
 	// test_init_map();
 	// test_iterators();
+	massive_tests();
 }
