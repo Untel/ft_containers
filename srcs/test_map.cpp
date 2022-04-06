@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/08 14:23:38 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/04/06 23:47:33 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/04/06 23:48:25 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,10 +17,10 @@ template <class key, class value>
 void    print_map( ft::map<key, value> &test)
 {
     size_t i = 0;
-    typename  ft::map<key, value>::const_iterator        beg = test.begin();
-    typename  ft::map<key, value>::const_iterator        end = test.end();
-    typename  ft::map<key, value>::const_reverse_iterator        rbeg = test.rbegin();
-    typename  ft::map<key, value>::const_reverse_iterator        rend = test.rend();
+    typename  ft::map<key, value>::const_iterator                   beg = test.begin();
+    typename  ft::map<key, value>::const_iterator                   end = test.end();
+    typename  ft::map<key, value>::const_reverse_iterator           rbeg = test.rbegin();
+    typename  ft::map<key, value>::const_reverse_iterator           rend = test.rend();
     std::cout << "size : " << test.size() << std::endl;
     for (typename  ft::map<key, value>::const_iterator it = beg; it != end; it++)
     {
