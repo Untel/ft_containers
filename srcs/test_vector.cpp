@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/18 15:09:31 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/04/06 23:46:54 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/04/07 00:01:49 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -121,14 +121,15 @@ void comp() {
   ft::vector<int> bar (2,200);   // two ints with a value of 200
 
   if (foo==bar) std::cout << "foo and bar are equal\n";
-//   if (foo!=bar) std::cout << "foo and bar are not equal\n";
-//   if (foo< bar) std::cout << "foo is less than bar\n";
-//   if (foo> bar) std::cout << "foo is greater than bar\n";
-//   if (foo<=bar) std::cout << "foo is less than or equal to bar\n";
-//   if (foo>=bar) std::cout << "foo is greater than or equal to bar\n";
+  if (foo!=bar) std::cout << "foo and bar are not equal\n";
+  if (foo< bar) std::cout << "foo is less than bar\n";
+  if (foo> bar) std::cout << "foo is greater than bar\n";
+  if (foo<=bar) std::cout << "foo is less than or equal to bar\n";
+  if (foo>=bar) std::cout << "foo is greater than or equal to bar\n";
 }
 
-void revite() {
+void
+	revite() {
 	const int size = 5;
 	ft::vector<int> vct(size);
 	ft::vector<int>::reverse_iterator it = vct.rbegin();
@@ -162,6 +163,20 @@ void revite() {
 	std::cout << "(const_ite - it): " << (ite - it) << std::endl;
 }
 
+void
+	massive_tests_vector()
+{
+    std::cout << std::endl << "MASSIVE TESTS" << std::endl;
+    ft::vector<std::string> test2;
+    for (int i = 0; i < 50000; i++) {
+        test2.push_back(toString(i).append(" yo"));
+    }
+    for (int i = 49999; i >= 0; i--)
+        std::cout << test2[i] << std::endl;
+    for (int i = 0; i < 50000; i++)
+        std::cout << test2[i] << std::endl;
+}
+
 void test_vector_main(void) {
 	test_push_back();
 	test_push_list();
@@ -169,4 +184,7 @@ void test_vector_main(void) {
 	plus_iterator();
 	comp();
 	revite();
+    #ifdef RUN_PERF
+	    massive_tests_vector();
+    #endif
 }
