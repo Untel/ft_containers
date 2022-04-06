@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/16 12:01:27 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/04/06 22:05:50 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/04/06 22:19:16 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -254,7 +254,6 @@ namespace ft {
   			void insert(
 				InputIterator first,
 				InputIterator last
-                // typename enable_if <!is_integral <InputIterator>::value, InputIterator >::type last
 			) {
 				while (first != last) {
 					insert(*first);
@@ -581,16 +580,11 @@ namespace ft {
 
 
 			void _transplant(node_ptr node, node_ptr with) {
-				MDBG("Transplanting " << *node << " with " << *with << " Size left " << _size);
 				if (node == _root) {
-					MDBG("2 " << *node->parent->right);
 					_root = with;
-					//todo
 				}  else if (node->is_left()) {
-					MDBG("3 " << *node->parent->right);
 					node->parent->left = with;
 				} else {
-					MDBG("4 " << *node->parent->right);
 					node->parent->right = with;
 				}
 				with->parent = node->parent;
@@ -628,14 +622,12 @@ namespace ft {
 
 	template <class K, class V, class Cmp, class Alc>
     bool operator == (const ft::map<K,V,Cmp,Alc> & lhs, const ft::map<K,V,Cmp,Alc> & rhs) {
-        VDBG("lhs == rhs");
         if (lhs.size() != rhs.size())
             return false;
         return ft::equal(lhs.begin(), lhs.end(), rhs.begin());
     }
     template <class K, class V, class Cmp, class Alc>
     bool operator != (const ft::map<K,V,Cmp,Alc>& lhs, const ft::map<K,V,Cmp,Alc>& rhs) {
-        VDBG("lhs != rhs");
         return (!(lhs == rhs));
     }
     template <class K, class V, class Cmp, class Alc>

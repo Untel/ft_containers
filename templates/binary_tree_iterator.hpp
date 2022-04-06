@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/19 19:48:57 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/03/31 21:40:58 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/04/06 22:16:39 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,15 +18,9 @@
 
 namespace ft
 {
-    /**
-     * @brief 
-     * @see https://cplusplus.com/reference/iterator/RandomAccessIterator/
-     * @todo For mutable iterators (non-constant iterators): Can be dereferenced as an lvalue (if in a dereferenceable state).
-     */
     template < class T >
     class binary_tree_iterator : public std::iterator<std::bidirectional_iterator_tag, T>
     {
-        // typedef typename
         public:
             typedef ptrdiff_t                           	    difference_type;
             typedef T                                   	    value_type;
@@ -53,49 +47,36 @@ namespace ft
                     reinterpret_cast<const_node_ptr>(_p)
                 ));
             }
-// RBTNode<ft::pair<const int, foo<int> > > *
-// binary_tree_iterator<const pair<const int, foo<int> > >
-
-            // maybe return void *a = t
-            // binary_tree_iterator & operator = (reference val) { *this->_p = val; return *this; }
             ~binary_tree_iterator(void) {}
        
             binary_tree_iterator & operator ++ (void) {
                 if (_p->nil()) {
-                    // std::cout << "-- sentry, reset to right most\n";
                     _p = _p->left;
                 } else
                     _p = _p->getNext();
                 return (*this);
             }
             binary_tree_iterator operator ++ (int) {
-                //IDBG("2 ++");
                 binary_tree_iterator tmp(*this); operator++(); return tmp;
             }
             binary_tree_iterator & operator -- (void) {
                 // Si le courant == end() == la sentry, alors on set automatiquement à _sentry->right qui est le max value
-                
                 if (_p->nil()) {
-                    // std::cout << "-- sentry, reset to right most\n";
                     _p = _p->right;
                 } else
                     _p = _p->getPrev();
                 return (*this);
             }
             binary_tree_iterator operator -- (int) {
-                //IDBG("2 --");
                 binary_tree_iterator tmp(*this); operator--(); return tmp;
             }
             reference operator * () const {
-                //IDBG("* " << *(this->_p->data));
                 return *(this->_p->data);
             }
 
             pointer operator -> () const { return _p->data; }
 
             node_ptr base() const { return _p; }
-// ft::binary_tree_iterator<ft::pair<const int, std::__cxx11::basic_string<char> > >&
-// ft::binary_tree_iterator<ft::pair<const int, std::__cxx11::basic_string<char> > >
         private:
             node_ptr           _p;
 
@@ -106,7 +87,6 @@ namespace ft
         const ft::binary_tree_iterator<T> & lhs,
         const ft::binary_tree_iterator<T> & rhs
     ) {
-        //IDBG("T == T");
         typedef typename ft::binary_tree_iterator<T>::const_node_ptr n;
         return reinterpret_cast<n>(lhs.base()) == reinterpret_cast<n>(rhs.base());
     }

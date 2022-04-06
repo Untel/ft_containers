@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/07 16:22:03 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/04/05 22:45:22 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/04/06 22:20:02 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,30 +30,6 @@ namespace ft {
                 second = pr.second;
                 return *this;
             };
-
-            // operator pair<const T1, T2>(void) const {
-            //     return (pair<const T1, T2>(first, second));
-            // }
-
-            // template <class U, class K>
-            // operator pair<U, K>(void) const {
-            //     DBG("static cast");
-            //     return (pair<U, K>(
-            //         static_cast<U>(first),
-            //         static_cast<K>(second)
-            //     ));
-            // }
-
-            // void swap (pair & x) {
-            //     size_type   tmp_first   = first;
-            //     size_type   tmp_second  = second;
-
-            //     first                   = x.first;
-            //     second                  = x.second;
-
-            //     x.first                 = tmp_first;
-            //     x.second                = tmp_second;
-            // }
     };
 
     template <class T1, class T2>
@@ -85,9 +61,11 @@ namespace ft {
 		return ( pair<T1,T2>(x,y) );
 	}
 
-    template <class T1, class T2>
-    std::ostream & operator << (std::ostream & o, ft::pair<T1, T2> const & pr){
-        o << "(" << pr.first << ") " << pr.second; 
-	    return o;
-    }
+    #ifdef DEBUG
+        template <class T1, class T2>
+        std::ostream & operator << (std::ostream & o, ft::pair<T1, T2> const & pr){
+            o << "(" << pr.first << ") " << pr.second; 
+            return o;
+        }
+    #endif
 }

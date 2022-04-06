@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/16 12:00:27 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/04/06 21:55:16 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/04/06 22:11:57 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 
 int main(void)
 {
-    // test_vector_main();
+    test_vector_main();
     test_map_main();
     return (0);
 }

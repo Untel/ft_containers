@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/18 19:02:40 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/04/05 23:27:16 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/04/06 22:20:15 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -177,16 +177,18 @@ namespace ft {
         }
     };
 
-    template <class T>
-    std::ostream & operator << (std::ostream & o, RBTNode<T> const & n) {
-        if (n.color == BLACK_NODE)
-            o << BLACK;
-        else
-            o << RED;
-        o << "Node(" << *n.data << ")";
-        o << " - L( " << (n.left->data->first) << " )" << " R( " << (n.right->data->first) << " )";
-        o << RESET;
-	    return o;
-    }
+    #ifdef DEBUG
+        template <class T>
+        std::ostream & operator << (std::ostream & o, RBTNode<T> const & n) {
+            if (n.color == BLACK_NODE)
+                o << BLACK;
+            else
+                o << RED;
+            o << "Node(" << *n.data << ")";
+            o << " - L( " << (n.left->data->first) << " )" << " R( " << (n.right->data->first) << " )";
+            o << RESET;
+            return o;
+        }
+    #endif
 }
 #endif

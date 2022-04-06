@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/16 12:01:27 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/04/06 22:05:37 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/04/06 22:34:00 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -106,7 +106,6 @@ namespace ft {
                 insert(end(), 1, val);
             }
             void pop_back() {
-                VDBG("Poping back");
                 erase(end() - 1);
             }
             iterator insert (iterator position, const value_type & val) {
@@ -121,7 +120,6 @@ namespace ft {
                 _buildMemoryHole(n_to_insert, position);
                 for (size_type i = 0; i < n_to_insert; i++)
                     _allocator.construct(_c + at + i, val);
-                // __VECTOR_INSERT(val, val);
             }
             
             template <class InputIterator>
@@ -152,14 +150,12 @@ namespace ft {
                 // Cf. problème de memset dans libft (gauche a droite et pas droite a gauche)
                 iterator it = first + n;
                 for (; it != e; it++) {
-                    VDBG("Erasing " << *it << " with " << *(it - n) );
                     *(it - n) = *(it); // assigner de n elements vers la gauche
                 }
                 it = end();
                 // détruire les n éléments en partant du iterator end()
                 // on ne détruit pas les éléments qu'on a érase, mais ceux a la fin du ctn, qui on été réassigné a la boucle précédente
                 for (; it != end(); it++) {
-                    VDBG("Destroying " << *it);
                     _allocator.destroy(&(*it));
                 }
                 _size -= n;
@@ -169,10 +165,8 @@ namespace ft {
             // will probably just call insert ??
             void resize (size_type n, value_type val = value_type()) {
                 if (n < _size) {
-                    VDBG("Resizing: deletion");
                     erase(begin() + n, end());
                 } else {
-                    VDBG("Resizing: addition");
                     insert(end(), n - _size, val);
                 }
             }
@@ -216,7 +210,6 @@ namespace ft {
                     throw std::length_error("Length error");
                 } else if (new_cap > _capacity) {
                     size_type s = _size;
-                    VDBG("Reallocating " << new_cap);
                     pointer tmp = _allocator.allocate(new_cap + 1);
                     for (size_type i = 0; i < _size; i++)
                         _allocator.construct(tmp + i, _c[i]);
@@ -228,7 +221,6 @@ namespace ft {
             }
 
             void clear(void) {
-                VDBG("Clearing actual container");
                 erase(begin(), end());
             }
 
@@ -247,34 +239,28 @@ namespace ft {
             }
 
             iterator begin() {
-                VDBG("Begin iterator");
                 return iterator(_c);
             }
             const_iterator begin() const {
                 return const_iterator(_c);
             }
             iterator end() {
-                VDBG("End iterator");
                 return iterator(_c + _size);
             }
             const_iterator end() const {
-                VDBG("Const End iterator");
                 return const_iterator(_c + _size);
             }
 
             reverse_iterator rbegin() {
-                VDBG("Begin reverse_iterator");
                 return reverse_iterator(end());
             }
             const_reverse_iterator rbegin() const {
                 return const_reverse_iterator(end());
             }
             reverse_iterator rend() {
-                VDBG("End reverse_iterator");
                 return reverse_iterator(begin());
             }
             const_reverse_iterator rend() const {
-                VDBG("Const End reverse_iterator");
                 return const_reverse_iterator(begin());
             }
 
@@ -285,7 +271,6 @@ namespace ft {
             pointer                     _c;
 
             void _clean(void) {
-                VDBG(MAGENTA << "CLEARING " << _c << RESET);
                 clear();
                 _allocator.deallocate(_c, _capacity + 1);
                 _capacity = 0;
@@ -325,14 +310,12 @@ namespace ft {
 
     template <class T, class Alloc>
     bool operator == (const vector<T,Alloc> & lhs, const vector<T,Alloc> & rhs) {
-        VDBG("lhs == rhs");
         if (lhs.size() != rhs.size())
             return false;
         return ft::equal(lhs.begin(), lhs.end(), rhs.begin());
     }
     template <class T, class Alloc>
     bool operator != (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs) {
-        VDBG("lhs != rhs");
         return (!(lhs == rhs));
     }
     template <class T, class Alloc>
