@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/08 14:23:38 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/04/06 22:13:11 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/04/06 23:47:33 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -171,9 +171,6 @@ void                            massive_tests()
 }
 
 void test_map_main(void) {
-
-
-	// insert_range<int, char>(20);
 	test_iterators();
 	insert_test<int, std::string>(1, "yolo", "re");
 	const_pair();

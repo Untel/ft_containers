@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/18 15:09:31 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/03/04 07:59:53 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/04/06 23:46:54 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -137,8 +137,7 @@ void revite() {
 
 	for (int i = 0; i < size; ++i) {
 		it[i] = (size - i) * 5;
-		std::cout << "Insert at " << i << " value "
-			<< it[i] << " should be " << (size - i) * 5 << std::endl;
+		std::cout << "Insert at " << i << " value " << it[i] << " should be " << (size - i) * 5 << std::endl;
 	}
 
 	ft::vector<int>::iterator nit = vct.begin();
@@ -164,15 +163,10 @@ void revite() {
 }
 
 void test_vector_main(void) {
-	#ifdef STL
-		std::cout << "IS STL" << std::endl;
-	#else
-		std::cout << "IS FT" << std::endl;
-	#endif
-	// test_push_back();
-	// test_push_list();
-	// test_erase();
-	// plus_iterator();
-	// comp();
+	test_push_back();
+	test_push_list();
+	test_erase();
+	plus_iterator();
+	comp();
 	revite();
 }
