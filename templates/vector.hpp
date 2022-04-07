@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/16 12:01:27 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/04/07 00:11:10 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/04/07 19:49:40 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,6 +60,7 @@ namespace ft {
                 *this = cpy;
             }
             vector & operator = ( const vector &cpy) {
+                _clean();
                 _size = cpy._size;
                 _capacity = cpy._capacity;
                 _allocator = cpy._allocator;

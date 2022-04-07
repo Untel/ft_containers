@@ -6,7 +6,7 @@
 #    By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/01/13 16:35:21 by adda-sil          #+#    #+#              #
-#    Updated: 2022/04/07 00:49:22 by adda-sil         ###   ########.fr        #
+#    Updated: 2022/04/07 17:34:31 by adda-sil         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -39,7 +39,7 @@ INCLUDES			= -I . -I $(HEAD_DIR) -I $(TEMPLATE_DIR)
 LIBS				= 
 CXX					= c++
 OPTS				=
-CXXFLAGS			= -std=c++98 -Wall -Wextra -Werror ${OPTS} $(INCLUDES) -MMD #-g3 -fsanitize=address
+CXXFLAGS			= -std=c++98 -Wall -Wextra -Werror ${OPTS} $(INCLUDES) -MMD -g3 -fsanitize=address
 OBJS				= $(SRCS:.cpp=.o)
 NAME				= containers
 ARGS				= 

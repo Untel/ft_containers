@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/16 12:01:27 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/04/06 23:45:00 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/04/07 19:43:41 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -105,6 +105,8 @@ namespace ft {
 				insert(cpy.begin(), cpy.end());
 			}
 			map & operator = ( const map &cpy) {
+				clear();
+				_delete_node(_sentry);
 				_size = 0;
 				_allocator = cpy._allocator;
 				_comp_keys = cpy._comp_keys;
@@ -147,17 +149,26 @@ namespace ft {
 
 			// helped from https://www.techiedelight.com/deletion-from-bst/
 			void _erase(node_ptr node) {
+				MDBG("DELETING " << *node << " Parent ");
+				// MDBG("1 Left is " << *_sentry->left << " left parent " << *_sentry->left->parent);
 				if (node == _sentry->left)
-					_sentry->left = node->parent->exist() ? node->parent : node->right;
+					_sentry->left = node->getNext();
 				if (node == _sentry->right)
-					_sentry->right = node->parent->exist() ? node->parent : node->left;
+					_sentry->right = node->getPrev();
+				// MDBG("2 Left is " << *_sentry->left << " left parent " << *_sentry->left->parent);
 				if (_size > 1)
 					_unlink_node(node);
 				else {
 					_root = _sentry;
 				}
+				_sentry->parent = _root;
 				_delete_node(node);
+				// MDBG("3 Left is " << *_sentry->left << " left parent " << *_sentry->left->parent);
 				_size--;
+				// #ifdef DEBUG
+				// 	print();
+				// 	MDBG("NEW ROOT IS " << *_root);
+				// #endif
 			}
 
 			size_type erase(const key_type & k) {
@@ -232,6 +243,7 @@ namespace ft {
 				if (found.second == FOUND)
 					return ft::make_pair(iterator(parent), false);
 				node_ptr node = _new_node(val);
+				MDBG("CREATING NODE " << _size << " " << *node);
 				_attach(parent, node, found.second);
 				_fixViolation(node);
 				_root->color = BLACK_NODE;
@@ -342,7 +354,7 @@ namespace ft {
 				{
 					std::stringstream	buffer;
 
-					if (node->exist()) {
+					if (node != _sentry) {
 						_print(node, buffer, true, "");
 						std::cout << buffer.str();
 					}
@@ -350,20 +362,18 @@ namespace ft {
 
 				void	print(void) {
 					std::cout << "size: " << this->size() << std::endl;
-					std::cout << "Sentry left: " << *_sentry->left << std::endl;
-					std::cout << "Sentry right: " << *_sentry->right << std::endl;
 					print(_root);
 				}
 
 				void _print(node_ptr node, std::stringstream &buffer, bool isTail, std::string prefix)
 				{
-					if (node->right->exist())
+					if (node->right && node->right->exist())
 						this->_print(node->right, buffer, false, std::string(prefix).append(isTail ? "│   " : "    "));
 					buffer << prefix << (isTail ? "└── " : "┌── ");
 					if (node->color == RED_NODE)
 						buffer << "\033[31m";
 					buffer << *(node->data) << "\033[0m" << (node->is_leaf() ? "🌱" : "") << std::endl;
-					if (node->left->exist())
+					if (node->left && node->left->exist())
 						this->_print(node->left, buffer, true, std::string(prefix).append(isTail ? "    " : "│   "));
 				}
 			#endif
@@ -406,9 +416,11 @@ namespace ft {
 				Color origin = node->color;
 				if (node->left->nil()) {
 					x = node->right;
+					// MDBG("UNLINK RIGHT" << *x);
 					_transplant(node, node->right);
 				} else if (node->right->nil()) {
 					x = node->left;
+					// MDBG("UNLINK LEFT" << *x);
 					_transplant(node, node->left);
 				} else {
 					y = node->right->min_subtree();
@@ -515,7 +527,7 @@ namespace ft {
 			}
 
 			void _fixDelete(node_ptr x) {
-				while (!x->is_root() && x->color == BLACK_NODE) {
+				while (x != _root && x != _sentry && x->color == BLACK_NODE) {
 					if (x == x->parent->left) {
 						node_ptr w = x->parent->right;
 						if (w->color == RED_NODE) {

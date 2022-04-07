@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/08 14:23:38 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/04/06 23:48:25 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/04/07 19:32:02 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -122,9 +122,9 @@ void mescande_example() {
 
     m.insert(m.find(90), ft::make_pair(99, ""));
 	MAP_PRINT(m);
-
-	// m.erase(110);
-	std::cout << "\n";
+    m.clear();
+	std::cout << "SIZE IS " << m.size() << "\n";
+    MAP_PRINT(m);
 }
 
 void const_pair() {
@@ -171,10 +171,10 @@ void                            massive_tests()
 }
 
 void test_map_main(void) {
+	mescande_example();
 	test_iterators();
 	insert_test<int, std::string>(1, "yolo", "re");
 	const_pair();
-	mescande_example();
 	test_init_map();
 	test_iterators();
     #ifdef RUN_PERF
