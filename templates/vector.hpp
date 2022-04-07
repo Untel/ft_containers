@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/16 12:01:27 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/04/07 19:49:40 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/04/07 22:18:50 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -193,7 +193,7 @@ namespace ft {
              */
             void reserve(size_type new_cap) {
                 if (new_cap > max_size()) {
-                    throw std::length_error("Length error");
+                    // throw std::length_error("Length error");
                 } else if (new_cap > _capacity) {
                     size_type s = _size;
                     pointer tmp = _allocator.allocate(new_cap + 1);
@@ -263,8 +263,8 @@ namespace ft {
             }
 
             void _buildMemoryHole(size_type additional, iterator position) {
-                if (_size + additional >= max_size())
-                    throw std::length_error("Length error");
+                // if (_size + additional >= max_size())
+                    // throw std::length_error("Length error");
                 size_type required_cap = _size + additional;
                 pointer ref = _c;
                 size_type to_move = end() - position;

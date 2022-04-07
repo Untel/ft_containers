@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/16 12:01:27 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/04/07 19:43:41 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/04/07 22:24:02 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -150,12 +150,10 @@ namespace ft {
 			// helped from https://www.techiedelight.com/deletion-from-bst/
 			void _erase(node_ptr node) {
 				MDBG("DELETING " << *node << " Parent ");
-				// MDBG("1 Left is " << *_sentry->left << " left parent " << *_sentry->left->parent);
 				if (node == _sentry->left)
 					_sentry->left = node->getNext();
 				if (node == _sentry->right)
 					_sentry->right = node->getPrev();
-				// MDBG("2 Left is " << *_sentry->left << " left parent " << *_sentry->left->parent);
 				if (_size > 1)
 					_unlink_node(node);
 				else {
@@ -163,12 +161,11 @@ namespace ft {
 				}
 				_sentry->parent = _root;
 				_delete_node(node);
-				// MDBG("3 Left is " << *_sentry->left << " left parent " << *_sentry->left->parent);
 				_size--;
-				// #ifdef DEBUG
-				// 	print();
-				// 	MDBG("NEW ROOT IS " << *_root);
-				// #endif
+				#ifdef DEBUG
+					print();
+					MDBG("NEW ROOT IS " << *_root);
+				#endif
 			}
 
 			size_type erase(const key_type & k) {
@@ -209,8 +206,6 @@ namespace ft {
 			}
 
 			void _attach(node_ptr parent, node_ptr node, NodeFinder pos) {
-				if (_size >= max_size())
-                    throw std::length_error("Length error");
 				node->parent = parent;
 				switch (pos) {
 					case NO_ELEMS:
@@ -416,11 +411,9 @@ namespace ft {
 				Color origin = node->color;
 				if (node->left->nil()) {
 					x = node->right;
-					// MDBG("UNLINK RIGHT" << *x);
 					_transplant(node, node->right);
 				} else if (node->right->nil()) {
 					x = node->left;
-					// MDBG("UNLINK LEFT" << *x);
 					_transplant(node, node->left);
 				} else {
 					y = node->right->min_subtree();
