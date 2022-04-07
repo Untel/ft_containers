@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/16 12:01:27 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/04/06 22:19:16 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/04/06 23:45:00 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -120,11 +120,9 @@ namespace ft {
 			}
 
             iterator begin() {
-				MDBG("Begin nig" << *_sentry);
                 return iterator(_sentry->left);
             }
             const_iterator begin() const {
-                // return const_iterator(iterator(_sentry->left));
                 return const_iterator(reinterpret_cast<const_node_ptr>(_sentry->left));
             }
             iterator end() {
@@ -141,29 +139,23 @@ namespace ft {
                 return const_reverse_iterator(end());
             }
             reverse_iterator rend() {
-                VDBG("End reverse_iterator");
                 return reverse_iterator(begin());
             }
             const_reverse_iterator rend() const {
-                VDBG("Const End reverse_iterator");
                 return const_reverse_iterator(begin());
             }
 
 			// helped from https://www.techiedelight.com/deletion-from-bst/
 			void _erase(node_ptr node) {
-				MDBG("Pre Before delete " << *node << " sentry: " << *_sentry);
 				if (node == _sentry->left)
 					_sentry->left = node->parent->exist() ? node->parent : node->right;
 				if (node == _sentry->right)
 					_sentry->right = node->parent->exist() ? node->parent : node->left;
-				MDBG("Before delete " << *node << " sentry: " << *_sentry);
 				if (_size > 1)
 					_unlink_node(node);
 				else {
 					_root = _sentry;
 				}
-				MDBG("After delete " << *node << " sentry: " << *_sentry);
-
 				_delete_node(node);
 				_size--;
 			}

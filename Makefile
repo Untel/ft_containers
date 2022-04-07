@@ -6,7 +6,7 @@
 #    By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/01/13 16:35:21 by adda-sil          #+#    #+#              #
-#    Updated: 2022/04/06 22:01:37 by adda-sil         ###   ########.fr        #
+#    Updated: 2022/04/07 00:49:22 by adda-sil         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -15,6 +15,7 @@ SRCS_DIR			= srcs
 SRCS_FILES			= 	\
 						main.cpp \
 						test_vector.cpp \
+						test_stack.cpp \
 						test_map.cpp \
 
 HEAD_DIR			= includes
@@ -74,8 +75,8 @@ debug:
 					git diff --no-index ft.output stl.output
 
 compare_time:
-					$(MAKE) OPTS="-D STL" re && time ./$(NAME) > stl.output
-					$(MAKE) OPTS="" re && time ./$(NAME) > ft.output
+					$(MAKE) OPTS="-D STL -D RUN_PERF" re && time ./$(NAME) > stl.output
+					$(MAKE) OPTS="-D RUN_PERF" re && time ./$(NAME) > ft.output
 
 
 stl:

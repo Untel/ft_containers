@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/16 12:01:27 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/04/06 22:34:00 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/04/07 00:11:10 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,6 @@ namespace ft {
     template < class T, class Allocator = std::allocator<T> >
     class vector {
         public:
-            // Member types
             typedef T                                                               value_type;
             typedef Allocator                                                       allocator_type;
             typedef typename allocator_type::reference                              reference;
@@ -42,18 +41,13 @@ namespace ft {
             typedef typename allocator_type::size_type                              size_type;
             typedef typename ft::array_iterator< value_type >::iterator             iterator;
             typedef typename ft::array_iterator<const value_type >::const_iterator  const_iterator;
-            // typedef typename ft::array_iterator< value_type >                       iterator;
-            // typedef typename ft::array_iterator< const value_type >                 const_iterator;
             typedef typename ft::reverse_iterator< iterator >                       reverse_iterator;
             typedef typename ft::reverse_iterator< const_iterator >                 const_reverse_iterator;
             typedef typename ft::iterator_traits<iterator>::difference_type         difference_type;
 
-            // Member functions
             vector (const allocator_type& alloc = allocator_type()) :
                 _size(0), _capacity(0), _allocator(alloc), _c(_allocator.allocate(1))
-            {
-                VDBG("Default Constructor");
-            };
+            {};
             vector (
                 size_type n,
                 const value_type & val = value_type(),
@@ -63,11 +57,9 @@ namespace ft {
             }
 
             vector(const vector & cpy) {
-                VDBG(RED << "COPY CONST OLD REF:" << cpy._c << BLUE << " NEW REF " << _c << RESET);
                 *this = cpy;
             }
             vector & operator = ( const vector &cpy) {
-                VDBG(RED << "ASSIGNING OLD REF:" << cpy._c << BLUE << " NEW REF " << _c << RESET);
                 _size = cpy._size;
                 _capacity = cpy._capacity;
                 _allocator = cpy._allocator;
@@ -86,18 +78,15 @@ namespace ft {
                 insert(begin(), first, last);
             }
             ~vector(void) {
-                VDBG("Destructor _c ref " << _c);
                 _clean();
             };
             // Data access
             reference at(size_type position) {
-                VDBG("At position " << position);
                 if (!(position < size()))
                     throw std::out_of_range("out of range");
                 return _c[position];
             }
             const_reference at(size_type position) const {
-                VDBG("const At position " << position);
                 if (!(position < size()))
                     throw std::out_of_range("out of range");
                 return _c[position];
@@ -115,7 +104,6 @@ namespace ft {
             }
 
             void insert (iterator position, size_type n_to_insert, const value_type& val) {
-                VDBG(GREEN << "Insert by val n(" << n_to_insert << ") val(" << val << ")" << RESET);
                 size_type at = std::distance(begin(), position);
                 _buildMemoryHole(n_to_insert, position);
                 for (size_type i = 0; i < n_to_insert; i++)
@@ -128,13 +116,11 @@ namespace ft {
                 InputIterator first,
                 typename enable_if <!is_integral <InputIterator>::value, InputIterator >::type last
             ) {
-                VDBG(BLUE << "Insert by range" << RESET);
                 size_type at = std::distance(begin(), position);
                 size_type n_to_insert = std::distance(first, last);
                 _buildMemoryHole(n_to_insert, position);
                 for (size_type i = 0; i < n_to_insert; i++)
                     _allocator.construct(_c + at + i, *(first++));
-                // __VECTOR_INSERT(*(first + i), *((is_collapsing && i < collapse_at) ? last - collapse_at + i : it_end - construct_from_end + i));
             }
             iterator erase (iterator position) {
                 return erase(position, position + 1);
@@ -144,7 +130,6 @@ namespace ft {
                 size_type at        = std::distance(begin(), first);
                 // Nombre d'el a remove
                 size_type n         = std::distance(first, last);
-                VDBG("Erasing " << n << " elements");
 
                 // Iterer entre iterator last et iterator end(), car on déplace ce qu'il y a après last a l'endroit mémoire qu'on erase
                 // Cf. problème de memset dans libft (gauche a droite et pas droite a gauche)
@@ -162,7 +147,6 @@ namespace ft {
                 return iterator(_c + at);
             }
 
-            // will probably just call insert ??
             void resize (size_type n, value_type val = value_type()) {
                 if (n < _size) {
                     erase(begin() + n, end());
@@ -183,6 +167,7 @@ namespace ft {
                 clear();
                 insert(begin(), n, val);
             }
+
             // getters
             allocator_type      get_allocator() const { return _allocator; }
             reference           operator[] (size_type position) { return _c[position]; }
