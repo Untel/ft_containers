@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/18 19:02:40 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/04/06 22:20:15 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/04/07 04:02:25 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,12 +107,14 @@ namespace ft {
         }
 
         node_ptr min_subtree() {
-            if (nil())
-                return this;
-            node_ptr l = this;
-            while (l->left->exist())
-                l = l->left;
-            return l;
+            node_ptr	current = this;
+
+			if (current->exist())
+			{
+				while (current->left->exist())
+					current = current->left;
+			}
+			return (current);
         }
 
         node_ptr max_subtree() {
@@ -139,17 +141,22 @@ namespace ft {
         }
 
 		node_ptr getNext() {
+            MDBG("GET NEXT " << *this << " parent is " << *parent);
             if (right->exist()) {
+                MDBG("HAVE A RIGHT ONE CHILD " << *this);
 				node_ptr el = right;
 				while (el->left->exist())
 					el = el->left;
 				return el;
 			} else if (is_left()) {
+                MDBG("I AM A LEFT CHILD " << *parent);
 				return parent;
 			} else if (is_right()) {
+                MDBG("I AM RIGHT CHILD " << *this);
 				node_ptr el = parent;
 				while (el->exist() && el->is_right())
 					el = el->parent;
+                MDBG("Found " << *el);
 				if (el->nil())
 					return (el->right);
 				return el->parent; 
@@ -184,9 +191,24 @@ namespace ft {
                 o << BLACK;
             else
                 o << RED;
+            if (n.data->first == 0) {
+                o << "Node(Sentry)";
+                return o;
+            }
             o << "Node(" << *n.data << ")";
             o << " - L( " << (n.left->data->first) << " )" << " R( " << (n.right->data->first) << " )";
             o << RESET;
+            if (
+                n.parent
+                && n.parent->data
+            ) {
+                o << " P(";
+                o << n.parent->data->first;
+                o << ")";
+
+            } else {
+                o << "P(NIL)";
+            }
             return o;
         }
     #endif

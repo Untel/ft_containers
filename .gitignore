@@ -4,4 +4,5 @@ containers
 .vscode
 containers.dSYM
 **/*.output
+**/*.errors
 .DS_STORE

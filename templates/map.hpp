@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/16 12:01:27 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/04/06 23:45:00 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/04/07 04:05:36 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -120,10 +120,10 @@ namespace ft {
 			}
 
             iterator begin() {
-                return iterator(_sentry->left);
+                return iterator(_root->min_subtree());
             }
             const_iterator begin() const {
-                return const_iterator(reinterpret_cast<const_node_ptr>(_sentry->left));
+                return const_iterator(reinterpret_cast<const_node_ptr>(_root->min_subtree()));
             }
             iterator end() {
                 return iterator(_sentry);
@@ -147,10 +147,10 @@ namespace ft {
 
 			// helped from https://www.techiedelight.com/deletion-from-bst/
 			void _erase(node_ptr node) {
-				if (node == _sentry->left)
-					_sentry->left = node->parent->exist() ? node->parent : node->right;
-				if (node == _sentry->right)
-					_sentry->right = node->parent->exist() ? node->parent : node->left;
+				// if (node == _sentry->left)
+				// 	_sentry->left = _sentry->left->getNext();
+				// if (node == _sentry->right)
+				// 	_sentry->right = _sentry->left->getPrev();
 				if (_size > 1)
 					_unlink_node(node);
 				else {
@@ -158,6 +158,8 @@ namespace ft {
 				}
 				_delete_node(node);
 				_size--;
+				MDBG("Erased new root " << *_root);
+				_set_root(_root);
 			}
 
 			size_type erase(const key_type & k) {
@@ -174,8 +176,9 @@ namespace ft {
 			}
 
 			void erase (iterator first, iterator last) {
-				while (first != last)
+				while (first != last) {
 					erase(first++);
+				}
 			}
 
 			iterator find (const key_type & k) {
@@ -205,18 +208,18 @@ namespace ft {
 					case NO_ELEMS:
 						_root = node;
 						node->parent = _sentry;
-						_sentry->right = node;
-						_sentry->left = node;
+						// _sentry->right = node;
+						// _sentry->left = node;
 						break;
 					case IS_RIGHT:
 						parent->right = node;
-						if (_comp_values(*(_sentry->right->data), *(node->data)))
-							_sentry->right = node;
+						// if (_comp_values(*(_sentry->right->data), *(node->data)))
+						// 	_sentry->right = node;
 						break;
 					case IS_LEFT:
 						parent->left = node;
-						if (_comp_values(*(node->data), *(_sentry->left->data)))
-							_sentry->left = node;
+						// if (_comp_values(*(node->data), *(_sentry->left->data)))
+						// 	_sentry->left = node;
 						break;
 					case FOUND:
 					default:
@@ -235,6 +238,7 @@ namespace ft {
 				_attach(parent, node, found.second);
 				_fixViolation(node);
 				_root->color = BLACK_NODE;
+				_set_root(_root);
 				return ft::make_pair<iterator, bool>(iterator(node), true);
 			}
 
@@ -255,12 +259,8 @@ namespace ft {
 
 			iterator insert (iterator hint, const value_type & val) {
 				// Fast insert if pos is begin or rbegin (sentry values)
-				node_ptr	base = hint.base();
-				if ((base == _sentry->right) && _comp_values(*base->data, val)) {
-					return _insert(val, base).first;
-				} else if (base == _sentry->left && _comp_values(val, *base->data)) {
-					return _insert(val, base).first;
-				}
+				// node_ptr	base = hint.base();
+				(void)hint;
 				return _insert(val, _root).first;
 			}
 
@@ -350,8 +350,6 @@ namespace ft {
 
 				void	print(void) {
 					std::cout << "size: " << this->size() << std::endl;
-					std::cout << "Sentry left: " << *_sentry->left << std::endl;
-					std::cout << "Sentry right: " << *_sentry->right << std::endl;
 					print(_root);
 				}
 
@@ -376,6 +374,10 @@ namespace ft {
 			node_ptr					_root;
 			size_type					_size;
 
+			void _set_root(node_ptr el) {
+				_root = el;
+				_sentry->parent = el;
+			}
 
 			node_ptr _init_sentry(void) {
 				_sentry = new node_type();
@@ -515,7 +517,7 @@ namespace ft {
 			}
 
 			void _fixDelete(node_ptr x) {
-				while (!x->is_root() && x->color == BLACK_NODE) {
+				while (x != _root && x->exist() && x->color == BLACK_NODE) {
 					if (x == x->parent->left) {
 						node_ptr w = x->parent->right;
 						if (w->color == RED_NODE) {
@@ -572,12 +574,16 @@ namespace ft {
 
 
 			void _transplant(node_ptr node, node_ptr with) {
-				if (node == _root) {
+				if (with->nil()) {
+				}
+				
+				if (node->parent == _sentry) {
 					_root = with;
 				}  else if (node->is_left()) {
 					node->parent->left = with;
-				} else {
+				} else if (node->is_right()){
 					node->parent->right = with;
+				} else {
 				}
 				with->parent = node->parent;
 			}

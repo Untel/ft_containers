@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/08 14:23:38 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/04/06 23:48:25 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/04/07 03:00:27 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,6 +63,9 @@ void test_iterators() {
 	for (; it != ite; it++) {
 		std::cout << "Iter " << it->second << std::endl;
 	}
+    m.clear();
+	std::cout << "Size became " << m.size() << std::endl;
+	MAP_PRINT(m);
 }
 
 void test_init_map() {
@@ -82,12 +85,15 @@ void test_init_map() {
 	MAP_PRINT(m);
 	// MAP_PRINT(m);
 	std::cout << "\n";
+    m.clear();
+	std::cout << "Size became " << m.size() << std::endl;
+	MAP_PRINT(m);
 }
 
 void mescande_example() {
 	std::cout << "INIT MAP" << std::endl;
-
-	ft::map<int, std::string> m;
+    typedef typename ft::map<int, std::string> _m;
+	_m m;
     m.insert(ft::make_pair(10, ""));
     m.insert(ft::make_pair(30, ""));
     m.insert(ft::make_pair(40, ""));
@@ -125,6 +131,17 @@ void mescande_example() {
 
 	// m.erase(110);
 	std::cout << "\n";
+
+    _m::iterator it = m.begin();    
+    _m::iterator ite = m.end();
+    for (int i = 0; it != ite; it++, i++) {
+        MAP_PRINT(m);
+        std::cout << "Element iter " << i << " Key: " << it->first << " value: " << it->second << std::endl;
+    }
+
+    m.clear();
+	std::cout << "Size became " << m.size() << std::endl;
+	MAP_PRINT(m);
 }
 
 void const_pair() {
@@ -176,7 +193,6 @@ void test_map_main(void) {
 	const_pair();
 	mescande_example();
 	test_init_map();
-	test_iterators();
     #ifdef RUN_PERF
 	    massive_tests();
     #endif

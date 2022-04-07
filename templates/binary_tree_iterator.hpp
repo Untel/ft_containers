@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/19 19:48:57 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/04/06 22:16:39 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/04/07 02:36:36 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,7 @@ namespace ft
        
             binary_tree_iterator & operator ++ (void) {
                 if (_p->nil()) {
-                    _p = _p->left;
+                    _p = _p->parent->min_subtree();
                 } else
                     _p = _p->getNext();
                 return (*this);
@@ -62,7 +62,7 @@ namespace ft
             binary_tree_iterator & operator -- (void) {
                 // Si le courant == end() == la sentry, alors on set automatiquement à _sentry->right qui est le max value
                 if (_p->nil()) {
-                    _p = _p->right;
+                    _p = _p->parent->max_subtree();
                 } else
                     _p = _p->getPrev();
                 return (*this);
@@ -79,6 +79,7 @@ namespace ft
             node_ptr base() const { return _p; }
         private:
             node_ptr           _p;
+            node_ptr           _root;
 
     };
 
