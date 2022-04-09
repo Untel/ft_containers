@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/16 12:01:27 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/04/07 22:24:02 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/04/09 18:35:01 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -149,16 +149,14 @@ namespace ft {
 
 			// helped from https://www.techiedelight.com/deletion-from-bst/
 			void _erase(node_ptr node) {
-				MDBG("DELETING " << *node << " Parent ");
 				if (node == _sentry->left)
 					_sentry->left = node->getNext();
 				if (node == _sentry->right)
 					_sentry->right = node->getPrev();
 				if (_size > 1)
 					_unlink_node(node);
-				else {
+				else
 					_root = _sentry;
-				}
 				_sentry->parent = _root;
 				_delete_node(node);
 				_size--;
@@ -331,16 +329,19 @@ namespace ft {
 				value_compare		tmp_comp_values = _comp_values;
 				key_compare			tmp_comp_keys = _comp_keys;
 				node_ptr			tmp_sentry = _sentry;
+				node_ptr			tmp_root = _root;
 				size_type			tmp_size = _size;
 
 				_comp_values = x._comp_values;
 				_comp_keys = x._comp_keys;
 				_sentry = x._sentry;
+				_root = x._root;
 				_size = x._size;
 
 				x._comp_values = tmp_comp_values;
 				x._comp_keys = tmp_comp_keys;
 				x._sentry = tmp_sentry;
+				x._root = tmp_root;
 				x._size = tmp_size;
             }
 
@@ -356,7 +357,8 @@ namespace ft {
 				}
 
 				void	print(void) {
-					std::cout << "size: " << this->size() << std::endl;
+					std::cout << "size: " << size() << std::endl;
+					std::cout << "sentry: " << *_sentry << std::endl;
 					print(_root);
 				}
 

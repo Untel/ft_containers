@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/16 12:01:27 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/04/07 22:18:50 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/04/09 17:55:31 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,17 +56,12 @@ namespace ft {
                 insert(begin(), n, val);
             }
 
-            vector(const vector & cpy) {
+            vector(const vector & cpy) :
+                _size(0), _capacity(0), _allocator(cpy._allocator), _c(_allocator.allocate(1)) {
                 *this = cpy;
             }
             vector & operator = ( const vector &cpy) {
-                _clean();
-                _size = cpy._size;
-                _capacity = cpy._capacity;
-                _allocator = cpy._allocator;
-                _c = _allocator.allocate(_capacity + 1);
-                for (size_type i = 0; i < _size; i++)
-                    _allocator.construct(_c + i, cpy._c[i]);
+                assign(cpy.begin(), cpy.end());
                 return *this;
             }
 
@@ -105,10 +100,16 @@ namespace ft {
             }
 
             void insert (iterator position, size_type n_to_insert, const value_type& val) {
-                size_type at = std::distance(begin(), position);
-                _buildMemoryHole(n_to_insert, position);
-                for (size_type i = 0; i < n_to_insert; i++)
-                    _allocator.construct(_c + at + i, val);
+                difference_type	at = position - begin();
+                reserve(_fittableCapacity(_size + n_to_insert));
+                iterator ite = end();
+                _size += n_to_insert;
+                iterator pos = iterator(&_c[at]);
+                if (pos != ite)
+                    for (int i = 0; end() - i != pos; i++)
+                        _allocator.construct(&(*(end() - i - 1)), *(ite - i - 1));
+                for (size_type i = 0; i < n_to_insert; i++, pos++)
+                    _allocator.construct(&(*pos), val);
             }
             
             template <class InputIterator>
@@ -117,11 +118,18 @@ namespace ft {
                 InputIterator first,
                 typename enable_if <!is_integral <InputIterator>::value, InputIterator >::type last
             ) {
-                size_type at = std::distance(begin(), position);
-                size_type n_to_insert = std::distance(first, last);
-                _buildMemoryHole(n_to_insert, position);
-                for (size_type i = 0; i < n_to_insert; i++)
-                    _allocator.construct(_c + at + i, *(first++));
+                difference_type	at  = position - begin();
+                difference_type	len = std::distance(first, last);
+            
+                reserve(_fittableCapacity(_size + len));
+                iterator ite = end();
+                iterator pos = iterator(&_c[at]);
+                _size += len;
+                if (pos != ite)
+                    for (int i = 0; end() - i != pos; i++)
+                        _allocator.construct(&(*(end() - i - 1)), *(ite - i - 1));
+                for (; first != last; first++, pos++)
+                    _allocator.construct(&(*pos), *first);
             }
             iterator erase (iterator position) {
                 return erase(position, position + 1);
@@ -193,7 +201,7 @@ namespace ft {
              */
             void reserve(size_type new_cap) {
                 if (new_cap > max_size()) {
-                    // throw std::length_error("Length error");
+                    throw std::length_error("Length error");
                 } else if (new_cap > _capacity) {
                     size_type s = _size;
                     pointer tmp = _allocator.allocate(new_cap + 1);
@@ -260,6 +268,15 @@ namespace ft {
                 clear();
                 _allocator.deallocate(_c, _capacity + 1);
                 _capacity = 0;
+            }
+
+            size_type _fittableCapacity(size_type req) {
+                size_type newCap = _capacity ? _capacity : 1;
+                if (req > newCap * 2)
+                    return req;
+                while (req >= newCap)
+                    newCap *= 2;
+                return (newCap);
             }
 
             void _buildMemoryHole(size_type additional, iterator position) {
