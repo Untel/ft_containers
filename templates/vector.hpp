@@ -6,7 +6,7 @@
 /*   By: adda-sil <adda-sil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/16 12:01:27 by adda-sil          #+#    #+#             */
-/*   Updated: 2022/04/09 17:55:31 by adda-sil         ###   ########.fr       */
+/*   Updated: 2022/04/12 12:21:20 by adda-sil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,17 +99,21 @@ namespace ft {
                 return (begin() + at);
             }
 
+            #ifdef DEBUG
+                void print() {
+                    iterator it = begin();
+                    iterator ite = end();
+                    size_type len = 0;
+                    for (; it != ite; it++, len++)
+                        VDBG("Iteration" << len << " : " << *it);
+                }
+            #endif
+
             void insert (iterator position, size_type n_to_insert, const value_type& val) {
-                difference_type	at = position - begin();
-                reserve(_fittableCapacity(_size + n_to_insert));
-                iterator ite = end();
-                _size += n_to_insert;
-                iterator pos = iterator(&_c[at]);
-                if (pos != ite)
-                    for (int i = 0; end() - i != pos; i++)
-                        _allocator.construct(&(*(end() - i - 1)), *(ite - i - 1));
-                for (size_type i = 0; i < n_to_insert; i++, pos++)
-                    _allocator.construct(&(*pos), val);
+                size_type at = std::distance(begin(), position);
+                _buildMemoryHole(n_to_insert, position);
+                for (size_type i = 0; i < n_to_insert; i++)
+                    _allocator.construct(_c + at + i, val);
             }
             
             template <class InputIterator>
@@ -118,18 +122,11 @@ namespace ft {
                 InputIterator first,
                 typename enable_if <!is_integral <InputIterator>::value, InputIterator >::type last
             ) {
-                difference_type	at  = position - begin();
-                difference_type	len = std::distance(first, last);
-            
-                reserve(_fittableCapacity(_size + len));
-                iterator ite = end();
-                iterator pos = iterator(&_c[at]);
-                _size += len;
-                if (pos != ite)
-                    for (int i = 0; end() - i != pos; i++)
-                        _allocator.construct(&(*(end() - i - 1)), *(ite - i - 1));
-                for (; first != last; first++, pos++)
-                    _allocator.construct(&(*pos), *first);
+                size_type at = std::distance(begin(), position);
+                size_type n_to_insert = std::distance(first, last);
+                _buildMemoryHole(n_to_insert, position);
+                for (size_type i = 0; i < n_to_insert; i++)
+                    _allocator.construct(_c + at + i, *(first++));
             }
             iterator erase (iterator position) {
                 return erase(position, position + 1);
